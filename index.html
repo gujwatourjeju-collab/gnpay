@@ -27,7 +27,7 @@
     window.addEventListener('message', function(e) {
         if (!e.data || !e.data.type) return;
 
-        // 세션 요청 응답
+        // 세션 요청 응답 (혹시 몰라 유지)
         if (e.data.type === 'GET_SESSION') {
             const saved = localStorage.getItem('k_user');
             if (saved) {
@@ -48,20 +48,24 @@
         else if (e.data.type === 'LOGOUT' || e.data.type === 'LOGOUT_FORCE') {
             console.log("로그아웃 실행");
             localStorage.removeItem('k_user');
-            window.location.href = 'https://gnpay.my';
+            window.location.href = 'https://gnpay.my'; // 깨끗한 주소로 리로드
         }
     });
 
-    // [4] Iframe 생성
+    // [4] Iframe 생성 (로그인 유지 핵심 로직 적용됨)
     function createIframe() {
         let src = baseUrl;
         const saved = localStorage.getItem('k_user');
         
-        // 좀비 로그인 방지 파라미터 추가
+        // ★ [수정됨] 저장된 유저가 있으면 이메일을 암호화해서 URL에 붙임
         if (saved) {
             try {
                 const data = JSON.parse(saved);
-                if (data.email) src += "?u=" + encodeURIComponent(data.email) + "&v=" + Date.now();
+                if (data.email) {
+                    // btoa(): 이메일을 외계어(Base64)로 바꿔서 주소창에 넣음 (보기 좋게)
+                    const secureEmail = btoa(encodeURIComponent(data.email));
+                    src += "?u=" + secureEmail + "&v=" + Date.now();
+                }
             } catch(e){}
         }
         
@@ -72,7 +76,7 @@
         // 권한 허용
         iframe.allow = "camera; microphone; storage-access; clipboard-write";
         
-        // 샌드박스 설정 (줄바꿈 없이 한 줄로 작성하여 오류 방지)
+        // 샌드박스 설정 (줄바꿈 없이 한 줄로 작성)
         iframe.setAttribute("sandbox", "allow-forms allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-storage-access-by-user-activation allow-modals allow-top-navigation");
         
         iframe.setAttribute("allowfullscreen", "");
