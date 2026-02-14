@@ -32,14 +32,13 @@
             let popup = window.open(gasUrl + "?page=login_popup", "LoginPopup", `width=${w},height=${h},top=${top},left=${left}`);
             
             // 팝업이 닫혔는지 0.5초마다 감시
-            let timer = setInterval(function() { 
-                if(popup.closed) {
-                    clearInterval(timer);
-                    // 팝업이 닫히면 -> 로그인이 성공한 거니까 메인화면 새로고침!
-                    // (src를 다시 넣으면 새로고침 효과)
-                    document.getElementById('appFrame').src = gasUrl;
-                }
-            }, 500);
+let timer = setInterval(function() { 
+    if(popup.closed) {
+        clearInterval(timer);
+        // 타임스탬프(?t=...)를 붙여야 강제로 새로고침되어 로그인 세션을 읽어옵니다.
+        document.getElementById('appFrame').src = gasUrl + "?t=" + new Date().getTime();
+    }
+}, 500);
         }
     });
 
@@ -59,3 +58,4 @@
 </head>
 <body></body>
 </html>
+
