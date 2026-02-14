@@ -18,32 +18,26 @@
         let currentUser = null;
 
         // 메시지 리스너 (iframe 생성 전에 먼저 등록)
-        window.addEventListener('message', function(e) {
-            if (e.data.type === 'GET_SESSION') {
-                // 저장된 데이터 있으면 바로 전달
-                if (currentUser) {
-                    e.source.postMessage({ type: 'SEND_SESSION', data: currentUser }, '*');
-                } else {
-                    const saved = localStorage.getItem('k_user');
-                    if (saved) {
-                        try {
-                            currentUser = JSON.parse(saved);
-                            e.source.postMessage({ type: 'SEND_SESSION', data: currentUser }, '*');
-                        } catch(err) {}
-                    }
-                }
-            }
-            else if (e.data.type === 'SAVE_USER' && e.data.data) {
-                currentUser = e.data.data;
-                localStorage.setItem('k_user', JSON.stringify(e.data.data));
-            }
-            else if (e.data.type === 'LOGOUT') {
-                localStorage.removeItem('k_user');
-                currentUser = null;
-                window.location.replace('https://gnpay.my');
-            }
-        });
+// Vercel index.html <script> 안에 추가 (message listener 부분)
+window.addEventListener('message', function(e) {
+    console.log("Vercel 부모가 받은 메시지:", e.data.type, e.data);
 
+    if (e.data.type === 'GET_SESSION') {
+        const saved = localStorage.getItem('k_user');
+        if (saved) {
+            try {
+                const data = JSON.parse(saved);
+                console.log("Vercel → iframe 에게 SEND_SESSION 전송:", data.email);
+                e.source.postMessage({ type: 'SEND_SESSION', data: data }, '*');
+            } catch(err) {
+                console.error("저장된 데이터 파싱 실패", err);
+            }
+        } else {
+            console.log("Vercel에 k_user 없음");
+        }
+    }
+    // ... 나머지 SAVE_USER, LOGOUT 처리 그대로
+});
         // iframe 생성 (document.write 대신)
         function createIframe() {
             let src = baseUrl;
@@ -72,3 +66,4 @@
 <body>
 </body>
 </html>
+
