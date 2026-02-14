@@ -11,72 +11,27 @@
 
 <title>김녕페이</title>
 <style>
-    body { margin:0; padding:0; overflow:hidden; background:#f7fbfc; }
-    iframe { position:absolute; top:0; left:0; width:100%; height:100%; border:none; }
+    body, html { margin:0; padding:0; height:100%; overflow:hidden; background:#f7fbfc; }
+    iframe { width:100%; height:100%; border:none; display:block; }
 </style>
-<script>
-    // [중요] GAS 배포 주소 (최신 버전인지 꼭 확인하세요)
-    const gasUrl = "https://script.google.com/macros/s/AKfycbzphuuFoYHHWoaNkFQqlKFQbzDt5UjeF03r8O_S52kkWLIcwHFy-W2bkMygqlabHIG9/exec";
-
-    // 1. 자식(GAS) 신호 수신 리스너
-    window.addEventListener('message', function(e) {
-        // 보안 에러 방지: 데이터가 없으면 무시
-        if (!e.data) return;
-
-        let data = e.data;
-        // 데이터가 문자열(JSON)로 올 경우 대비 파싱
-        if (typeof data === 'string') {
-            try { data = JSON.parse(data); } catch(err) { return; }
-        }
-
-        // 로그인 창 열기 신호 수신 시
-        if (data.type === 'OPEN_LOGIN') {
-            console.log("부모 수신: 로그인 팝업 실행");
-            const w = 450, h = 650;
-            const left = (window.screen.width / 2) - (w / 2);
-            const top = (window.screen.height / 2) - (h / 2);
-            
-            // 팝업 창 열기
-            let popup = window.open(gasUrl + "?page=login_popup", "LoginPopup", `width=${w},height=${h},top=${top},left=${left}`);
-            
-            if(!popup) {
-                alert("팝업이 차단되었습니다. 주소창 우측에서 팝업 허용을 해주세요.");
-                return;
-            }
-
-            // 팝업 닫힘 감지 및 새로고침
-            let timer = setInterval(function() { 
-                if(popup.closed) {
-                    clearInterval(timer);
-                    console.log("팝업 닫힘 감지: 메인 프레임 갱신");
-                    // 캐시 무시를 위해 타임스탬프 추가
-                    document.getElementById('appFrame').src = gasUrl + "?t=" + new Date().getTime();
-                }
-            }, 500);
-        }
-    });
-
-    // 2. Iframe 생성 및 초기화
-    window.onload = function() {
-        let iframe = document.createElement('iframe');
-        iframe.id = 'appFrame';
-        iframe.src = gasUrl;
-        
-        // 카메라 권한 및 클립보드 허용
-        iframe.allow = "camera; microphone; clipboard-write";
-        
-        // [보안 핵심] 샌드박스 설정: allow-top-navigation-by-user-activation 추가로 postMessage 에러 해결
-        iframe.setAttribute("sandbox", "allow-forms allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-storage-access-by-user-activation allow-modals allow-top-navigation allow-top-navigation-by-user-activation");
-        
-        document.body.appendChild(iframe);
-    }
-</script>
 </head>
-<body></body>
+<body>
+    <iframe id="gas-frame"
+            src="https://script.google.com/macros/s/AKfycbxj7hSFLS6zuXB9fOciMeZe6j2BDdYzyEShgkerQElSuQcdr7fuwNfLCfBwwNEC6F9O/exec"
+            allow="camera; microphone; geolocation; clipboard-write;"
+            sandbox="allow-forms allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-storage-access-by-user-activation allow-modals allow-top-navigation-by-user-activation">
+    </iframe>
+
+    <script>
+        // 팝업 관련 복잡한 리스너 코드는 이제 필요 없습니다! 
+        // 자식(GAS)이 내부 레이어로 로그인을 처리하므로 부모는 그냥 '틀'만 제공하면 됩니다.
+        
+        // (선택사항) 혹시 나중에 자식에서 부모 페이지를 새로고침해야 할 때를 대비한 비상 리스너
+        window.addEventListener('message', function(e) {
+            if (e.data && e.data.type === 'RELOAD_PARENT') {
+                window.location.reload();
+            }
+        });
+    </script>
+</body>
 </html>
-
-
-
-
-
-
