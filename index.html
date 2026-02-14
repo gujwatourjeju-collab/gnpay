@@ -8,62 +8,85 @@
         body, html { margin:0; padding:0; height:100%; overflow:hidden; background:#f7fbfc; }
         iframe { border:none; width:100%; height:100%; display:block; position:absolute; top:0; left:0; }
     </style>
-    <script>
-        /** 주소창 방어 **/
-        if (window.location.hostname.includes('googleusercontent.com')) {
-            window.location.replace('https://gnpay.my');
-        }
+<script>
+/** 주소창 방어 **/
+if (window.location.hostname.includes('googleusercontent.com')) {
+    window.location.replace('https://gnpay.my');
+}
 
-        const baseUrl = "https://script.google.com/macros/s/AKfycbytgcHHzaZTkp6e1XWBXBVNVFRE8bzgE2i6EI9N3k3Vv0FAyCmv9sfDa1_o212bd94U/exec";
-        let currentUser = null;
+window.onpagehide = function () {
+    history.replaceState(null, null, location.href);
+};
 
-        // 메시지 리스너 (iframe 생성 전에 먼저 등록)
-// Vercel index.html <script> 안에 추가 (message listener 부분)
+const baseUrl = "https://script.google.com/macros/s/AKfycbytgcHHzaZTkp6e1XWBXBVNVFRE8bzgE2i6EI9N3k3Vv0FAyCmv9sfDa1_o212bd94U/exec";
+
+let currentUser = null;
+
+/* ===========================
+   강화형 세션 동기화 로직
+=========================== */
+
 window.addEventListener('message', function(e) {
-    console.log("Vercel 부모가 받은 메시지:", e.data.type, e.data);
 
+    if (!e.data || !e.data.type) return;
+
+    /* 1️⃣ iframe → 부모 : 세션 요청 */
     if (e.data.type === 'GET_SESSION') {
         const saved = localStorage.getItem('k_user');
         if (saved) {
             try {
                 const data = JSON.parse(saved);
-                console.log("Vercel → iframe 에게 SEND_SESSION 전송:", data.email);
                 e.source.postMessage({ type: 'SEND_SESSION', data: data }, '*');
-            } catch(err) {
-                console.error("저장된 데이터 파싱 실패", err);
-            }
-        } else {
-            console.log("Vercel에 k_user 없음");
+            } catch(err){}
         }
     }
-    // ... 나머지 SAVE_USER, LOGOUT 처리 그대로
+
+    /* 2️⃣ iframe → 부모 : 로그인 성공 */
+    if (e.data.type === 'SAVE_USER') {
+        localStorage.setItem('k_user', JSON.stringify(e.data.data));
+        currentUser = e.data.data;
+    }
+
+    /* 3️⃣ iframe → 부모 : 로그아웃 */
+    if (e.data.type === 'LOGOUT') {
+        localStorage.removeItem('k_user');
+        currentUser = null;
+    }
 });
-        // iframe 생성 (document.write 대신)
-        function createIframe() {
-            let src = baseUrl;
-            const saved = localStorage.getItem('k_user');
-            if (saved) {
-                try {
-                    const data = JSON.parse(saved);
-                    if (data && data.email) {
-                        src += (src.includes('?') ? '&' : '?') + "u=" + encodeURIComponent(data.email) + "&v=" + Date.now();
-                        currentUser = data;
-                    }
-                } catch(e) {}
+
+/* ===========================
+   iframe 생성
+=========================== */
+
+function createIframe() {
+    let src = baseUrl;
+
+    const saved = localStorage.getItem('k_user');
+    if (saved) {
+        try {
+            const data = JSON.parse(saved);
+            if (data && data.email) {
+                src += "?u=" + encodeURIComponent(data.email) + "&v=" + Date.now();
+                currentUser = data;
             }
+        } catch(e){}
+    }
 
-            const iframe = document.createElement('iframe');
-            iframe.id = "appFrame";
-            iframe.src = src;
-            iframe.allow = "camera; microphone; storage-access";
-            iframe.sandbox = "allow-forms allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-storage-access-by-user-activation";
-            document.body.appendChild(iframe);
-        }
+    const iframe = document.createElement('iframe');
+    iframe.id = "appFrame";
+    iframe.src = src;
+    iframe.allow = "camera; microphone; storage-access";
+    iframe.sandbox = "allow-forms allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-storage-access-by-user-activation";
 
-        window.addEventListener('load', createIframe);
-    </script>
+    document.body.appendChild(iframe);
+}
+
+window.addEventListener('load', createIframe);
+</script>
+
 </head>
 <body>
 </body>
 </html>
+
 
