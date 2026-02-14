@@ -22,8 +22,12 @@ window.addEventListener('message', function(e) {
         localStorage.setItem('k_user', JSON.stringify(e.data.data));
     } 
     else if (e.data.type === 'LOGOUT') {
-        // 부모의 저장소만 비웁니다. 이동은 자식(GAS)이 window.top으로 처리합니다.
+        // 부모 쪽 데이터도 깨끗이 삭제
         localStorage.removeItem('k_user');
+        // 자식이 직접 이동시키겠지만, 안전장치로 한 번 더 메인 이동
+        setTimeout(() => {
+            window.location.replace('https://gnpay.my');
+        }, 100);
     }
 });
 
@@ -50,5 +54,6 @@ window.addEventListener('message', function(e) {
 </head>
 <body></body>
 </html>
+
 
 
