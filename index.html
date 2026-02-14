@@ -3,6 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="김녕페이 (GIMNYEONG PAY)">
+<meta property="og:description" content="탄소중립 실천 및 플로깅 활동으로 나만의 에코 포인트를 쌓아보세요. 🌱">
+<meta property="og:image" content="/og-image.png">
+
 <title>김녕페이</title>
 <style>
     html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #f7fbfc; }
@@ -13,46 +19,38 @@
     if (window.location.hostname.includes('googleusercontent.com')) {
         window.location.replace('https://gnpay.my');
     }
+    
+    // GAS 배포 URL (수정 금지)
     const baseUrl = "https://script.google.com/macros/s/AKfycbytgcHHzaZTkp6e1XWBXBVNVFRE8bzgE2i6EI9N3k3Vv0FAyCmv9sfDa1_o212bd94U/exec";
     
-/* [부모 페이지 - script 태그 내부] */
+    // [수정된 로직] 로그아웃 및 세션 관리
+    window.addEventListener('message', function(e) {
+        if (!e.data || !e.data.type) return;
 
-// 기존 window.addEventListener('message', ...) 지우고 이걸로 교체
-window.addEventListener('message', function(e) {
-    // 1. 데이터가 없으면 무시
-    if (!e.data || !e.data.type) return;
-
-    // 2. 자식이 세션 달라고 할 때 (자동로그인용)
-    if (e.data.type === 'GET_SESSION') {
-        const saved = localStorage.getItem('k_user');
-        if (saved) {
-            // iframe을 찾아서 세션 정보를 쏴줍니다.
-            const iframe = document.getElementById('appFrame');
-            if (iframe && iframe.contentWindow) {
-                iframe.contentWindow.postMessage({ 
-                    type: 'SEND_SESSION', 
-                    data: JSON.parse(saved) 
-                }, '*');
+        // 1. 세션 요청 응답
+        if (e.data.type === 'GET_SESSION') {
+            const saved = localStorage.getItem('k_user');
+            if (saved) {
+                const iframe = document.getElementById('appFrame');
+                if (iframe && iframe.contentWindow) {
+                    iframe.contentWindow.postMessage({ 
+                        type: 'SEND_SESSION', 
+                        data: JSON.parse(saved) 
+                    }, '*');
+                }
             }
+        } 
+        // 2. 로그인 저장
+        else if (e.data.type === 'SAVE_USER') {
+            localStorage.setItem('k_user', JSON.stringify(e.data.data));
+        } 
+        // 3. 로그아웃 처리 (구버전/신버전 신호 모두 수신)
+        else if (e.data.type === 'LOGOUT' || e.data.type === 'LOGOUT_FORCE') {
+            console.log("로그아웃 실행");
+            localStorage.removeItem('k_user');
+            window.location.href = 'https://gnpay.my'; // 강제 새로고침
         }
-    } 
-
-    // 3. 자식이 로그인 성공했다고 할 때 (저장용)
-    else if (e.data.type === 'SAVE_USER') {
-        localStorage.setItem('k_user', JSON.stringify(e.data.data));
-    } 
-
-    // 4. [핵심수정] 로그아웃 신호 처리 (LOGOUT 또는 LOGOUT_FORCE 둘 다 받게 수정)
-    else if (e.data.type === 'LOGOUT' || e.data.type === 'LOGOUT_FORCE') {
-        console.log("로그아웃 신호 수신 - 세션 삭제 및 새로고침");
-        
-        // (1) 부모 쪽 스토리지 삭제
-        localStorage.removeItem('k_user');
-        
-        // (2) 가장 강력한 새로고침 (페이지를 아예 새로 로드)
-        window.location.href = 'https://gnpay.my';
-    }
-});
+    });
 
     function createIframe() {
         let src = baseUrl;
@@ -66,10 +64,12 @@ window.addEventListener('message', function(e) {
         const iframe = document.createElement('iframe');
         iframe.id = "appFrame";
         iframe.src = src;
-        // [핵심] allow-modals 추가하여 로그아웃 confirm 창 해결
+        
+        // [필수] 권한 허용 설정
         iframe.allow = "camera; microphone; storage-access; clipboard-write";
         iframe.setAttribute("sandbox", "allow-forms allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-storage-access-by-user-activation allow-modals");
         iframe.setAttribute("allowfullscreen", "");
+        
         document.body.appendChild(iframe);
     }
     window.addEventListener('load', createIframe);
@@ -77,9 +77,3 @@ window.addEventListener('message', function(e) {
 </head>
 <body></body>
 </html>
-
-
-
-
-
-
