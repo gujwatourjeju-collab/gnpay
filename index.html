@@ -3,17 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
     <meta property="og:type" content="website">
     <meta property="og:title" content="김녕페이 (GIMNYEONG PAY)">
     <meta property="og:description" content="탄소중립 실천 및 플로깅 활동으로 나만의 에코 포인트를 쌓아보세요. 🌱">
     <meta property="og:image" content="/og-image.png">
+    
     <title>김녕페이</title>
     <style>
         body, html { margin:0; padding:0; height:100%; overflow:hidden; background:#f7fbfc; }
-        iframe { border:none; width:100%; height:100%; }
+        iframe { border:none; width:100%; height:100%; display: block; }
     </style>
+    
+    <script>
+        /** [핵심 규칙 2] 주소창 방어 로직 **/
+        // 1. Google 서버 주소로 직접 진입 시 메인 도메인으로 리다이렉트
+        if (window.location.hostname.includes('googleusercontent.com')) {
+            window.location.replace('https://gnpay.my');
+        }
+
+        // 2. 뒤로가기 시 히스토리 꼬임 방지 (백버튼 루프 방어)
+        window.onpagehide = function () {
+            window.history.replaceState(null, null, 'https://gnpay.my');
+        };
+    </script>
 </head>
 <body>
+
 <iframe id="appFrame" 
     src="https://script.google.com/macros/s/AKfycbytgcHHzaZTkp6e1XWBXBVNVFRE8bzgE2i6EI9N3k3Vv0FAyCmv9sfDa1_o212bd94U/exec" 
     allow="camera; microphone;" 
@@ -24,45 +40,37 @@
 <script>
     const baseUrl = "https://script.google.com/macros/s/AKfycbytgcHHzaZTkp6e1XWBXBVNVFRE8bzgE2i6EI9N3k3Vv0FAyCmv9sfDa1_o212bd94U/exec";
     const frame = document.getElementById('appFrame');
-    const savedUser = localStorage.getItem('k_user');
-
-    // 1. 초기 프레임 주소 설정 (로그인 유지용)
-    if (savedUser) {
-        try {
+    
+    // 세션 복구 로직 (기존 기능 유지)
+    try {
+        const savedUser = localStorage.getItem('k_user');
+        if (savedUser) {
             const data = JSON.parse(savedUser);
-            if(data.email) {
+            if(data && data.email) {
                 frame.src = baseUrl + "?u=" + encodeURIComponent(data.email);
-            } else {
-                frame.src = baseUrl;
             }
-        } catch(e) {
-            frame.src = baseUrl;
         }
-    } else {
+    } catch(e) {
+        console.error("Session recovery failed:", e);
         frame.src = baseUrl;
     }
 
-    // 2. 메시지 리스너 (로그인 정보 저장 및 로그아웃)
+    // 메시지 통신 로직 (기존 기능 유지)
     window.addEventListener('message', function(e) {
+        // 보안을 위해 특정 타입만 처리
         if (e.data.type === 'SAVE_USER') {
             localStorage.setItem('k_user', JSON.stringify(e.data.data));
         } else if (e.data.type === 'LOGOUT') {
             localStorage.removeItem('k_user');
-            window.location.reload();
+            // 로그아웃 시 히스토리 청소 후 메인으로
+            window.location.replace('https://gnpay.my');
         }
     });
 
-    // 3. 브라우저가 이상한 구글 주소(googleusercontent)를 기억하지 못하게 방어
-    window.onload = function() {
-        // 현재 주소가 gnpay.my도 아니고, vercel.app도 아닌 '병신 같은 주소'일 때만 튕겨냄
-        if (!window.location.hostname.includes('gnpay.my') && !window.location.hostname.includes('vercel.app')) {
-            window.location.href = 'https://gnpay.my';
-        }
-    };
-
-    // 4. 페이지를 떠날 때 히스토리를 메인 도메인으로 강제 고정
-    window.onunload = function() {
-        window.history.replaceState(null, null, "/");
+    /** 추가 보완: Iframe 로드 실패 대비 **/
+    frame.onerror = function() {
+        console.error("GNPAY App load failed.");
+        window.location.reload();
     };
 </script>
 </body>
