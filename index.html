@@ -3,13 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-
-<meta property="og:type" content="website">
-<meta property="og:title" content="김녕페이 (GIMNYEONG PAY)">
-<meta property="og:description" content="탄소중립 실천 및 플로깅 활동으로 나만의 에코 포인트를 쌓아보세요. 🌱">
-<meta property="og:image" content="/og-image.png">
-
-<title>김녕페이</title>
+<title>김녕페이 (진단모드)</title>
 <style>
     html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #f7fbfc; }
     iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; display: block; }
@@ -23,45 +17,39 @@
     // [2] GAS 배포 URL
     const baseUrl = "https://script.google.com/macros/s/AKfycbytgcHHzaZTkp6e1XWBXBVNVFRE8bzgE2i6EI9N3k3Vv0FAyCmv9sfDa1_o212bd94U/exec";
     
-    // [3] 메시지 수신
+    // [3] 메시지 수신 (알림 추가됨)
     window.addEventListener('message', function(e) {
         if (!e.data || !e.data.type) return;
 
-        if (e.data.type === 'GET_SESSION') {
-            const saved = localStorage.getItem('k_user');
-            if (saved) {
-                try {
-                    const iframe = document.getElementById('appFrame');
-                    if (iframe && iframe.contentWindow) {
-                        iframe.contentWindow.postMessage({ type: 'SEND_SESSION', data: JSON.parse(saved) }, '*');
-                    }
-                } catch(err) {}
-            }
-        } 
-        else if (e.data.type === 'SAVE_USER' && e.data.data) {
-            // ★ 로그인 성공 시 무조건 저장
+        if (e.data.type === 'SAVE_USER' && e.data.data) {
+            // ★ 여기가 핵심입니다. 로그인을 하면 이 알림이 떠야 합니다.
+            alert("✅ [성공] 부모에게 로그인 정보가 저장되었습니다!\n이제 앱을 껐다 켜보세요.");
             localStorage.setItem('k_user', JSON.stringify(e.data.data));
         } 
         else if (e.data.type === 'LOGOUT' || e.data.type === 'LOGOUT_FORCE') {
+            alert("👋 로그아웃 되었습니다.");
             localStorage.removeItem('k_user');
             window.location.href = 'https://gnpay.my';
         }
     });
 
-    // [4] Iframe 생성 (단순화 버전)
+    // [4] Iframe 생성
     function createIframe() {
         let src = baseUrl;
         const saved = localStorage.getItem('k_user');
         
-        // ★ [여기가 수정됨] 암호화고 뭐고 다 빼고, 이메일 있으면 그냥 바로 붙입니다.
         if (saved) {
+            // 저장된 게 있으면 알림을 띄웁니다.
             try {
                 const data = JSON.parse(saved);
                 if (data.email) {
-                    // 복잡한 btoa 제거 -> 그냥 인코딩해서 전송 (가장 확실함)
+                    // alert("⚡ 자동 로그인 시도: " + data.email); // 너무 시끄러우면 이 줄 삭제
                     src += "?u=" + encodeURIComponent(data.email) + "&v=" + Date.now();
                 }
             } catch(e){}
+        } else {
+            // 저장된 게 없으면 이 알림이 뜹니다.
+            // alert("⚠ 저장된 로그인 정보가 없습니다. (최초 1회 로그인 필요)"); 
         }
         
         const iframe = document.createElement('iframe');
