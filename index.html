@@ -16,18 +16,10 @@
     const baseUrl = "https://script.google.com/macros/s/AKfycbytgcHHzaZTkp6e1XWBXBVNVFRE8bzgE2i6EI9N3k3Vv0FAyCmv9sfDa1_o212bd94U/exec";
     
 window.addEventListener('message', function(e) {
-    if (!e.data || !e.data.type) return;
-
-    if (e.data.type === 'SAVE_USER') {
-        localStorage.setItem('k_user', JSON.stringify(e.data.data));
-    } 
-    else if (e.data.type === 'LOGOUT') {
-        // 부모 쪽 데이터도 깨끗이 삭제
+    if (e.data.type === 'LOGOUT_FORCE') {
         localStorage.removeItem('k_user');
-        // 자식이 직접 이동시키겠지만, 안전장치로 한 번 더 메인 이동
-        setTimeout(() => {
-            window.location.replace('https://gnpay.my');
-        }, 100);
+        // 부모(본인)가 직접 주소를 바꾸면 절대 흰 화면이 안 뜹니다.
+        window.location.href = 'https://gnpay.my';
     }
 });
 
@@ -54,6 +46,7 @@ window.addEventListener('message', function(e) {
 </head>
 <body></body>
 </html>
+
 
 
 
