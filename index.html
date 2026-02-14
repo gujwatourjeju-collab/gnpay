@@ -3,12 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    
     <meta property="og:type" content="website">
     <meta property="og:title" content="김녕페이 (GIMNYEONG PAY)">
     <meta property="og:description" content="탄소중립 실천 및 플로깅 활동으로 나만의 에코 포인트를 쌓아보세요. 🌱">
     <meta property="og:image" content="/og-image.png">
-    
     <title>김녕페이</title>
     <style>
         body, html { margin:0; padding:0; height:100%; overflow:hidden; background:#f7fbfc; }
@@ -16,39 +14,32 @@
     </style>
     
     <script>
-        /** [1] 주소창 방어 로직 **/
+        /** [1] 주소창 방어 **/
         if (window.location.hostname.includes('googleusercontent.com')) {
             window.location.replace('https://gnpay.my');
         }
 
-        window.onpagehide = function () {
-            window.history.replaceState(null, null, 'https://gnpay.my');
-        };
-
-        /** [2] 세션 복구 및 URL 결정 **/
+        /** [2] 세션 데이터 준비 **/
         const baseUrl = "https://script.google.com/macros/s/AKfycbytgcHHzaZTkp6e1XWBXBVNVFRE8bzgE2i6EI9N3k3Vv0FAyCmv9sfDa1_o212bd94U/exec";
+        let savedData = null;
         let finalUrl = baseUrl;
 
         try {
             const saved = localStorage.getItem('k_user');
             if (saved) {
-                const data = JSON.parse(saved);
-                if (data && data.email) {
-                    // u=파라미터와 v=랜덤값을 통해 캐시를 완전히 파괴하고 세션을 주입
-                    finalUrl = baseUrl + "?u=" + encodeURIComponent(data.email) + "&v=" + Date.now();
-                    console.log("부모 도메인에서 세션 발견 및 주입:", data.email);
+                savedData = JSON.parse(saved);
+                if (savedData && savedData.email) {
+                    // 1차 주입: URL 파라미터에 이메일 박기
+                    finalUrl = baseUrl + "?u=" + encodeURIComponent(savedData.email) + "&v=" + Date.now();
                 }
             }
-        } catch(e) {
-            console.error("Storage error:", e);
-        }
+        } catch(e) { console.error(e); }
     </script>
 </head>
 <body>
 
 <script>
-    /** [3] iframe 단일 생성 **/
-    // 중복 생성을 막기 위해 document.write는 단 한 번만 실행합니다.
+    /** [3] iframe 생성 **/
     document.write(`
         <iframe id="appFrame" 
             src="${finalUrl}" 
@@ -58,18 +49,33 @@
         </iframe>
     `);
 
-    /** [4] 자식(GAS)과의 세션 동기화 **/
+    /** [4] 핑퐁 통신 로직 (로그인 유지의 핵심) **/
     window.addEventListener('message', function(e) {
-        if (e.data.type === 'SAVE_USER' && e.data.data && e.data.data.email) {
-            console.log("자식으로부터 세션 저장 신호 수신:", e.data.data.email);
+        const frame = document.getElementById('appFrame');
+        
+        // 자식이 "나 로드됐어, 정보 줘!" 라고 요청할 때 (GET_SESSION)
+        if (e.data.type === 'GET_SESSION') {
+            if (savedData) {
+                // 2차 주입: postMessage로 세션 데이터 직접 전송
+                frame.contentWindow.postMessage({ type: 'SEND_SESSION', data: savedData }, '*');
+                console.log("자식에게 세션 데이터 전송 완료");
+            }
+        } 
+        
+        // 자식이 로그인을 새로 했을 때 정보 저장 (SAVE_USER)
+        else if (e.data.type === 'SAVE_USER' && e.data.data) {
             localStorage.setItem('k_user', JSON.stringify(e.data.data));
-        } else if (e.data.type === 'LOGOUT') {
-            console.log("로그아웃 신호 수신");
+            savedData = e.data.data; // 메모리 갱신
+            console.log("새로운 세션 정보 저장 완료");
+        } 
+        
+        // 로그아웃 처리
+        else if (e.data.type === 'LOGOUT') {
             localStorage.removeItem('k_user');
+            savedData = null;
             window.location.replace('https://gnpay.my');
         }
     });
 </script>
-
 </body>
 </html>
