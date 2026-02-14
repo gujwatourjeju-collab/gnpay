@@ -24,33 +24,31 @@
     const baseUrl = "https://script.google.com/macros/s/AKfycbytgcHHzaZTkp6e1XWBXBVNVFRE8bzgE2i6EI9N3k3Vv0FAyCmv9sfDa1_o212bd94U/exec";
     
     // [수정된 로직] 로그아웃 및 세션 관리
-    window.addEventListener('message', function(e) {
-        if (!e.data || !e.data.type) return;
+window.addEventListener('message', function(e) {
+    if (!e.data || !e.data.type) return;
 
-        // 1. 세션 요청 응답
-        if (e.data.type === 'GET_SESSION') {
-            const saved = localStorage.getItem('k_user');
-            if (saved) {
+    if (e.data.type === 'GET_SESSION') {
+        const saved = localStorage.getItem('k_user');
+        if (saved) {
+            try {
+                const data = JSON.parse(saved);
                 const iframe = document.getElementById('appFrame');
                 if (iframe && iframe.contentWindow) {
-                    iframe.contentWindow.postMessage({ 
-                        type: 'SEND_SESSION', 
-                        data: JSON.parse(saved) 
-                    }, '*');
+                    iframe.contentWindow.postMessage({ type: 'SEND_SESSION', data }, '*');
                 }
-            }
-        } 
-        // 2. 로그인 저장
-        else if (e.data.type === 'SAVE_USER') {
-            localStorage.setItem('k_user', JSON.stringify(e.data.data));
-        } 
-        // 3. 로그아웃 처리 (구버전/신버전 신호 모두 수신)
-        else if (e.data.type === 'LOGOUT' || e.data.type === 'LOGOUT_FORCE') {
-            console.log("로그아웃 실행");
-            localStorage.removeItem('k_user');
-            window.location.href = 'https://gnpay.my'; // 강제 새로고침
+            } catch(e) {}
         }
-    });
+    } 
+    else if (e.data.type === 'SAVE_USER' && e.data.data) {
+        localStorage.setItem('k_user', JSON.stringify(e.data.data));
+    } 
+    else if (e.data.type === 'LOGOUT' || e.data.type === 'LOGOUT_FORCE') {
+        console.log("부모가 LOGOUT 신호 수신 → 실행");
+        localStorage.removeItem('k_user');
+        document.getElementById('loading-overlay')?.style.display = 'none';  // 로딩 강제 종료
+        window.location.href = 'https://gnpay.my';  // 부모가 직접 리로드
+    }
+});
 
 function createIframe() {
         let src = baseUrl;
@@ -90,4 +88,5 @@ function createIframe() {
 </head>
 <body></body>
 </html>
+
 
