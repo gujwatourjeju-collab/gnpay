@@ -52,6 +52,20 @@
             window.location.reload();
         }
     });
+    // index.html의 <script> 부분에 추가
+window.onload = function() {
+    // 만약 현재 주소가 gnpay.my가 아닌 다른 구글 주소라면, 
+    // 브라우저가 기억을 잘못한 것이므로 즉시 메인 도메인으로 보냅니다.
+    if (!window.location.href.includes('gnpay.my')) {
+        window.location.href = 'https://gnpay.my';
+    }
+};
+
+// 사용자가 페이지를 나갈 때(강제 종료 직전 등) 히스토리를 gnpay.my로 고정
+window.onunload = function() {
+    window.history.replaceState(null, null, "/");
+};
 </script>
 </body>
+
 </html>
