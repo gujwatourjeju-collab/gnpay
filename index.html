@@ -19,28 +19,39 @@
     const gasUrl = "https://script.google.com/macros/s/AKfycbytgcHHzaZTkp6e1XWBXBVNVFRE8bzgE2i6EI9N3k3Vv0FAyCmv9sfDa1_o212bd94U/exec";
 
     // 1. 자식(GAS)이 보내는 신호 수신
-    window.addEventListener('message', function(e) {
-        if (!e.data || !e.data.type) return;
+// [Vercel 부모 코드 내 리스너 수정]
+window.addEventListener('message', function(e) {
+    // 보안 에러 방지: 데이터가 없으면 무시
+    if (!e.data) return;
 
-        // [A] 로그인 버튼 눌렀을 때 -> 팝업창 열기
-        if (e.data.type === 'OPEN_LOGIN') {
-            // 화면 중앙에 예쁘게 띄우기 계산
-            const w = 450, h = 650;
-            const left = (window.screen.width / 2) - (w / 2);
-            const top = (window.screen.height / 2) - (h / 2);
-            
-            let popup = window.open(gasUrl + "?page=login_popup", "LoginPopup", `width=${w},height=${h},top=${top},left=${left}`);
-            
-            // 팝업이 닫혔는지 0.5초마다 감시
-let timer = setInterval(function() { 
-    if(popup.closed) {
-        clearInterval(timer);
-        // 타임스탬프(?t=...)를 붙여야 강제로 새로고침되어 로그인 세션을 읽어옵니다.
-        document.getElementById('appFrame').src = gasUrl + "?t=" + new Date().getTime();
+    // 만약 데이터가 문자열로 왔을 경우를 대비 (JSON 파싱)
+    let data = e.data;
+    if (typeof data === 'string') {
+        try { data = JSON.parse(data); } catch(err) { return; }
     }
-}, 500);
+
+    if (data.type === 'OPEN_LOGIN') {
+        console.log("부모가 신호 수신함: 팝업 실행");
+        const w = 450, h = 650;
+        const left = (window.screen.width / 2) - (w / 2);
+        const top = (window.screen.height / 2) - (h / 2);
+        
+        let popup = window.open(gasUrl + "?page=login_popup", "LoginPopup", `width=${w},height=${h},top=${top},left=${left}`);
+        
+        if(!popup) {
+            alert("팝업이 차단되었습니다. 주소창의 팝업 차단을 해제해주세요.");
+            return;
         }
-    });
+
+        let timer = setInterval(function() { 
+            if(popup.closed) {
+                clearInterval(timer);
+                // 강제 새로고침 (타임스탬프 추가)
+                document.getElementById('appFrame').src = gasUrl + "?t=" + new Date().getTime();
+            }
+        }, 500);
+    }
+});
 
     // 2. 초기 실행
     window.onload = function() {
@@ -58,4 +69,5 @@ let timer = setInterval(function() {
 </head>
 <body></body>
 </html>
+
 
