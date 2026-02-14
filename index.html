@@ -3,26 +3,31 @@
 <head>
 <meta charset="UTF-8">
 
-<!-- ✅ iOS 축소 버그 수정된 viewport -->
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 
 <title>김녕페이</title>
 
 <style>
-html, body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    background: #f7fbfc;
-}
+    /* ✅ 화면 전체를 쓰도록 강제 설정 */
+    html, body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden; /* 이중 스크롤 방지 */
+        background: #f7fbfc;
+    }
 
-/* ✅ iOS 축소 방지 */
-iframe {
-    border: none;
-    width: 100vw;
-    height: 100vh;
-    display: block;
-}
+    /* ✅ iframe이 부모를 100% 채우도록 절대 위치 지정 */
+    iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: none;
+        display: block;
+    }
 </style>
 
 <script>
@@ -33,67 +38,55 @@ if (window.location.hostname.includes('googleusercontent.com')) {
     window.location.replace('https://gnpay.my');
 }
 
+// 종료 시 히스토리 오염 방지
 window.onpagehide = function () {
-    history.replaceState(null, null, location.href);
+    window.history.replaceState(null, null, "/");
 };
 
 /* ===============================
    기본 설정
 ================================ */
 const baseUrl = "https://script.google.com/macros/s/AKfycbytgcHHzaZTkp6e1XWBXBVNVFRE8bzgE2i6EI9N3k3Vv0FAyCmv9sfDa1_o212bd94U/exec";
-let currentUser = null;
 
 /* ===============================
-   세션 동기화 (완전 유지)
+   세션 동기화 및 메시지 리스너
 ================================ */
 window.addEventListener('message', function(e) {
-
     if (!e.data || !e.data.type) return;
 
-    // 🔒 origin 체크
-    if (!e.origin.includes("google.com")) return;
-
-    /* 1️⃣ iframe → 부모 : 세션 요청 */
+    // 1️⃣ 세션 요청 시 응답
     if (e.data.type === 'GET_SESSION') {
         const saved = localStorage.getItem('k_user');
-        if (saved) {
-            try {
-                const data = JSON.parse(saved);
-                e.source.postMessage({ type: 'SEND_SESSION', data: data }, e.origin);
-            } catch(err){}
+        if (saved && e.source) {
+            e.source.postMessage({ type: 'SEND_SESSION', data: JSON.parse(saved) }, e.origin);
         }
     }
 
-    /* 2️⃣ iframe → 부모 : 로그인 성공 */
+    // 2️⃣ 로그인 성공 시 저장
     if (e.data.type === 'SAVE_USER') {
         localStorage.setItem('k_user', JSON.stringify(e.data.data));
-        currentUser = e.data.data;
-        console.log("부모에 세션 저장 완료:", currentUser.email);
     }
 
-    /* 3️⃣ iframe → 부모 : 로그아웃 */
+    // 3️⃣ 로그아웃 시 삭제
     if (e.data.type === 'LOGOUT') {
         localStorage.removeItem('k_user');
-        currentUser = null;
-        console.log("부모 세션 삭제 완료");
+        window.location.replace('https://gnpay.my'); // 깔끔하게 메인으로 이동
     }
 });
 
 /* ===============================
-   iframe 생성
+   iframe 생성 실행
 ================================ */
 function createIframe() {
-
     let src = baseUrl;
-
     const saved = localStorage.getItem('k_user');
+    
     if (saved) {
         try {
             const data = JSON.parse(saved);
             if (data && data.email) {
+                // 자동 로그인 세션 주입
                 src += "?u=" + encodeURIComponent(data.email) + "&v=" + Date.now();
-                currentUser = data;
-                console.log("자동 로그인 시도:", data.email);
             }
         } catch(e){}
     }
@@ -102,8 +95,11 @@ function createIframe() {
     iframe.id = "appFrame";
     iframe.src = src;
 
-    /* ✅ 카메라 권한 유지 */
-    iframe.allow = "camera; microphone; storage-access";
+    // ✅ 필수 권한 설정 (카메라 및 팝업 허용)
+    iframe.allow = "camera; microphone; storage-access; clipboard-write";
+    
+    // ✅ sandbox가 없으면 보안상 로그인이 튕길 수 있어 필수 옵션만 넣음
+    iframe.setAttribute("sandbox", "allow-forms allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-storage-access-by-user-activation");
     iframe.setAttribute("allowfullscreen", "");
 
     document.body.appendChild(iframe);
@@ -113,5 +109,5 @@ window.addEventListener('load', createIframe);
 </script>
 </head>
 <body>
-</body>
+    </body>
 </html>
