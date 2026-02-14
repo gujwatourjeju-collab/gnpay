@@ -15,7 +15,7 @@
     iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; display: block; }
 </style>
 <script>
-    // [1] 주소창 방어 로직
+    // [1] 주소창 방어
     if (window.location.hostname.includes('googleusercontent.com')) {
         window.location.replace('https://gnpay.my');
     }
@@ -23,48 +23,43 @@
     // [2] GAS 배포 URL
     const baseUrl = "https://script.google.com/macros/s/AKfycbytgcHHzaZTkp6e1XWBXBVNVFRE8bzgE2i6EI9N3k3Vv0FAyCmv9sfDa1_o212bd94U/exec";
     
-    // [3] 메시지 수신 (로그아웃 및 세션)
+    // [3] 메시지 수신
     window.addEventListener('message', function(e) {
         if (!e.data || !e.data.type) return;
 
-        // 세션 요청 응답 (혹시 몰라 유지)
         if (e.data.type === 'GET_SESSION') {
             const saved = localStorage.getItem('k_user');
             if (saved) {
                 try {
-                    const data = JSON.parse(saved);
                     const iframe = document.getElementById('appFrame');
                     if (iframe && iframe.contentWindow) {
-                        iframe.contentWindow.postMessage({ type: 'SEND_SESSION', data: data }, '*');
+                        iframe.contentWindow.postMessage({ type: 'SEND_SESSION', data: JSON.parse(saved) }, '*');
                     }
                 } catch(err) {}
             }
         } 
-        // 로그인 정보 저장
         else if (e.data.type === 'SAVE_USER' && e.data.data) {
+            // ★ 로그인 성공 시 무조건 저장
             localStorage.setItem('k_user', JSON.stringify(e.data.data));
         } 
-        // 로그아웃 처리 (강력 새로고침)
         else if (e.data.type === 'LOGOUT' || e.data.type === 'LOGOUT_FORCE') {
-            console.log("로그아웃 실행");
             localStorage.removeItem('k_user');
-            window.location.href = 'https://gnpay.my'; // 깨끗한 주소로 리로드
+            window.location.href = 'https://gnpay.my';
         }
     });
 
-    // [4] Iframe 생성 (로그인 유지 핵심 로직 적용됨)
+    // [4] Iframe 생성 (단순화 버전)
     function createIframe() {
         let src = baseUrl;
         const saved = localStorage.getItem('k_user');
         
-        // ★ [수정됨] 저장된 유저가 있으면 이메일을 암호화해서 URL에 붙임
+        // ★ [여기가 수정됨] 암호화고 뭐고 다 빼고, 이메일 있으면 그냥 바로 붙입니다.
         if (saved) {
             try {
                 const data = JSON.parse(saved);
                 if (data.email) {
-                    // btoa(): 이메일을 외계어(Base64)로 바꿔서 주소창에 넣음 (보기 좋게)
-                    const secureEmail = btoa(encodeURIComponent(data.email));
-                    src += "?u=" + secureEmail + "&v=" + Date.now();
+                    // 복잡한 btoa 제거 -> 그냥 인코딩해서 전송 (가장 확실함)
+                    src += "?u=" + encodeURIComponent(data.email) + "&v=" + Date.now();
                 }
             } catch(e){}
         }
@@ -73,17 +68,13 @@
         iframe.id = "appFrame";
         iframe.src = src;
         
-        // 권한 허용
         iframe.allow = "camera; microphone; storage-access; clipboard-write";
-        
-        // 샌드박스 설정 (줄바꿈 없이 한 줄로 작성)
         iframe.setAttribute("sandbox", "allow-forms allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-storage-access-by-user-activation allow-modals allow-top-navigation");
-        
         iframe.setAttribute("allowfullscreen", "");
+        
         document.body.appendChild(iframe);
     }
 
-    // 로드 시 실행
     window.addEventListener('load', createIframe);
 </script>
 </head>
