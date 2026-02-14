@@ -1,32 +1,6 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>김녕페이</title>
-
-<style>
-body, html {
-    margin:0;
-    padding:0;
-    height:100%;
-    overflow:hidden;
-    background:#f7fbfc;
-}
-iframe {
-    border:none;
-    width:100%;
-    height:100%;
-    display:block;
-    position:absolute;
-    top:0;
-    left:0;
-}
-</style>
-
 <script>
 /* ===============================
-   주소창 방어 (필수 유지)
+   주소창 방어
 ================================ */
 if (window.location.hostname.includes('googleusercontent.com')) {
     window.location.replace('https://gnpay.my');
@@ -43,31 +17,35 @@ const baseUrl = "https://script.google.com/macros/s/AKfycbytgcHHzaZTkp6e1XWBXBVN
 let currentUser = null;
 
 /* ===============================
-   세션 동기화 (완전 강화형)
+   세션 동기화 (완전 최종본)
 ================================ */
 window.addEventListener('message', function(e) {
 
     if (!e.data || !e.data.type) return;
 
-    // 🔒 origin 체크 (보안 강화)
+    // google 도메인 iframe만 허용
     if (!e.origin.includes("google.com")) return;
 
     /* 1️⃣ iframe → 부모 : 세션 요청 */
     if (e.data.type === 'GET_SESSION') {
         const saved = localStorage.getItem('k_user');
+
         if (saved) {
             try {
                 const data = JSON.parse(saved);
-                e.source.postMessage({ type: 'SEND_SESSION', data: data }, e.origin);
+                e.source.postMessage(
+                    { type: 'SEND_SESSION', data: data },
+                    e.origin
+                );
             } catch(err){}
         }
     }
 
     /* 2️⃣ iframe → 부모 : 로그인 성공 */
-    if (e.data.type === 'SAVE_USER') {
-        localStorage.setItem('k_user', JSON.stringify(e.data.data));
-        currentUser = e.data.data;
-        console.log("부모에 세션 저장 완료:", currentUser.email);
+    if (e.data.type === 'LOGIN_SUCCESS') {
+        localStorage.setItem('k_user', JSON.stringify(e.data.user));
+        currentUser = e.data.user;
+        console.log("부모 세션 저장 완료:", currentUser.email);
     }
 
     /* 3️⃣ iframe → 부모 : 로그아웃 */
@@ -86,9 +64,11 @@ function createIframe() {
     let src = baseUrl;
 
     const saved = localStorage.getItem('k_user');
+
     if (saved) {
         try {
             const data = JSON.parse(saved);
+
             if (data && data.email) {
                 src += "?u=" + encodeURIComponent(data.email) + "&v=" + Date.now();
                 currentUser = data;
@@ -101,7 +81,6 @@ function createIframe() {
     iframe.id = "appFrame";
     iframe.src = src;
 
-    // 🔥 sandbox 완전 제거 (핵심)
     iframe.allow = "camera; microphone; storage-access";
 
     document.body.appendChild(iframe);
@@ -109,7 +88,3 @@ function createIframe() {
 
 window.addEventListener('load', createIframe);
 </script>
-</head>
-<body>
-</body>
-</html>
