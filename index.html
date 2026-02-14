@@ -52,22 +52,35 @@
         }
     });
 
-    function createIframe() {
+function createIframe() {
         let src = baseUrl;
         const saved = localStorage.getItem('k_user');
+        
+        // [좀비 로그인 방지] 
+        // 로그아웃 했는데도 스토리지에 정보가 남아있으면 URL에 파라미터를 붙이는 로직 때문에
+        // 무한 재로그인이 될 수 있습니다. 
+        // saved가 확실히 있을 때만 파라미터를 붙입니다.
         if (saved) {
             try {
                 const data = JSON.parse(saved);
                 if (data.email) src += "?u=" + encodeURIComponent(data.email) + "&v=" + Date.now();
             } catch(e){}
         }
+        
         const iframe = document.createElement('iframe');
         iframe.id = "appFrame";
         iframe.src = src;
         
         // [필수] 권한 허용 설정
         iframe.allow = "camera; microphone; storage-access; clipboard-write";
-        iframe.setAttribute("sandbox", "allow-forms allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-storage-access-by-user-activation allow-modals");
+        
+        // ★★★ [여기가 핵심입니다] ★★★
+        // allow-top-navigation : 이게 있어야 자식이 부모 주소창을 강제로 바꿀 수 있습니다.
+        // allow-modals : 이게 있어야 alert, confirm 창이 뜹니다.
+        iframe.setAttribute("sandbox", 
+            "allow-forms allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-storage-access-by-user-activation allow-modals allow-top-navigation"
+        );
+        
         iframe.setAttribute("allowfullscreen", "");
         
         document.body.appendChild(iframe);
@@ -77,3 +90,4 @@
 </head>
 <body></body>
 </html>
+
