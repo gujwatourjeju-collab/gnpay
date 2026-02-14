@@ -58,29 +58,38 @@
 </script>
 
 <script>
-    // 1. 기존 리다이렉트 방어 로직 유지
+    // [보안] 구글 서버 주소 노출 시 리다이렉트 (테스트 시에는 잠시 주석 처리 가능)
     if (window.location.hostname.includes('googleusercontent.com')) {
         window.location.replace('https://gnpay.my');
     }
 
     const baseUrl = "https://script.google.com/macros/s/AKfycbytgcHHzaZTkp6e1XWBXBVNVFRE8bzgE2i6EI9N3k3Vv0FAyCmv9sfDa1_o212bd94U/exec";
-    
-    // 2. 세션 확인 및 iframe 주소 결정
-    let finalUrl = baseUrl;
-    const savedUser = localStorage.getItem('k_user');
-    if (savedUser) {
+    const saved = localStorage.getItem('k_user');
+    let finalSrc = baseUrl;
+
+    if (saved) {
         try {
-            const data = JSON.parse(savedUser);
-            if (data && data.email) {
-                // v=Date.now()를 붙여서 브라우저 캐시를 강제로 무효화(Busting)합니다.
-                finalUrl = baseUrl + "?u=" + encodeURIComponent(data.email) + "&v=" + Date.now();
+            const user = JSON.parse(saved);
+            if (user && user.email) {
+                // 이메일 주입 + 캐시 방지 파라미터(v)
+                finalSrc += "?u=" + encodeURIComponent(user.email) + "&v=" + Date.now();
             }
         } catch(e) {}
     }
 
-    // 3. iframe 동적 생성 (가장 빠른 시점)
-    document.write(`<iframe id="appFrame" src="${finalUrl}" allow="camera; microphone;" sandbox="allow-forms allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-storage-access-by-user-activation" allowfullscreen style="border:none; width:100%; height:100%; display:block;"></iframe>`);
+    // iframe 생성 시 'allow-storage-access-by-user-activation'는 
+    // 최신 브라우저에서 iframe 내 스토리지를 허용하는 핵심 옵션입니다.
+    document.write(`
+        <iframe id="appFrame" 
+            src="${finalSrc}" 
+            allow="camera; microphone; clipboard-read; clipboard-write;" 
+            sandbox="allow-forms allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-storage-access-by-user-activation"
+            allowfullscreen 
+            style="width:100%; height:100vh; border:none; display:block;">
+        </iframe>
+    `);
 </script>
 </body>
 </html>
+
 
