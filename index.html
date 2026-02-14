@@ -15,15 +15,18 @@
     }
     const baseUrl = "https://script.google.com/macros/s/AKfycbytgcHHzaZTkp6e1XWBXBVNVFRE8bzgE2i6EI9N3k3Vv0FAyCmv9sfDa1_o212bd94U/exec";
     
-    window.addEventListener('message', function(e) {
-        if (!e.data || !e.data.type) return;
-        if (e.data.type === 'SAVE_USER') {
-            localStorage.setItem('k_user', JSON.stringify(e.data.data));
-        } else if (e.data.type === 'LOGOUT') {
-            localStorage.removeItem('k_user');
-            window.location.replace('https://gnpay.my');
-        }
-    });
+window.addEventListener('message', function(e) {
+    if (!e.data || !e.data.type) return;
+
+    if (e.data.type === 'SAVE_USER') {
+        localStorage.setItem('k_user', JSON.stringify(e.data.data));
+    } 
+    else if (e.data.type === 'LOGOUT') {
+        // [중요] 세션 삭제 후 페이지를 새로고침하는 대신, 메인 주소로 '교체'합니다.
+        localStorage.removeItem('k_user');
+        window.location.replace('https://gnpay.my'); 
+    }
+});
 
     function createIframe() {
         let src = baseUrl;
@@ -48,3 +51,4 @@
 </head>
 <body></body>
 </html>
+
