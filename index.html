@@ -3,13 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    
     <meta property="og:type" content="website">
     <meta property="og:title" content="김녕페이 (GIMNYEONG PAY)">
     <meta property="og:description" content="탄소중립 실천 및 플로깅 활동으로 나만의 에코 포인트를 쌓아보세요. 🌱">
-    
     <meta property="og:image" content="/og-image.png">
-    
     <title>김녕페이</title>
     <style>
         body, html { margin:0; padding:0; height:100%; overflow:hidden; background:#f7fbfc; }
@@ -23,11 +20,13 @@
     sandbox="allow-forms allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-storage-access-by-user-activation"
     allowfullscreen>
 </iframe>
+
 <script>
     const baseUrl = "https://script.google.com/macros/s/AKfycbytgcHHzaZTkp6e1XWBXBVNVFRE8bzgE2i6EI9N3k3Vv0FAyCmv9sfDa1_o212bd94U/exec";
     const frame = document.getElementById('appFrame');
     const savedUser = localStorage.getItem('k_user');
 
+    // 1. 초기 프레임 주소 설정 (로그인 유지용)
     if (savedUser) {
         try {
             const data = JSON.parse(savedUser);
@@ -43,29 +42,28 @@
         frame.src = baseUrl;
     }
 
+    // 2. 메시지 리스너 (로그인 정보 저장 및 로그아웃)
     window.addEventListener('message', function(e) {
         if (e.data.type === 'SAVE_USER') {
             localStorage.setItem('k_user', JSON.stringify(e.data.data));
         } else if (e.data.type === 'LOGOUT') {
             localStorage.removeItem('k_user');
-            // 로그아웃 시 페이지 새로고침 (선택사항)
             window.location.reload();
         }
     });
-    // index.html의 <script> 부분에 추가
-window.onload = function() {
-    // 만약 현재 주소가 gnpay.my가 아닌 다른 구글 주소라면, 
-    // 브라우저가 기억을 잘못한 것이므로 즉시 메인 도메인으로 보냅니다.
-    if (!window.location.href.includes('gnpay.my')) {
-        window.location.href = 'https://gnpay.my';
-    }
-};
 
-// 사용자가 페이지를 나갈 때(강제 종료 직전 등) 히스토리를 gnpay.my로 고정
-window.onunload = function() {
-    window.history.replaceState(null, null, "/");
-};
+    // 3. 브라우저가 이상한 구글 주소(googleusercontent)를 기억하지 못하게 방어
+    window.onload = function() {
+        // 현재 주소가 gnpay.my도 아니고, vercel.app도 아닌 '병신 같은 주소'일 때만 튕겨냄
+        if (!window.location.hostname.includes('gnpay.my') && !window.location.hostname.includes('vercel.app')) {
+            window.location.href = 'https://gnpay.my';
+        }
+    };
+
+    // 4. 페이지를 떠날 때 히스토리를 메인 도메인으로 강제 고정
+    window.onunload = function() {
+        window.history.replaceState(null, null, "/");
+    };
 </script>
 </body>
-
 </html>
