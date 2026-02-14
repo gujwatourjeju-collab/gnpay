@@ -3,7 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>김녕페이 (진단모드)</title>
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="김녕페이 (GIMNYEONG PAY)">
+<meta property="og:description" content="탄소중립 실천 및 플로깅 활동으로 나만의 에코 포인트를 쌓아보세요. 🌱">
+<meta property="og:image" content="/og-image.png">
+
+<title>김녕페이</title>
 <style>
     html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #f7fbfc; }
     iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; display: block; }
@@ -14,52 +20,52 @@
         window.location.replace('https://gnpay.my');
     }
     
-    // [2] GAS 배포 URL
+    // [2] GAS 배포 URL (기존 주소 유지)
     const baseUrl = "https://script.google.com/macros/s/AKfycbytgcHHzaZTkp6e1XWBXBVNVFRE8bzgE2i6EI9N3k3Vv0FAyCmv9sfDa1_o212bd94U/exec";
     
-    // [3] 메시지 수신 (알림 추가됨)
+    // [3] 메시지 수신 (로그인/로그아웃 처리)
     window.addEventListener('message', function(e) {
         if (!e.data || !e.data.type) return;
 
+        // A. 로그인 성공 신호 받음 -> 저장하고 "새로고침"
         if (e.data.type === 'SAVE_USER' && e.data.data) {
-            // ★ 여기가 핵심입니다. 로그인을 하면 이 알림이 떠야 합니다.
-            alert("✅ [성공] 부모에게 로그인 정보가 저장되었습니다!\n이제 앱을 껐다 켜보세요.");
             localStorage.setItem('k_user', JSON.stringify(e.data.data));
+            // ★ 여기서 페이지를 다시 로드해야 주소창에 이메일이 붙습니다!
+            window.location.reload(); 
         } 
+        // B. 로그아웃 신호 받음 -> 삭제하고 메인으로 "이동"
         else if (e.data.type === 'LOGOUT' || e.data.type === 'LOGOUT_FORCE') {
-            alert("👋 로그아웃 되었습니다.");
             localStorage.removeItem('k_user');
             window.location.href = 'https://gnpay.my';
         }
     });
 
-    // [4] Iframe 생성
+    // [4] Iframe 생성 (자동 로그인 주소 생성)
     function createIframe() {
         let src = baseUrl;
         const saved = localStorage.getItem('k_user');
         
+        // ★ 저장된 유저가 있으면 주소 뒤에 이메일을 붙여서 iframe을 만듭니다.
         if (saved) {
-            // 저장된 게 있으면 알림을 띄웁니다.
             try {
                 const data = JSON.parse(saved);
                 if (data.email) {
-                    // alert("⚡ 자동 로그인 시도: " + data.email); // 너무 시끄러우면 이 줄 삭제
                     src += "?u=" + encodeURIComponent(data.email) + "&v=" + Date.now();
                 }
             } catch(e){}
-        } else {
-            // 저장된 게 없으면 이 알림이 뜹니다.
-            // alert("⚠ 저장된 로그인 정보가 없습니다. (최초 1회 로그인 필요)"); 
         }
         
         const iframe = document.createElement('iframe');
         iframe.id = "appFrame";
         iframe.src = src;
         
+        // 권한 허용 (필수)
         iframe.allow = "camera; microphone; storage-access; clipboard-write";
-        iframe.setAttribute("sandbox", "allow-forms allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-storage-access-by-user-activation allow-modals allow-top-navigation");
-        iframe.setAttribute("allowfullscreen", "");
         
+        // 샌드박스 설정 (로그아웃 권한 해제: allow-top-navigation)
+        iframe.setAttribute("sandbox", "allow-forms allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-storage-access-by-user-activation allow-modals allow-top-navigation");
+        
+        iframe.setAttribute("allowfullscreen", "");
         document.body.appendChild(iframe);
     }
 
