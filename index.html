@@ -15,49 +15,49 @@
     iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; display: block; }
 </style>
 <script>
-    // [보안] 깡통 주소 방어
+    // [1] 주소창 방어 로직
     if (window.location.hostname.includes('googleusercontent.com')) {
         window.location.replace('https://gnpay.my');
     }
     
-    // GAS 배포 URL (수정 금지)
+    // [2] GAS 배포 URL
     const baseUrl = "https://script.google.com/macros/s/AKfycbytgcHHzaZTkp6e1XWBXBVNVFRE8bzgE2i6EI9N3k3Vv0FAyCmv9sfDa1_o212bd94U/exec";
     
-    // [수정된 로직] 로그아웃 및 세션 관리
-window.addEventListener('message', function(e) {
-    if (!e.data || !e.data.type) return;
+    // [3] 메시지 수신 (로그아웃 및 세션)
+    window.addEventListener('message', function(e) {
+        if (!e.data || !e.data.type) return;
 
-    if (e.data.type === 'GET_SESSION') {
-        const saved = localStorage.getItem('k_user');
-        if (saved) {
-            try {
-                const data = JSON.parse(saved);
-                const iframe = document.getElementById('appFrame');
-                if (iframe && iframe.contentWindow) {
-                    iframe.contentWindow.postMessage({ type: 'SEND_SESSION', data }, '*');
-                }
-            } catch(e) {}
+        // 세션 요청 응답
+        if (e.data.type === 'GET_SESSION') {
+            const saved = localStorage.getItem('k_user');
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    const iframe = document.getElementById('appFrame');
+                    if (iframe && iframe.contentWindow) {
+                        iframe.contentWindow.postMessage({ type: 'SEND_SESSION', data: data }, '*');
+                    }
+                } catch(err) {}
+            }
+        } 
+        // 로그인 정보 저장
+        else if (e.data.type === 'SAVE_USER' && e.data.data) {
+            localStorage.setItem('k_user', JSON.stringify(e.data.data));
+        } 
+        // 로그아웃 처리 (강력 새로고침)
+        else if (e.data.type === 'LOGOUT' || e.data.type === 'LOGOUT_FORCE') {
+            console.log("로그아웃 실행");
+            localStorage.removeItem('k_user');
+            window.location.href = 'https://gnpay.my';
         }
-    } 
-    else if (e.data.type === 'SAVE_USER' && e.data.data) {
-        localStorage.setItem('k_user', JSON.stringify(e.data.data));
-    } 
-    else if (e.data.type === 'LOGOUT' || e.data.type === 'LOGOUT_FORCE') {
-        console.log("부모가 LOGOUT 신호 수신 → 실행");
-        localStorage.removeItem('k_user');
-        document.getElementById('loading-overlay')?.style.display = 'none';  // 로딩 강제 종료
-        window.location.href = 'https://gnpay.my';  // 부모가 직접 리로드
-    }
-});
+    });
 
-function createIframe() {
+    // [4] Iframe 생성
+    function createIframe() {
         let src = baseUrl;
         const saved = localStorage.getItem('k_user');
         
-        // [좀비 로그인 방지] 
-        // 로그아웃 했는데도 스토리지에 정보가 남아있으면 URL에 파라미터를 붙이는 로직 때문에
-        // 무한 재로그인이 될 수 있습니다. 
-        // saved가 확실히 있을 때만 파라미터를 붙입니다.
+        // 좀비 로그인 방지 파라미터 추가
         if (saved) {
             try {
                 const data = JSON.parse(saved);
@@ -69,24 +69,20 @@ function createIframe() {
         iframe.id = "appFrame";
         iframe.src = src;
         
-        // [필수] 권한 허용 설정
+        // 권한 허용
         iframe.allow = "camera; microphone; storage-access; clipboard-write";
         
-        // ★★★ [여기가 핵심입니다] ★★★
-        // allow-top-navigation : 이게 있어야 자식이 부모 주소창을 강제로 바꿀 수 있습니다.
-        // allow-modals : 이게 있어야 alert, confirm 창이 뜹니다.
-        iframe.setAttribute("sandbox", 
-            "allow-forms allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-storage-access-by-user-activation allow-modals allow-top-navigation"
-        );
+        // 샌드박스 설정 (줄바꿈 없이 한 줄로 작성하여 오류 방지)
+        iframe.setAttribute("sandbox", "allow-forms allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-storage-access-by-user-activation allow-modals allow-top-navigation");
         
         iframe.setAttribute("allowfullscreen", "");
-        
         document.body.appendChild(iframe);
     }
+
+    // 로드 시 실행
     window.addEventListener('load', createIframe);
 </script>
 </head>
-<body></body>
+<body>
+</body>
 </html>
-
-
