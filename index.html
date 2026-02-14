@@ -1,15 +1,33 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>김녕페이</title>
-    <style>
-        body, html { margin:0; padding:0; height:100%; overflow:hidden; background:#f7fbfc; }
-        iframe { border:none; width:100%; height:100%; display:block; position:absolute; top:0; left:0; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>김녕페이</title>
+
+<style>
+body, html {
+    margin:0;
+    padding:0;
+    height:100%;
+    overflow:hidden;
+    background:#f7fbfc;
+}
+iframe {
+    border:none;
+    width:100%;
+    height:100%;
+    display:block;
+    position:absolute;
+    top:0;
+    left:0;
+}
+</style>
+
 <script>
-/** 주소창 방어 **/
+/* ===============================
+   주소창 방어 (필수 유지)
+================================ */
 if (window.location.hostname.includes('googleusercontent.com')) {
     window.location.replace('https://gnpay.my');
 }
@@ -18,17 +36,21 @@ window.onpagehide = function () {
     history.replaceState(null, null, location.href);
 };
 
+/* ===============================
+   기본 설정
+================================ */
 const baseUrl = "https://script.google.com/macros/s/AKfycbytgcHHzaZTkp6e1XWBXBVNVFRE8bzgE2i6EI9N3k3Vv0FAyCmv9sfDa1_o212bd94U/exec";
-
 let currentUser = null;
 
-/* ===========================
-   강화형 세션 동기화 로직
-=========================== */
-
+/* ===============================
+   세션 동기화 (완전 강화형)
+================================ */
 window.addEventListener('message', function(e) {
 
     if (!e.data || !e.data.type) return;
+
+    // 🔒 origin 체크 (보안 강화)
+    if (!e.origin.includes("google.com")) return;
 
     /* 1️⃣ iframe → 부모 : 세션 요청 */
     if (e.data.type === 'GET_SESSION') {
@@ -36,7 +58,7 @@ window.addEventListener('message', function(e) {
         if (saved) {
             try {
                 const data = JSON.parse(saved);
-                e.source.postMessage({ type: 'SEND_SESSION', data: data }, '*');
+                e.source.postMessage({ type: 'SEND_SESSION', data: data }, e.origin);
             } catch(err){}
         }
     }
@@ -45,20 +67,22 @@ window.addEventListener('message', function(e) {
     if (e.data.type === 'SAVE_USER') {
         localStorage.setItem('k_user', JSON.stringify(e.data.data));
         currentUser = e.data.data;
+        console.log("부모에 세션 저장 완료:", currentUser.email);
     }
 
     /* 3️⃣ iframe → 부모 : 로그아웃 */
     if (e.data.type === 'LOGOUT') {
         localStorage.removeItem('k_user');
         currentUser = null;
+        console.log("부모 세션 삭제 완료");
     }
 });
 
-/* ===========================
+/* ===============================
    iframe 생성
-=========================== */
-
+================================ */
 function createIframe() {
+
     let src = baseUrl;
 
     const saved = localStorage.getItem('k_user');
@@ -68,6 +92,7 @@ function createIframe() {
             if (data && data.email) {
                 src += "?u=" + encodeURIComponent(data.email) + "&v=" + Date.now();
                 currentUser = data;
+                console.log("자동 로그인 시도:", data.email);
             }
         } catch(e){}
     }
@@ -75,18 +100,16 @@ function createIframe() {
     const iframe = document.createElement('iframe');
     iframe.id = "appFrame";
     iframe.src = src;
+
+    // 🔥 sandbox 완전 제거 (핵심)
     iframe.allow = "camera; microphone; storage-access";
-    iframe.sandbox = "allow-forms allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-storage-access-by-user-activation";
 
     document.body.appendChild(iframe);
 }
 
 window.addEventListener('load', createIframe);
 </script>
-
 </head>
 <body>
 </body>
 </html>
-
-
