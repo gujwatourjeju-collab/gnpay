@@ -16,10 +16,29 @@
     const baseUrl = "https://script.google.com/macros/s/AKfycbytgcHHzaZTkp6e1XWBXBVNVFRE8bzgE2i6EI9N3k3Vv0FAyCmv9sfDa1_o212bd94U/exec";
     
 window.addEventListener('message', function(e) {
-    if (e.data.type === 'LOGOUT_FORCE') {
+    if (!e.data || !e.data.type) return;
+
+    // 1. 자식이 세션을 요청할 때 응답 (로그인 유지 핵심)
+    if (e.data.type === 'GET_SESSION') {
+        const saved = localStorage.getItem('k_user');
+        if (saved) {
+            const iframe = document.getElementById('appFrame');
+            if (iframe) {
+                iframe.contentWindow.postMessage({ 
+                    type: 'SEND_SESSION', 
+                    data: JSON.parse(saved) 
+                }, '*');
+            }
+        }
+    } 
+    // 2. 로그인 성공 시 저장
+    else if (e.data.type === 'SAVE_USER') {
+        localStorage.setItem('k_user', JSON.stringify(e.data.data));
+    } 
+    // 3. 로그아웃 시 강제 이동 (흰 화면 방지)
+    else if (e.data.type === 'LOGOUT' || e.data.type === 'LOGOUT_FORCE') {
         localStorage.removeItem('k_user');
-        // 부모(본인)가 직접 주소를 바꾸면 절대 흰 화면이 안 뜹니다.
-        window.location.href = 'https://gnpay.my';
+        window.location.replace('https://gnpay.my'); // 부모 주소창을 새로고침
     }
 });
 
@@ -46,6 +65,7 @@ window.addEventListener('message', function(e) {
 </head>
 <body></body>
 </html>
+
 
 
 
