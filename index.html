@@ -12,26 +12,20 @@
 <title>김녕페이</title>
 <style>
     body, html { margin:0; padding:0; height:100%; overflow:hidden; background:#f7fbfc; }
-    iframe { width:100%; height:100%; border:none; display:block; }
+    iframe { position:absolute; top:0; left:0; width:100%; height:100%; border:none; outline:none; }
 </style>
 </head>
 <body>
-    <iframe id="gas-frame"
-            src="https://script.google.com/macros/s/AKfycbxj7hSFLS6zuXB9fOciMeZe6j2BDdYzyEShgkerQElSuQcdr7fuwNfLCfBwwNEC6F9O/exec"
-            allow="camera; microphone; geolocation; clipboard-write;"
+
+    <iframe id="appFrame" 
+            src="https://script.google.com/macros/s/AKfycbxj7hSFLS6zuXB9fOciMeZe6j2BDdYzyEShgkerQElSuQcdr7fuwNfLCfBwwNEC6F9O/exec" 
+            allow="camera; microphone; geolocation; clipboard-write;" 
             sandbox="allow-forms allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-storage-access-by-user-activation allow-modals allow-top-navigation-by-user-activation">
     </iframe>
 
     <script>
-        // 팝업 관련 복잡한 리스너 코드는 이제 필요 없습니다! 
-        // 자식(GAS)이 내부 레이어로 로그인을 처리하므로 부모는 그냥 '틀'만 제공하면 됩니다.
-        
-        // (선택사항) 혹시 나중에 자식에서 부모 페이지를 새로고침해야 할 때를 대비한 비상 리스너
-        window.addEventListener('message', function(e) {
-            if (e.data && e.data.type === 'RELOAD_PARENT') {
-                window.location.reload();
-            }
-        });
+        // 이 안에는 아무것도 넣지 않습니다. 
+        // 팝업 명령(window.open)이 여기 있으면 안 되기 때문입니다.
     </script>
 </body>
 </html>
