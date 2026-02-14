@@ -16,61 +16,66 @@
     </style>
     
     <script>
-        /** [핵심 규칙 2] 주소창 방어 로직 **/
-        // 1. Google 서버 주소로 직접 진입 시 메인 도메인으로 리다이렉트
+        /** [핵심 규칙] 주소창 방어 및 초기화 **/
         if (window.location.hostname.includes('googleusercontent.com')) {
             window.location.replace('https://gnpay.my');
         }
 
-        // 2. 뒤로가기 시 히스토리 꼬임 방지 (백버튼 루프 방어)
         window.onpagehide = function () {
             window.history.replaceState(null, null, 'https://gnpay.my');
         };
+
+        // 전역 변수 설정
+        const baseUrl = "https://script.google.com/macros/s/AKfycbytgcHHzaZTkp6e1XWBXBVNVFRE8bzgE2i6EI9N3k3Vv0FAyCmv9sfDa1_o212bd94U/exec";
+        
+        // [강력 세션 복구] iframe이 생성되기 전에 src를 미리 결정합니다.
+        let initialSrc = baseUrl;
+        try {
+            const savedUser = localStorage.getItem('k_user');
+            if (savedUser) {
+                const data = JSON.parse(savedUser);
+                if (data && data.email) {
+                    initialSrc = baseUrl + "?u=" + encodeURIComponent(data.email);
+                    console.log("세션 발견: " + data.email);
+                }
+            }
+        } catch(e) {
+            console.error("Storage error:", e);
+        }
     </script>
 </head>
 <body>
 
-<iframe id="appFrame" 
-    src="https://script.google.com/macros/s/AKfycbytgcHHzaZTkp6e1XWBXBVNVFRE8bzgE2i6EI9N3k3Vv0FAyCmv9sfDa1_o212bd94U/exec" 
-    allow="camera; microphone;" 
-    sandbox="allow-forms allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-storage-access-by-user-activation"
-    allowfullscreen>
-</iframe>
+<script>
+    document.write(`
+        <iframe id="appFrame" 
+            src="${initialSrc}" 
+            allow="camera; microphone;" 
+            sandbox="allow-forms allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-storage-access-by-user-activation"
+            allowfullscreen>
+        </iframe>
+    `);
+</script>
 
 <script>
-    const baseUrl = "https://script.google.com/macros/s/AKfycbytgcHHzaZTkp6e1XWBXBVNVFRE8bzgE2i6EI9N3k3Vv0FAyCmv9sfDa1_o212bd94U/exec";
     const frame = document.getElementById('appFrame');
-    
-    // 세션 복구 로직 (기존 기능 유지)
-    try {
-        const savedUser = localStorage.getItem('k_user');
-        if (savedUser) {
-            const data = JSON.parse(savedUser);
-            if(data && data.email) {
-                frame.src = baseUrl + "?u=" + encodeURIComponent(data.email);
-            }
-        }
-    } catch(e) {
-        console.error("Session recovery failed:", e);
-        frame.src = baseUrl;
-    }
 
-    // 메시지 통신 로직 (기존 기능 유지)
+    // 메시지 통신 로직 (부모-자식 간 세션 동기화)
     window.addEventListener('message', function(e) {
-        // 보안을 위해 특정 타입만 처리
         if (e.data.type === 'SAVE_USER') {
+            console.log("세션 저장 요청 수신");
             localStorage.setItem('k_user', JSON.stringify(e.data.data));
         } else if (e.data.type === 'LOGOUT') {
+            console.log("로그아웃 요청 수신");
             localStorage.removeItem('k_user');
-            // 로그아웃 시 히스토리 청소 후 메인으로
             window.location.replace('https://gnpay.my');
         }
     });
 
-    /** 추가 보완: Iframe 로드 실패 대비 **/
+    // 앱 로드 실패 시 재시도 로직
     frame.onerror = function() {
         console.error("GNPAY App load failed.");
-        window.location.reload();
+        setTimeout(() => { window.location.reload(); }, 1000);
     };
 </script>
 </body>
