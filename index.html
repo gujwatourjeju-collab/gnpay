@@ -188,6 +188,7 @@ function updateUI(data) {
     document.getElementById('bar-user').style.display = 'block';
     document.getElementById('btn-user-qr').style.display = 'flex';
 }
+        let selectedFileBase64 = null;
 function previewImage(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -292,6 +293,7 @@ function resetActivityPage() {
     </script>
 </body>
 </html>
+
 
 
 
