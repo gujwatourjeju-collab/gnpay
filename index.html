@@ -49,27 +49,29 @@
     </div>
 
     <div id="page-login" class="page">
-        <div class="p-4"><i class="bi bi-chevron-left fs-2" onclick="showPage('page-main')"></i></div>
-        <div class="container px-4">
-            <h2 class="fw-bold mb-5">로그인</h2>
-            <input type="email" id="l-email" class="form-control mb-3 p-3" placeholder="이메일 주소">
-            <input type="password" id="l-pw" class="form-control mb-4 p-3" placeholder="비밀번호">
-            <input type="email" id="l-email" class="form-control mb-3 p-3" placeholder="이메일 주소">
-<input type="password" id="l-pw" class="form-control mb-4 p-3" placeholder="비밀번호">
-
-<input type="email" id="l-email" class="form-control mb-3 p-3" 
-       placeholder="이메일 주소" 
-       autocapitalize="none" 
-       spellcheck="false" 
-       autocomplete="username">
-
-<input type="password" id="l-pw" class="form-control mb-4 p-3" 
-       placeholder="비밀번호" 
-       autocapitalize="none" 
-       autocomplete="current-password">
-            <button class="btn btn-primary w-100 p-3 rounded-4" onclick="doLogin()">로그인하기</button>
-        </div>
+    <div class="p-4"><i class="bi bi-chevron-left fs-2" onclick="showPage('page-main')"></i></div>
+    <div class="container px-4">
+        <h2 class="fw-bold mb-5">로그인</h2>
+        <input type="email" id="l-email" class="form-control mb-3 p-3" 
+               placeholder="이메일 주소" autocapitalize="none" spellcheck="false">
+        <input type="password" id="l-pw" class="form-control mb-4 p-3" 
+               placeholder="비밀번호" autocapitalize="none">
+        <button class="btn btn-primary w-100 p-3 rounded-4" onclick="doLogin()">로그인하기</button>
     </div>
+</div>
+
+<div id="page-join" class="page">
+    <div class="p-4"><i class="bi bi-chevron-left fs-2" onclick="showPage('page-main')"></i></div>
+    <div class="container px-4">
+        <h2 class="fw-bold mb-4">회원가입</h2>
+        <input type="text" id="j-name" class="form-control mb-2" placeholder="성함">
+        <input type="email" id="j-email" class="form-control mb-2" placeholder="이메일 (ID)">
+        <input type="password" id="j-pw" class="form-control mb-2" placeholder="비밀번호">
+        <input type="text" id="j-phone" class="form-control mb-2" placeholder="휴대폰">
+        <input type="text" id="j-birth" class="form-control mb-2" placeholder="생년월일 8자리">
+        <button class="btn btn-primary w-100 mt-4 p-3 rounded-4" onclick="handleJoin()">가입 완료하기</button>
+    </div>
+</div>
 
     <div id="page-info" class="page">
         <div class="info-card">
@@ -203,6 +205,7 @@ async function doLogin() {
 </script>
 </body>
 </html>
+
 
 
 
