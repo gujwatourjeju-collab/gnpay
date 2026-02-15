@@ -38,7 +38,7 @@
         .main-welcome h1 { font-size: 2.6rem; font-weight: 800; color: var(--primary); margin-bottom: 8px; letter-spacing: -1.5px; }
 
         /* [마이 페이지] Gradient Top-Down */
-        #page-info { background: linear-gradient(180deg, var(--primary) 0%, #34c7c2 30%, var(--bg) 60%) !important; padding-top: 40px; }
+        #page-info { padding-bottom: 50px !important; } /* 마이페이지는 하단 고정바가 없으므로 여백만 줌 */
         .info-header { text-align: center; color: white; margin-bottom: 30px; }
         .qr-card-v2 { background: white; border-radius: 35px; width: 240px; margin: 0 auto 35px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); text-align: center; }
         .qr-card-v2 img { width: 100%; border-radius: 20px; }
@@ -56,6 +56,17 @@
             position: fixed; bottom: 30px; left: 20px; right: 20px; z-index: 1000;
             display: flex; gap: 10px;
         }
+        .fixed-bottom-bar { 
+    position: fixed; 
+    bottom: 0; 
+    left: 0; 
+    right: 0; 
+    background: white; 
+    padding: 20px; 
+    border-top: 1px solid #eee; 
+    z-index: 1000;
+    box-shadow: 0 -5px 15px rgba(0,0,0,0.05);
+}
 
         #btn-user-qr { 
     position: fixed !important; 
@@ -81,35 +92,54 @@
     <div id="loading-overlay"><div class="spinner"></div><p class="mt-3 fw-bold text-muted">연결 중...</p></div>
     <button id="btn-user-qr" onclick="showPage('page-info')"><i class="bi bi-qr-code"></i></button>
 
-    <div id="page-main" class="page active">
-        <div class="main-welcome">
-            <h1>김녕페이</h1>
-            <p>오늘도 김녕을 지켜주세요! 🌱<br>자연과 상생하는 스마트 커뮤니티</p>
-        </div>
-
-        <div class="pill-card" onclick="showPage('page-activities')">
-            <div class="icon-circle" style="background: var(--primary-light); color: var(--primary);"><i class="bi bi-tree-fill"></i></div>
-            <div><div class="fw-bold fs-5">환경 정화 활동</div><div class="text-muted small">지금 참여하고 리워드 받기</div></div>
-        </div>
-
-        <div class="pill-card" onclick="showPage('page-shops')">
-            <div class="icon-circle" style="background: #fff3e0; color: #ff9800;"><i class="bi bi-shop"></i></div>
-            <div><div class="fw-bold fs-5">김녕 가맹점 찾기</div><div class="text-muted small">포인트 사용처 확인하기</div></div>
-        </div>
-
-        <div class="guest-bar-pill" id="bar-guest">
-            <button class="btn btn-primary flex-grow-1 p-3 rounded-pill fw-bold shadow" onclick="showPage('page-login')">로그인</button>
-            <button class="btn btn-outline-primary flex-grow-1 p-3 rounded-pill fw-bold bg-white" onclick="alert('준비 중')">회원가입</button>
-        </div>
-        <button class="fixed-bottom-pill" id="bar-user" style="display:none;" onclick="showPage('page-info')">내 마이페이지 확인</button>
+<div id="page-main" class="page active">
+    <div class="main-welcome">
+        <h1>김녕페이</h1>
+        <p>오늘도 김녕을 지켜주세요! 🌱</p>
     </div>
 
-   <div id="page-info" class="page">
+    <div class="pill-card" onclick="showPage('page-activities')">
+        <div class="icon-circle" style="background: var(--primary-light); color: var(--primary);"><i class="bi bi-tree-fill"></i></div>
+        <div><div class="fw-bold fs-5">환경 정화 활동</div><div class="text-muted small">참여하고 리워드 받기</div></div>
+    </div>
+
+    <div class="pill-card" onclick="showPage('page-shops')">
+        <div class="icon-circle" style="background: #fff3e0; color: #ff9800;"><i class="bi bi-shop"></i></div>
+        <div><div class="fw-bold fs-5">김녕 가맹점 찾기</div><div class="text-muted small">포인트 사용처 확인</div></div>
+    </div>
+
+    <div id="bar-guest" class="fixed-bottom-bar d-flex gap-2">
+        <button class="btn btn-primary flex-grow-1 p-3 rounded-pill fw-bold" onclick="showPage('page-login')">로그인</button>
+        <button class="btn btn-outline-primary flex-grow-1 p-3 rounded-pill fw-bold" onclick="alert('준비 중')">회원가입</button>
+    </div>
+    <div id="bar-user" class="fixed-bottom-bar" style="display:none;">
+        <button class="btn btn-primary w-100 p-3 rounded-pill fw-bold" onclick="showPage('page-info')">내 정보 및 QR 확인</button>
+    </div>
+</div>
+
+<div id="page-info" class="page">
     <div class="info-header">
         <h4 id="u-name-top">환영합니다!</h4>
-        <p class="small opacity-75">사용 가능 포인트</p>
         <h1><span id="u-points">0</span> P</h1>
     </div>
+    <div class="qr-card-v2">
+        <img id="qr-img-v2" style="display:none;">
+        <i id="qr-placeholder-v2" class="bi bi-qr-code" style="font-size:100px; color:#eee;"></i>
+        <p class="small text-muted mt-2">직원에게 보여주세요</p>
+    </div>
+    
+    <div class="pill-card" onclick="showPage('page-main')">
+        <div class="icon-circle" style="background: var(--primary-light); color: var(--primary);"><i class="bi bi-house-door-fill"></i></div>
+        <div class="fw-bold flex-grow-1">메인으로 돌아가기</div>
+        <i class="bi bi-chevron-right"></i>
+    </div>
+
+    <div class="pill-card mt-2" onclick="handleLogout()">
+        <div class="icon-circle" style="background: #ffebee; color: #e74c3c;"><i class="bi bi-power"></i></div>
+        <div class="fw-bold flex-grow-1 text-danger">로그아웃</div>
+        <i class="bi bi-chevron-right text-danger"></i>
+    </div>
+</div>
     <div class="qr-card-v2">
         <img id="qr-img-v2" style="display:none;">
         <i id="qr-placeholder-v2" class="bi bi-qr-code" style="font-size:100px; color:#eee;"></i>
@@ -191,5 +221,6 @@
     </script>
 </body>
 </html>
+
 
 
