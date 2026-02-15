@@ -165,100 +165,97 @@ body { font-family: 'Pretendard', sans-serif; background-color: var(--bg); color
 </div>
 
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbydQbH0V9jDREBGFTw3lIVJjrOdRlB326ut5q5Pdh1sByf5krVtF92-801Qk5oLlvDR/exec";
-        let userData = null;
+const API_URL = "https://script.google.com/macros/s/AKfycbydQbH0V9jDREBGFTw3lIVJjrOdRlB326ut5q5Pdh1sByf5krVtF92-801Qk5oLlvDR/exec";
+    let userData = null;
 
-        function showPage(id) {
-            const pages = document.querySelectorAll('.page');
-            pages.forEach(p => p.classList.remove('active'));
-            const target = document.getElementById(id);
-            if (target) { 
-                target.classList.add('active'); 
-                window.scrollTo(0, 0); 
-            }
+    function showPage(id) {
+        const pages = document.querySelectorAll('.page');
+        pages.forEach(p => p.classList.remove('active'));
+        const target = document.getElementById(id);
+        if (target) { 
+            target.classList.add('active'); 
+            window.scrollTo(0, 0); 
         }
-        function loginOk(data) {
-    userData = data;
-    // 상단 이름과 포인트 업데이트
-    document.getElementById('u-name-top').innerText = data.name + "님 환원니단!";
-    document.getElementById('u-points').innerText = Number(data.points).toLocaleString();
-    
-    // QR 코드 생성 및 표시 (ID 확인!)
-    const qrImg = document.getElementById('qr-img-v2');
-    if(qrImg) {
-        qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${data.email}`;
-        qrImg.style.display = 'inline-block';
-        document.getElementById('qr-placeholder-v2').style.display = 'none';
     }
 
-    // 나머지 UI 제어...
-    document.getElementById('bar-guest').style.display = 'none';
-    document.getElementById('bar-user').style.display = 'block';
-    document.getElementById('btn-user-qr').style.display = 'flex';
-    showPage('page-main');
-}
-
-        async function doLogin() {
-            const email = document.getElementById('l-email').value.trim();
-            const pw = document.getElementById('l-pw').value.trim();
-            if(!email || !pw) return alert("정보를 입력하세요.");
-            showLoading();
-            try {
-                const res = await fetch(API_URL, {
-                    method: 'POST',
-                    mode: 'cors',
-                    body: JSON.stringify({ action: 'loginCheck', email, pw }),
-                    headers: { 'Content-Type': 'text/plain' }
-                }).then(r => r.json());
-                
-                hideLoading();
-                if(res.success) {
-                    localStorage.setItem('gnpay_user', JSON.stringify(res));
-                    loginOk(res);
-                } else { alert(res.msg); }
-            } catch (err) {
-                hideLoading();
-                alert("통신 에러가 발생했습니다.");
-            }
-        }
-
-        function loginOk(data) {
-            userData = data;
-            document.getElementById('u-name-hi').innerText = data.name + "님";
-            document.getElementById('u-points').innerText = Number(data.points).toLocaleString();
-            
-            // QR 코드 생성 (구글 차트 API 활용)
-            const qrImg = document.getElementById('qr-img');
+    // [수정된 통합 loginOk] 하나만 남겨야 합니다!
+    function loginOk(data) {
+        userData = data;
+        
+        // 1. 상단 이름과 포인트 업데이트 (새 디자인 ID 적용)
+        const nameTop = document.getElementById('u-name-top');
+        const pointsEl = document.getElementById('u-points');
+        
+        if(nameTop) nameTop.innerText = data.name + "님 환영합니다!";
+        if(pointsEl) pointsEl.innerText = Number(data.points).toLocaleString();
+        
+        // 2. QR 코드 생성 및 표시 (V2 ID 적용)
+        const qrImg = document.getElementById('qr-img-v2');
+        const qrPlaceholder = document.getElementById('qr-placeholder-v2');
+        
+        if(qrImg) {
             qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${data.email}`;
-            qrImg.style.display = 'block';
-            document.getElementById('qr-placeholder').style.display = 'none';
+            qrImg.style.display = 'inline-block';
+            if(qrPlaceholder) qrPlaceholder.style.display = 'none';
+        }
 
-            document.getElementById('bar-guest').style.display = 'none';
-            document.getElementById('bar-user').style.display = 'block';
-            document.getElementById('btn-user-qr').style.display = 'flex';
+        // 3. UI 제어
+        document.getElementById('bar-guest').style.display = 'none';
+        document.getElementById('bar-user').style.display = 'block';
+        document.getElementById('btn-user-qr').style.display = 'flex';
+        
+        showPage('page-main');
+    }
+
+    async function doLogin() {
+        const email = document.getElementById('l-email').value.trim();
+        const pw = document.getElementById('l-pw').value.trim();
+        if(!email || !pw) return alert("정보를 입력하세요.");
+        
+        showLoading();
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                mode: 'cors',
+                body: JSON.stringify({ action: 'loginCheck', email, pw }),
+                headers: { 'Content-Type': 'text/plain' }
+            });
+            const res = await response.json();
             
-            showPage('page-main');
-        }
-
-        function handleLogout() {
-            if(!confirm("로그아웃 하시겠습니까?")) return;
-            localStorage.removeItem('gnpay_user');
-            document.getElementById('bar-guest').style.display = 'flex';
-            document.getElementById('bar-user').style.display = 'none';
-            document.getElementById('btn-user-qr').style.display = 'none';
-            showPage('page-main');
-        }
-
-        function showLoading() { document.getElementById('loading-overlay').style.display = 'flex'; }
-        function hideLoading() { document.getElementById('loading-overlay').style.display = 'none'; }
-
-        window.onload = function() {
-            const savedUser = localStorage.getItem('gnpay_user');
-            if (savedUser) loginOk(JSON.parse(savedUser));
             hideLoading();
-        };
+            if(res.success) {
+                localStorage.setItem('gnpay_user', JSON.stringify(res));
+                loginOk(res);
+            } else { 
+                alert(res.msg || "로그인 실패"); 
+            }
+        } catch (err) {
+            hideLoading();
+            console.error("통신 에러:", err);
+            alert("통신 에러가 발생했습니다. GAS 배포 설정을 확인하세요.");
+        }
+    }
+
+    function handleLogout() {
+        if(!confirm("로그아웃 하시겠습니까?")) return;
+        localStorage.removeItem('gnpay_user');
+        document.getElementById('bar-guest').style.display = 'flex';
+        document.getElementById('bar-user').style.display = 'none';
+        document.getElementById('btn-user-qr').style.display = 'none';
+        showPage('page-main');
+    }
+
+    function showLoading() { document.getElementById('loading-overlay').style.display = 'flex'; }
+    function hideLoading() { document.getElementById('loading-overlay').style.display = 'none'; }
+
+    window.onload = function() {
+        const savedUser = localStorage.getItem('gnpay_user');
+        if (savedUser) loginOk(JSON.parse(savedUser));
+        hideLoading();
+    };
     </script>
 </body>
 </html>
+
 
 
