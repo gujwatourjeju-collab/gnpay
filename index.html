@@ -138,7 +138,7 @@
     </div>
 
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbxmolI14N5zl5darWrtLKALlB1ztz-pTv2xFnKQV4JjGWxIa_kzkxSChBx619HGVjA3/exec";
+        const API_URL = "https://script.google.com/macros/s/AKfycbwgY5CIUsTJ9Ywge6jNJqECmrG4u3znEwSNtfLnlAyTXobYsS0mg2bfu90POfXSN9Ww/exec";
         let userData = null;
         let selectedFileBase64 = null;
 
@@ -164,16 +164,14 @@ async function doSignup() {
     showLoading();
     try {
         // no-cors 모드는 응답을 읽지는 못하지만, 요청은 무조건 서버로 보냅니다.
-        await fetch(API_URL, {
-            method: 'POST',
-            mode: 'no-cors', 
-            cache: 'no-cache',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                action: 'signup', 
-                name, email, pw, phone, birth, gender 
-            })
-        });
+await fetch(API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ 
+        action: 'signup', 
+        name, email, pw, phone, birth, gender 
+    })
+});
 
         hideLoading();
         
@@ -266,6 +264,7 @@ async function doSignup() {
     </script>
 </body>
 </html>
+
 
 
 
