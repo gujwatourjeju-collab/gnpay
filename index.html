@@ -56,7 +56,7 @@
 </head>
 <body>
     <div id="loading-overlay"><div class="spinner"></div><p class="mt-3 fw-bold text-muted">연결 중...</p></div>
-    <button id="btn-user-qr" onclick="showPage('page-info')"><i class="bi bi-qr-code"></i></button>
+    <button id="btn-user-qr" onclick="handleQrBtnClick()"><i class="bi bi-qr-code"></i></button>
 
     <div id="page-main" class="page active">
         <div class="main-welcome">
@@ -126,6 +126,7 @@
             </div>
         </div>
     </div>
+    
     <div id="page-shops" class="page"><div class="p-4"><i class="bi bi-arrow-left fs-3" onclick="showPage('page-main')"></i><h1 class="mt-4">김녕 가맹점</h1><p>준비 중입니다.</p></div></div>
 
     <script>
@@ -137,6 +138,16 @@
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             window.scrollTo(0, 0);
+        }
+
+        // 상단 버튼 클릭 시: 마이페이지가 아니면 마이페이지로, 마이페이지면 스캔 알림(또는 기능 확장)
+        function handleQrBtnClick() {
+            const activePage = document.querySelector('.page.active').id;
+            if(activePage === 'page-info') {
+                alert("가맹점용 스캐너 기능은 곧 업데이트됩니다! 📷");
+            } else {
+                showPage('page-info');
+            }
         }
 
         function updateUI(data) {
@@ -152,6 +163,7 @@
             document.getElementById('btn-user-qr').style.display = 'flex';
         }
 
+        // 사진 미리보기 로직
         function previewImage(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -165,6 +177,7 @@
             reader.readAsDataURL(file);
         }
 
+        // 사진 업로드 로직
         async function uploadPhoto() {
             if (!userData) return alert("로그인이 필요합니다.");
             showLoading();
