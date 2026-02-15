@@ -149,8 +149,11 @@
         }
 
 function goToSignup() {
-    // API_URL은 아까 배포한 그 주소입니다.
-    window.open("https://script.google.com/macros/s/AKfycbxwcbIxXWXzOzS1gUXtGW-z3wjwvBIx0G60o0I7iH2LRwkgstcH_rnt2JPxZjEHlITg/exec", '회원가입', 'width=400,height=600');
+    const URL = "https://script.google.com/macros/s/AKfycbxwcbIxXWXzOzS1gUXtGW-z3wjwvBIx0G60o0I7iH2LRwkgstcH_rnt2JPxZjEHlITg/exec";
+    
+    // 팝업창 띄우지 말고, 그냥 현재 페이지를 구글 양식으로 날려버리세요.
+    // 이러면 '준비 중' 팝업 자체가 뜰 틈이 없습니다.
+    location.href = URL;
 }
         hideLoading();<script>
     const API_URL = "https://script.google.com/macros/s/AKfycby97aRP9k5XuS8G4UlWxiLFW7OWl3x0wd1C9SrWXLkvOL1MXvkyGmwQXrjNFWp5uuJq/exec";
@@ -263,6 +266,7 @@ function goToSignup() {
 </script>
 </body>
 </html>
+
 
 
 
