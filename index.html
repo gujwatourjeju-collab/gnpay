@@ -57,7 +57,24 @@
             display: flex; gap: 10px;
         }
 
-        #btn-user-qr { position: fixed; top: 15px; right: 15px; z-index: 10010; width: 50px; height: 50px; border-radius: 16px; display: none; background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.12); border:none; font-size: 26px; color: var(--primary); }
+        #btn-user-qr { 
+    position: fixed !important; 
+    top: 15px !important; 
+    right: 15px !important; 
+    z-index: 10010 !important; 
+    width: 48px !important; 
+    height: 48px !important; 
+    border-radius: 14px !important; 
+    display: none; 
+    align-items: center; 
+    justify-content: center; 
+    background: white; 
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
+    border: 1px solid rgba(1, 178, 173, 0.1) !important; /* 은은한 테두리 추가 */
+    color: var(--primary); 
+    font-size: 24px; 
+    padding: 0; /* 내부 여백 제거로 중앙 정렬 보장 */
+}
     </style>
 </head>
 <body>
@@ -167,3 +184,4 @@
     </script>
 </body>
 </html>
+
