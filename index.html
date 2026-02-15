@@ -99,7 +99,7 @@
 
 <script>
     // 1. 설정 (본인의 GAS 배포 주소가 맞는지 꼭 확인!)
-    const API_URL = "https://script.google.com/macros/s/AKfycbxBldgCSPBM49S5CVoVway0AM4IL0tYX12OJH2Qc0r1cnG0OQS3rO2dR2nIltV1Qow/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbzLxRcWm-fuKdHdHT9UNtQSIKkxpL5GcBqG3qqiYrr1mNLfvqsjn8iCcY6iHqmx_zOK/exec";
     let userData = null;
 
     /**
@@ -126,26 +126,15 @@
     /**
      * 3. API 통신 엔진
      */
-    async function apiRequest(action, data = {}, method = "GET") {
-        const url = new URL(API_URL);
-        let options = { method: method, mode: 'cors' };
-
-        if (method === "GET") {
-            url.searchParams.append("action", action);
-            for (let key in data) url.searchParams.append(key, data[key]);
-        } else {
-            options.body = JSON.stringify({ action, ...data });
-            options.headers = { 'Content-Type': 'text/plain' }; 
-        }
-
-        try {
-            const response = await fetch(url, options);
-            return await response.json();
-        } catch (err) {
-            console.error("API 통신 오류:", err);
-            return { success: false, msg: "서버 연결 실패" };
-        }
-    }
+async function apiRequest(action, data = {}, method = "POST") {
+    const response = await fetch(API_URL, {
+        method: 'POST',
+        mode: 'cors', // 이 설정이 중요합니다.
+        body: JSON.stringify({ action, ...data }),
+        headers: { 'Content-Type': 'text/plain' } // GAS 통신용 표준
+    });
+    return await response.json();
+}
 
     /**
      * 4. 로그인 실행 함수
@@ -211,6 +200,7 @@ async function doLogin() {
 </script>
 </body>
 </html>
+
 
 
 
