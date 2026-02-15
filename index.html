@@ -7,36 +7,37 @@
     <title>김녕페이 2.0</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <style>
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
         :root { --primary: #01b2ad; --primary-light: #e6f7f6; --dark: #2d3436; --bg: #f7fbfc; }
-        body { font-family: 'Pretendard', sans-serif; background-color: var(--bg); color: var(--dark); margin:0; padding-top: env(safe-area-inset-top, 20px) !important; padding-bottom: env(safe-area-inset-bottom, 20px) !important; min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
+        body { font-family: 'Pretendard', sans-serif; background-color: var(--bg); color: var(--dark); margin:0; padding-top: env(safe-area-inset-top, 20px) !important; padding-bottom: env(safe-area-inset-bottom, 20px) !important; min-height: 100vh; overflow-x: hidden; }
         
         #loading-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(255,255,255,0.9); z-index:10000; display:none; flex-direction:column; align-items:center; justify-content:center; }
         .spinner { width: 45px; height: 45px; border: 4px solid var(--primary-light); border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        .page { display: none; min-height: 100vh; animation: fadeData 0.3s ease-out; padding-bottom: 100px; }
+        .page { display: none; min-height: 100vh; animation: fadeData 0.3s ease-out; padding-bottom: 120px; }
         .active { display: block; }
+        @keyframes fadeData { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
         #btn-user-qr { position: fixed !important; top: 15px !important; right: 15px !important; z-index: 10010 !important; width: 48px !important; height: 48px !important; border-radius: 14px !important; display: none; align-items: center; justify-content: center; background: white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); color: var(--dark); border:none; font-size: 24px; }
         
         .btn-primary { background-color: var(--primary) !important; border: none !important; box-shadow: 0 4px 15px rgba(1, 178, 173, 0.2) !important; transition: all 0.2s ease; }
-        .btn-primary:active { transform: scale(0.96); }
-
-        .menu-card { background: white; border-radius: 20px; padding: 24px; margin-bottom: 16px; border: 1px solid rgba(0,0,0,0.05); display: flex; align-items: center; text-decoration: none; color: var(--dark); transition: background 0.2s; }
-        .menu-card:active { background-color: #f0f9f8; }
+        .menu-card { background: white; border-radius: 20px; padding: 24px; margin-bottom: 16px; border: 1px solid rgba(0,0,0,0.05); display: flex; align-items: center; text-decoration: none; color: var(--dark); transition: background 0.2s; cursor: pointer; }
+        .menu-card:active { background-color: #f0f9f8; transform: scale(0.98); }
         .menu-icon { width: 50px; height: 50px; background: var(--primary-light); border-radius: 14px; display: flex; align-items: center; justify-content: center; margin-right: 16px; color: var(--primary); font-size: 24px; }
         
         .info-card { background: linear-gradient(135deg, #01b2ad 0%, #008a86 100%) !important; padding: 40px 20px !important; border-radius: 0 0 40px 40px !important; color: white !important; text-align: center; margin-bottom: 20px; }
-        .qr-area { background: white !important; padding: 15px !important; border-radius: 25px !important; box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important; margin: 20px auto 10px !important; width: fit-content; min-height: 190px; display: flex; align-items: center; justify-content: center; }
+        .qr-area { background: white !important; padding: 15px !important; border-radius: 25px !important; box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important; margin: 20px auto 10px !important; width: 190px; height: 190px; display: flex; align-items: center; justify-content: center; }
+        
+        .nav-header { padding: 20px; display: flex; align-items: center; background: white; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 100; }
+        .nav-header i { font-size: 24px; margin-right: 15px; cursor: pointer; }
     </style>
 </head>
 <body>
     <div id="loading-overlay"><div class="spinner"></div><p class="mt-3 fw-bold text-muted">연결 중...</p></div>
     
-    <button id="btn-user-qr" onclick="showPage('page-info')"><i class="bi bi-qr-code-scan"></i></button>
+    <button id="btn-user-qr" onclick="showPage('page-info')"><i class="bi bi-qr-code"></i></button>
 
     <div id="page-main" class="page active">
         <div class="p-4">
@@ -51,28 +52,58 @@
                 </div>
             </div>
 
-            <div class="menu-card shadow-sm" onclick="alert('가맹점을 준비 중입니다.')">
+            <div class="menu-card shadow-sm" onclick="showPage('page-shops')">
                 <div class="menu-icon" style="background:#fff3e0; color:#ff9800;"><i class="bi bi-shop"></i></div>
                 <div>
                     <div class="fw-bold">김녕 가맹점 찾기</div>
-                    <div class="text-muted small">모은 포인트로 맛집 탐방!</div>
+                    <div class="text-muted small">포인트 사용 가능한 곳 확인</div>
                 </div>
             </div>
         </div>
 
         <div class="fixed-bottom p-4 bg-white border-top d-flex justify-content-between" id="bar-guest">
             <button class="btn btn-primary w-50 me-2 p-3 rounded-4" onclick="showPage('page-login')">로그인</button>
-            <button class="btn btn-outline-primary w-50 p-3 rounded-4" onclick="showPage('page-join')">회원가입</button>
+            <button class="btn btn-outline-primary w-50 p-3 rounded-4" onclick="alert('회원가입은 준비 중입니다.')">회원가입</button>
         </div>
         <div class="fixed-bottom p-4 bg-white border-top" id="bar-user" style="display:none;">
             <button class="btn btn-primary w-100 p-3 rounded-4" onclick="showPage('page-info')">내 정보 및 QR 확인</button>
         </div>
     </div>
 
+    <div id="page-activities" class="page">
+        <div class="nav-header">
+            <i class="bi bi-arrow-left" onclick="showPage('page-main')"></i>
+            <h5 class="mb-0 fw-bold">환경 정화 활동</h5>
+        </div>
+        <div class="p-4 text-center">
+            <div class="py-5">
+                <i class="bi bi-camera-fill display-1 text-muted mb-3"></i>
+                <h4 class="fw-bold">활동 사진 인증</h4>
+                <p class="text-muted">김녕 해변 정화 활동 후<br>인증 사진을 찍어 올려주세요.</p>
+            </div>
+            <button class="btn btn-primary w-100 p-3 rounded-4 mb-3" onclick="alert('카메라 기능을 연결할 예정입니다.')">사진 촬영하기</button>
+        </div>
+    </div>
+
+    <div id="page-shops" class="page">
+        <div class="nav-header">
+            <i class="bi bi-arrow-left" onclick="showPage('page-main')"></i>
+            <h5 class="mb-0 fw-bold">김녕 가맹점</h5>
+        </div>
+        <div class="p-4 text-center text-muted">
+            <div class="py-5">
+                <i class="bi bi-shop display-4 mb-3"></i>
+                <p>김녕페이와 함께하는<br>가맹점을 준비 중입니다.</p>
+            </div>
+        </div>
+    </div>
+
     <div id="page-login" class="page">
-        <div class="p-4"><i class="bi bi-chevron-left fs-2" onclick="showPage('page-main')"></i></div>
-        <div class="container px-4">
-            <h2 class="fw-bold mb-5">로그인</h2>
+        <div class="nav-header">
+            <i class="bi bi-arrow-left" onclick="showPage('page-main')"></i>
+            <h5 class="mb-0 fw-bold">로그인</h5>
+        </div>
+        <div class="container p-4">
             <input type="email" id="l-email" class="form-control mb-3 p-3" placeholder="이메일 주소" autocapitalize="none">
             <input type="password" id="l-pw" class="form-control mb-4 p-3" placeholder="비밀번호" autocapitalize="none">
             <button class="btn btn-primary w-100 p-3 rounded-4" onclick="doLogin()">로그인하기</button>
@@ -84,7 +115,8 @@
             <h5 id="u-name-hi">환영합니다!</h5>
             <h1 class="display-5 fw-bold mb-4"><span id="u-points">0</span> P</h1>
             <div class="qr-area">
-                <i class="bi bi-qr-code" style="font-size: 100px; color: #eee;"></i>
+                <img id="qr-img" style="width:160px; height:160px; display:none;">
+                <i id="qr-placeholder" class="bi bi-qr-code" style="font-size: 100px; color: #eee;"></i>
             </div>
         </div>
         <div class="p-4">
@@ -111,23 +143,19 @@
             }
         }
 
-        async function apiRequest(action, data = {}) {
-            const response = await fetch(API_URL, {
-                method: 'POST',
-                mode: 'cors',
-                body: JSON.stringify({ action, ...data }),
-                headers: { 'Content-Type': 'text/plain' }
-            });
-            return await response.json();
-        }
-
         async function doLogin() {
             const email = document.getElementById('l-email').value.trim();
             const pw = document.getElementById('l-pw').value.trim();
             if(!email || !pw) return alert("정보를 입력하세요.");
             showLoading();
             try {
-                const res = await apiRequest('loginCheck', { email, pw });
+                const res = await fetch(API_URL, {
+                    method: 'POST',
+                    mode: 'cors',
+                    body: JSON.stringify({ action: 'loginCheck', email, pw }),
+                    headers: { 'Content-Type': 'text/plain' }
+                }).then(r => r.json());
+                
                 hideLoading();
                 if(res.success) {
                     localStorage.setItem('gnpay_user', JSON.stringify(res));
@@ -144,7 +172,12 @@
             document.getElementById('u-name-hi').innerText = data.name + "님";
             document.getElementById('u-points').innerText = Number(data.points).toLocaleString();
             
-            // UI 상태 변경
+            // QR 코드 생성 (구글 차트 API 활용)
+            const qrImg = document.getElementById('qr-img');
+            qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${data.email}`;
+            qrImg.style.display = 'block';
+            document.getElementById('qr-placeholder').style.display = 'none';
+
             document.getElementById('bar-guest').style.display = 'none';
             document.getElementById('bar-user').style.display = 'block';
             document.getElementById('btn-user-qr').style.display = 'flex';
@@ -155,7 +188,6 @@
         function handleLogout() {
             if(!confirm("로그아웃 하시겠습니까?")) return;
             localStorage.removeItem('gnpay_user');
-            // 초기 상태로 UI 리셋
             document.getElementById('bar-guest').style.display = 'flex';
             document.getElementById('bar-user').style.display = 'none';
             document.getElementById('btn-user-qr').style.display = 'none';
@@ -167,9 +199,7 @@
 
         window.onload = function() {
             const savedUser = localStorage.getItem('gnpay_user');
-            if (savedUser) {
-                loginOk(JSON.parse(savedUser));
-            }
+            if (savedUser) loginOk(JSON.parse(savedUser));
             hideLoading();
         };
     </script>
