@@ -12,24 +12,39 @@
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
         :root { --primary: #01b2ad; --primary-grad: linear-gradient(135deg, #01b2ad 0%, #00d2ff 100%); --bg-grad: linear-gradient(180deg, #e6f7f6 0%, #f8fcfc 40%, #ffffff 100%); }
         body { font-family: 'Pretendard', sans-serif; background: var(--bg-grad); margin:0; padding: env(safe-area-inset-top, 20px) 0 140px 0; min-height: 100vh; color: #1a1a1a; }
-        .top-nav { display: flex; justify-content: space-between; align-items: center; padding: 40px 25px 10px; }
+        
+        /* 상단 네비게이션 (사용자님 원본 디자인 유지) */
+        .top-nav { display: flex; justify-content: space-between; align-items: flex-start; padding: 40px 25px 10px; }
         .auth-links { display: flex; gap: 5px; align-items: center; }
         .auth-link { font-size: 0.85rem; font-weight: 700; color: #888; text-decoration: none; cursor: pointer; padding: 8px 5px; line-height: 1; white-space: nowrap; }
+        
         .custom-input { border: none; border-radius: 16px; background: white; padding: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); margin-bottom: 15px; }
         .form-label { font-size: 0.8rem; font-weight: 700; color: #666; margin-left: 5px; margin-bottom: 5px; }
         .dashboard-card { background: white; margin: 0 20px 30px; padding: 30px; border-radius: 28px; box-shadow: 0 15px 35px rgba(1, 178, 173, 0.15); display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
         .amount-text { font-size: 2.2rem; font-weight: 900; background: var(--primary-grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .btn-scan { width: 100%; padding: 20px; border-radius: 24px; font-weight: 800; border: none; color: white; background: var(--primary-grad); box-shadow: 0 12px 24px rgba(1, 178, 173, 0.3); display: flex; align-items: center; justify-content: center; gap: 10px; }
         .fixed-footer-nav { position: fixed; bottom: 35px; left: 20px; right: 20px; z-index: 1000; }
+        
+        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 0 20px; margin-bottom: 30px; }
+        .menu-item { background: white; padding: 20px; text-align: center; border-radius: 24px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); border: 1px solid #eee; cursor: pointer; }
+        .menu-item i { font-size: 1.8rem; margin-bottom: 5px; display: inline-block; background: var(--primary-grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .menu-item .menu-title { font-size: 0.9rem; font-weight: 800; color: #333; margin-top: 5px; }
+
         .page { display: none; animation: fadeIn 0.3s ease-in-out; }
         .active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
         #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.9); z-index: 10000; display: none; justify-content: center; align-items: center; flex-direction: column; }
         #qr-focus-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; }
         .qr-wrapper { position: relative; width: 100%; display: flex; justify-content: center; align-items: center; }
         .qr-logo-box { position: absolute; width: 60px; height: 60px; background: var(--primary-grad); border-radius: 16px; border: 2px solid white; box-shadow: 0 4px 12px rgba(0,0,0,0.2); overflow: hidden; display: flex; align-items: center; justify-content: center; }
         .qr-logo-box img { width: 100%; height: 100%; object-fit: contain; }
-        .bi-patch-check-fill, .bi-bag-heart-fill, .bi-person-vcard-fill, .bi-journal-check { background: var(--primary-grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: inline-block; }
+        
+        /* 상태 뱃지 스타일 */
+        .badge-status { padding: 5px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; }
+        .badge-pending { background: #fff3cd; color: #856404; }
+        .badge-approved { background: #d4edda; color: #155724; }
+        .badge-rejected { background: #f8d7da; color: #721c24; }
     </style>
 </head>
 <body>
@@ -64,14 +79,31 @@
         <div class="pb-4" style="padding-left: 35px; padding-right: 25px;">
             <h1 class="fw-bolder mt-2" id="welcome-message">함께 만드는<br><strong>푸른 김녕 Wave</strong></h1>
         </div>
+        
         <div class="dashboard-card" id="qr-trigger">
             <div><div class="small fw-bold text-muted">MY POINTS</div><div class="amount-text" id="main-u-points">0</div></div>
             <div style="background: var(--primary-grad); color:white; width:50px; height:50px; border-radius:18px; display:flex; align-items:center; justify-content:center; font-size:1.5rem;"><i class="bi bi-qr-code"></i></div>
         </div>
-        <div class="px-4 mb-5" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-            <div class="p-4 bg-white text-center shadow-sm rounded-4 border" onclick="alert('준비 중')"><i class="bi bi-patch-check-fill fs-1"></i><div class="fw-bold mt-2">정화 활동</div></div>
-            <div class="p-4 bg-white text-center shadow-sm rounded-4 border" onclick="alert('준비 중')"><i class="bi bi-bag-heart-fill fs-1"></i><div class="fw-bold mt-2">가맹점</div></div>
+        
+        <div class="menu-grid">
+            <div class="menu-item" onclick="openSubmit('우리 마을 플로깅 (자유)', 2000, '김녕의 아름다운 바다와 마을을 위해 힘써주셔서 감사합니다.<br>활동 사진을 올려주시면 포인트가 지급됩니다.')">
+                <i class="bi bi-patch-check-fill"></i>
+                <div class="menu-title">정화 활동</div>
+            </div>
+            <div class="menu-item" onclick="alert('가맹점 기능은 준비 중입니다.')">
+                <i class="bi bi-bag-heart-fill"></i>
+                <div class="menu-title">가맹점</div>
+            </div>
+            <div class="menu-item" onclick="showPage('page-activities')">
+                <i class="bi bi-calendar-check-fill"></i>
+                <div class="menu-title">진행중 활동</div>
+            </div>
+            <div class="menu-item" onclick="showPage('page-guide')">
+                <i class="bi bi-info-circle-fill"></i>
+                <div class="menu-title">앱사용 안내</div>
+            </div>
         </div>
+        
         <div class="fixed-footer-nav"><button class="btn-scan" onclick="handleScan()"><i class="bi bi-camera-fill fs-4"></i> 인증용 QR 스캔하기</button></div>
     </div>
 
@@ -80,7 +112,7 @@
             <div><img src="https://gnpay.my/log.png" style="width: 85px; margin-bottom: 8px;"><div style="color:var(--primary); font-weight:900; font-size:1.4rem; letter-spacing:-0.5px; margin-left: 10px;">김녕페이 2.0</div></div>
             <div class="fs-2 text-secondary" style="cursor:pointer; padding: 10px;" onclick="showPage('page-main')"><i class="bi bi-x"></i></div>
         </div>
-        <div class="px-4 mt-4">
+        <div class="mt-4" style="padding-left: 35px; padding-right: 25px;">
             <h1 class="fw-bolder mb-5">반가워요!<br><strong>로그인 해주세요</strong></h1>
             <input type="email" id="login-email" class="form-control custom-input" placeholder="이메일">
             <input type="password" id="login-pw" class="form-control custom-input" placeholder="비밀번호">
@@ -94,7 +126,7 @@
             <div><img src="https://gnpay.my/log.png" style="width: 85px; margin-bottom: 8px;"><div style="color:var(--primary); font-weight:900; font-size:1.4rem; letter-spacing:-0.5px; margin-left: 10px;">김녕페이 2.0</div></div>
             <div class="fs-2 text-secondary" style="cursor:pointer; padding: 10px;" onclick="showPage('page-main')"><i class="bi bi-x"></i></div>
         </div>
-        <div class="px-4 mt-4">
+        <div class="mt-4" style="padding-left: 35px; padding-right: 25px;">
             <h1 class="fw-bolder mb-4">새로운 시작!<br><strong>정보를 입력하세요</strong></h1>
             <input type="text" id="reg-name" class="form-control custom-input" placeholder="이름">
             <input type="email" id="reg-email" class="form-control custom-input" placeholder="이메일">
@@ -109,7 +141,6 @@
             <div class="fw-bold text-secondary" style="cursor:pointer; padding:10px;" onclick="showPage('page-main')"><i class="bi bi-chevron-left"></i> 홈으로</div>
             <div style="color:var(--primary); font-weight:900; font-size:1.3rem;">마이페이지</div>
         </div>
-        
         <div class="bg-white p-4 mx-3 rounded-5 text-center shadow-lg border mt-3">
             <div class="fw-bold mb-3 small" style="color:var(--primary)">GIMNYEONG PASS</div>
             <div class="qr-wrapper">
@@ -121,28 +152,107 @@
                 <div class="small text-muted fw-bold">나의 에코 포인트</div>
             </div>
         </div>
-
         <div class="px-4 mt-4" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-            <div class="p-4 bg-white text-center shadow-sm rounded-4 border" onclick="alert('준비 중')">
-                <i class="bi bi-person-vcard-fill fs-1"></i>
-                <div class="fw-bold mt-2" style="font-size:0.9rem;">내 정보 확인</div>
-            </div>
-            <div class="p-4 bg-white text-center shadow-sm rounded-4 border" onclick="alert('준비 중')">
-                <i class="bi bi-journal-check fs-1"></i>
-                <div class="fw-bold mt-2" style="font-size:0.9rem;">활동 내역</div>
+            <div class="menu-item" onclick="openEditInfo()"><i class="bi bi-person-vcard-fill"></i><div class="menu-title">내 정보 수정</div></div>
+            <div class="menu-item" onclick="loadActivityHistory()"><i class="bi bi-journal-check"></i><div class="menu-title">활동 내역</div></div>
+        </div>
+        <div class="px-4 mt-4 text-center"><button class="btn btn-link text-danger text-decoration-none small" onclick="logout()">로그아웃</button></div>
+    </div>
+
+    <div id="page-edit-info" class="page">
+        <div class="top-nav">
+            <div class="fw-bold text-secondary" style="cursor:pointer; padding:10px;" onclick="showPage('page-mypage')"><i class="bi bi-chevron-left"></i> 취소</div>
+            <div class="fw-bold">정보 수정</div>
+        </div>
+        <div class="px-4 mt-3">
+            <div class="form-label">이름 (수정불가)</div>
+            <input type="text" id="edit-name" class="form-control custom-input" disabled>
+            <div class="form-label">이메일 (수정불가)</div>
+            <input type="email" id="edit-email" class="form-control custom-input" disabled>
+            <div class="form-label">새 비밀번호</div>
+            <input type="password" id="edit-pw" class="form-control custom-input" placeholder="변경할 경우 입력">
+            <div class="form-label">전화번호</div>
+            <input type="tel" id="edit-phone" class="form-control custom-input">
+            <button class="btn-scan w-100 mt-4" onclick="submitEditInfo()">수정 완료</button>
+        </div>
+    </div>
+
+    <div id="page-history" class="page">
+        <div class="top-nav">
+            <div class="fw-bold text-secondary" style="cursor:pointer; padding:10px;" onclick="showPage('page-mypage')"><i class="bi bi-chevron-left"></i> 뒤로</div>
+            <div class="fw-bold">신청 내역</div>
+        </div>
+        <div class="px-4 mt-2" id="history-list">
+            <div class="text-center text-muted mt-5 small">불러오는 중...</div>
+        </div>
+    </div>
+
+    <div id="page-activities" class="page">
+        <div class="top-nav">
+            <div class="fw-bold text-secondary" style="cursor:pointer; padding:10px;" onclick="showPage('page-main')"><i class="bi bi-chevron-left"></i> 홈으로</div>
+            <div style="color:var(--primary); font-weight:900; font-size:1.3rem;">진행중 활동</div>
+        </div>
+        <div class="px-3 mt-3">
+            <div class="dashboard-card" onclick="openSubmit('김녕 성세기해변 플로깅', 2000, '김녕의 푸른 바다를 위해 플로깅 활동을 인증해주세요.')">
+                <div>
+                    <div class="fw-bold" style="font-size:1.1rem;">김녕 성세기해변 플로깅</div>
+                    <div class="text-success small fw-bold">+2,000 포인트</div>
+                </div>
+                <i class="bi bi-chevron-right fs-4"></i>
             </div>
         </div>
-        
-        <div class="px-4 mt-4 text-center">
-            <button class="btn btn-link text-danger text-decoration-none small" onclick="logout()">로그아웃</button>
+    </div>
+
+    <div id="page-submit-act" class="page">
+        <div class="top-nav">
+            <div class="fw-bold text-secondary" style="cursor:pointer; padding:10px;" onclick="showPage('page-main')"><i class="bi bi-x-lg"></i></div>
+            <div id="act-title-display" class="fw-bold">인증하기</div>
         </div>
+        <div class="px-4 mt-3">
+            <div id="act-desc-display" class="small text-muted mb-4 p-3 bg-light rounded-3"></div>
+            
+            <div class="small fw-bold text-muted mb-2">활동 내용</div>
+            <textarea id="act-content" class="form-control custom-input" rows="4" placeholder="활동 내용을 입력하세요."></textarea>
+            
+            <div class="small fw-bold text-muted mb-2">사진 첨부 (최대 3장)</div>
+            <input type="file" id="act-files" class="form-control custom-input" accept="image/*" multiple onchange="previewImages()">
+            
+            <div id="image-preview" class="d-flex gap-2 mb-4 overflow-auto pb-2"></div>
+            
+            <button class="btn-scan w-100" onclick="submitActivity()">신청하기</button>
+        </div>
+    </div>
+
+    <div id="page-guide" class="page">
+        <div class="top-nav">
+            <div class="fw-bold text-secondary" style="cursor:pointer; padding:10px;" onclick="showPage('page-main')"><i class="bi bi-x-lg"></i></div>
+            <div class="fw-bold">앱 사용 안내</div>
+        </div>
+        <div class="px-4 mt-3">
+            <div class="custom-input p-4">
+                <h6 class="fw-bold" style="color:var(--primary);">1. 포인트 적립</h6>
+                <p class="small text-muted mb-4">현장 QR 스캔으로 즉시 적립하세요.</p>
+                <h6 class="fw-bold" style="color:var(--primary);">2. 활동 인증</h6>
+                <p class="small text-muted">진행중 활동에서 인증 사진을 올려주세요.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="scanner-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:black; z-index:20000;">
+        <div id="reader" style="width:100%; height:80vh;"></div>
+        <button class="btn btn-light" style="position:absolute; bottom:50px; left:50%; transform:translateX(-50%);" onclick="closeScanner()">닫기</button>
     </div>
 
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script>
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbx4b_7Af83uBEERmz7cjGB4ooTADffbwX8eTN0H6tranviyLTmhawDyEDBIEv8hAfkf/exec";
+        // [중요] 여기에 배포한 GAS URL을 넣어주세요
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbw7FBWIj1F1F6dciKnQf5y9ZYExj2JRvo-1A4SKEdPQn9ineCh73hLBtTE7weXOjUfP/exec";
+        
         let userData = JSON.parse(localStorage.getItem('gnpay_user')) || { isLoggedIn: false, points: 0 };
+        let selectedImages = [];
+        let currentAct = { title: "", amount: 0 };
         const loading = document.getElementById('loading-overlay');
+        let html5QrCode;
 
         function showPage(pageId) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -160,7 +270,6 @@
                 welcome.innerHTML = `${userData.name}님, 오늘도<br><strong>푸른 김녕을 지켜요!</strong>`;
             } else {
                 authArea.innerHTML = `<span class="auth-link" onclick="showPage('page-signup')">회원가입</span><span style="color:#eee; font-size:0.7rem;">|</span><span class="auth-link text-dark" onclick="showPage('page-login')">로그인</span>`;
-                welcome.innerHTML = `함께 만드는<br><strong>푸른 김녕 Wave</strong>`;
             }
         }
 
@@ -183,7 +292,7 @@
                     updateUI();
                     showPage('page-main');
                 } else { alert(res.message); }
-            } catch (e) { alert("오류"); }
+            } catch (e) { alert("오류: " + e); }
             loading.style.display='none';
         }
 
@@ -197,18 +306,125 @@
             loading.style.display='none';
         }
 
-        async function handleScan() {
-            if (!userData.isLoggedIn) { showPage('page-login'); return; }
-            const scannerModal = document.getElementById('scanner-modal');
-            if(!scannerModal) return alert("스캐너 설정 오류");
-            scannerModal.style.display = 'block';
-            const html5QrCode = new Html5Qrcode("reader");
-            html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, async (decodedText) => {
-                html5QrCode.stop().then(() => { scannerModal.style.display = 'none'; });
-                processAddPoints(100, "환경 정화 활동");
+        // 활동 신청
+        function openSubmit(title, amount, description) {
+            if (!userData.isLoggedIn) return showPage('page-login');
+            currentAct = { title, amount };
+            document.getElementById('act-title-display').innerText = title;
+            document.getElementById('act-desc-display').innerHTML = description || "활동 내용을 입력하세요.";
+            showPage('page-submit-act');
+        }
+
+        function previewImages() {
+            const files = document.getElementById('act-files').files;
+            const preview = document.getElementById('image-preview');
+            preview.innerHTML = '';
+            selectedImages = [];
+            Array.from(files).slice(0, 3).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    selectedImages.push(e.target.result);
+                    preview.innerHTML += `<img src="${e.target.result}" style="width:70px;height:70px;border-radius:10px;object-fit:cover;">`;
+                };
+                reader.readAsDataURL(file);
             });
         }
 
+        async function submitActivity() {
+            const content = document.getElementById('act-content').value;
+            if(!content || selectedImages.length === 0) return alert("내용과 사진을 등록해주세요.");
+            loading.style.display='flex';
+            try {
+                const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ type: 'submitActivity', email: userData.email, title: currentAct.title, content: content, images: selectedImages, pointAmount: currentAct.amount }) }).then(r => r.json());
+                if(res.result === 'success') { 
+                    alert("신청 완료! 관리자 확인 후 포인트가 지급됩니다."); 
+                    showPage('page-main'); 
+                } else {
+                    alert("오류: " + (res.message || "알 수 없음"));
+                }
+            } catch(e) { alert("서버 통신 오류"); }
+            loading.style.display='none';
+        }
+
+        // 활동 내역 조회
+        async function loadActivityHistory() {
+            showPage('page-history');
+            const list = document.getElementById('history-list');
+            list.innerHTML = '<div class="text-center mt-5"><div class="spinner-border text-info"></div></div>';
+            
+            try {
+                const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ type: 'getActivityHistory', email: userData.email }) }).then(r => r.json());
+                if(res.result === 'success') {
+                    if(res.history.length === 0) {
+                        list.innerHTML = '<div class="text-center text-muted mt-5 small">신청 내역이 없습니다.</div>';
+                    } else {
+                        list.innerHTML = res.history.map(item => {
+                            let badgeClass = 'badge-pending';
+                            if(item.status === '승인') badgeClass = 'badge-approved';
+                            else if(item.status === '반려') badgeClass = 'badge-rejected';
+                            return `
+                                <div class="bg-white p-3 mb-3 rounded-4 shadow-sm border">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <span class="badge ${badgeClass}">${item.status}</span>
+                                        <span class="small text-muted">${item.date}</span>
+                                    </div>
+                                    <div class="fw-bold">${item.title}</div>
+                                    <div class="small text-muted mt-1">+${item.points.toLocaleString()}P</div>
+                                </div>`;
+                        }).join('');
+                    }
+                }
+            } catch(e) { list.innerHTML = '<div class="text-center text-danger mt-5">불러오기 실패</div>'; }
+        }
+
+        // 내 정보 수정 화면
+        function openEditInfo() {
+            document.getElementById('edit-name').value = userData.name;
+            document.getElementById('edit-email').value = userData.email;
+            document.getElementById('edit-phone').value = userData.phone; // 기존 전화번호 표시
+            showPage('page-edit-info');
+        }
+
+        // 내 정보 수정 전송
+        async function submitEditInfo() {
+            const newPw = document.getElementById('edit-pw').value;
+            const newPhone = document.getElementById('edit-phone').value;
+            if(!newPhone) return alert("전화번호를 입력해주세요.");
+
+            loading.style.display = 'flex';
+            try {
+                const res = await fetch(GAS_URL, { 
+                    method: 'POST', 
+                    body: JSON.stringify({ 
+                        type: 'updateUserInfo', 
+                        email: userData.email, 
+                        newPhone: newPhone, 
+                        newPw: newPw 
+                    }) 
+                }).then(r => r.json());
+
+                if(res.result === 'success') {
+                    alert("수정되었습니다.");
+                    userData.phone = newPhone;
+                    localStorage.setItem('gnpay_user', JSON.stringify(userData));
+                    showPage('page-mypage');
+                } else { alert("수정 실패: " + res.message); }
+            } catch(e) { alert("오류"); }
+            loading.style.display = 'none';
+        }
+
+        // QR 스캐너
+        async function handleScan() {
+            if (!userData.isLoggedIn) return showPage('page-login');
+            document.getElementById('scanner-modal').style.display = 'block';
+            html5QrCode = new Html5Qrcode("reader");
+            html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, async (text) => {
+                closeScanner();
+                processAddPoints(100, "환경 정화 활동");
+            });
+        }
+        function closeScanner() { if(html5QrCode) html5QrCode.stop(); document.getElementById('scanner-modal').style.display='none'; }
+        
         async function processAddPoints(amount, action) {
             loading.style.display = 'flex';
             try {
@@ -223,28 +439,16 @@
             loading.style.display = 'none';
         }
 
-        function logout() {
-            if (confirm('로그아웃?')) {
-                localStorage.removeItem('gnpay_user');
-                userData = { isLoggedIn: false, points: 0 };
-                updateUI();
-                showPage('page-main');
-            }
-        }
+        function logout() { if(confirm('로그아웃?')) { localStorage.removeItem('gnpay_user'); location.reload(); } }
 
         document.getElementById('qr-trigger').onclick = (e) => {
             if (!userData.isLoggedIn) { showPage('page-login'); return; }
             document.getElementById('focus-points').innerText = Number(userData.points).toLocaleString();
-            document.getElementById('qr-img-large').src = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${userData.email}`;
+            document.getElementById('qr-img-large').src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${userData.email}`;
             document.getElementById('qr-focus-layer').style.display = 'flex';
         };
 
         window.onload = updateUI;
     </script>
-
-    <div id="scanner-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:black; z-index:20000;">
-        <div id="reader" style="width:100%; height:80vh;"></div>
-        <button class="btn btn-light" style="position:absolute; bottom:50px; left:50%; transform:translateX(-50%);" onclick="document.getElementById('scanner-modal').style.display='none'">닫기</button>
-    </div>
 </body>
 </html>
