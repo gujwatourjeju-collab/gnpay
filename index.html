@@ -138,7 +138,7 @@
     </div>
 
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbwzaol9eAZTls87Gv-CVAD0pYIFXhjDBMDunJbnR9lAKmtOXhyXnQsDw0LuEZIMGGtU/exec";
+        const API_URL = "https://script.google.com/macros/s/AKfycbxP6iq11asbUVre-b0A7zGr0sxItSl92fYWt2tHMVeQ4CHNMfsHuq7WUZzF8ZHru3hL/exec";
         let userData = null;
         let selectedFileBase64 = null;
 
@@ -148,15 +148,18 @@
             window.scrollTo(0, 0);
         }
 
-        async function doSignup() {
-            const name = document.getElementById('s-name').value.trim();
-            const email = document.getElementById('s-email').value.trim();
-            const pw = document.getElementById('s-pw').value.trim();
-            const phone = document.getElementById('s-phone').value.trim();
-            const birth = document.getElementById('s-birth').value;
-            const gender = document.getElementById('s-gender').value;
+async function doSignup() {
+    const name = document.getElementById('s-name').value.trim();
+    const email = document.getElementById('s-email').value.trim();
+    const pw = document.getElementById('s-pw').value.trim();
+    const phone = document.getElementById('s-phone').value.trim();
+    const birth = document.getElementById('s-birth').value;
+    const gender = document.getElementById('s-gender').value;
 
-            if(!name || !email || !pw) return alert("필수 정보를 입력하세요.");
+    if(!name || !email || !pw) {
+        alert("이름, 이메일, 비밀번호는 필수입니다.");
+        return;
+    }
             showLoading();
             try {
                 const res = await fetch(API_URL, {
@@ -248,3 +251,4 @@
     </script>
 </body>
 </html>
+
