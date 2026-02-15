@@ -138,7 +138,7 @@
     </div>
 
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbzFgZjD0RxkLeqXpJyyLnA_oSa4r0_3yY7nW4XXEZ_13bCUyX-rZI1tLxUoq9wbihDMeg/exec";
+        const API_URL = "https://script.google.com/macros/s/AKfycby97aRP9k5XuS8G4UlWxiLFW7OWl3x0wd1C9SrWXLkvOL1MXvkyGmwQXrjNFWp5uuJq/exec";
         let userData = null;
         let selectedFileBase64 = null;
 
@@ -148,31 +148,10 @@
             window.scrollTo(0, 0);
         }
 
-async function doSignup() {
-    const name = document.getElementById('s-name').value.trim();
-    const email = document.getElementById('s-email').value.trim();
-    const pw = document.getElementById('s-pw').value.trim();
-    const phone = document.getElementById('s-phone').value.trim();
-    const birth = document.getElementById('s-birth').value;
-    const gender = document.getElementById('s-gender').value;
-
-    if(!name || !email || !pw) {
-        alert("이름, 이메일, 비밀번호는 필수입니다.");
-        return;
-    }
-
-    showLoading();
-    try {
-        // no-cors 모드는 응답을 읽지는 못하지만, 요청은 무조건 서버로 보냅니다.
-await fetch(API_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ 
-        action: 'signup', 
-        name, email, pw, phone, birth, gender 
-    })
-});
-
+function goToSignup() {
+    // API_URL은 아까 배포한 그 주소입니다.
+    window.open(API_URL, '회원가입', 'width=400,height=600');
+}
         hideLoading();
         
         // 서버 대답을 기다리지 않고 일단 성공 메시지를 띄웁니다.
@@ -264,6 +243,7 @@ await fetch(API_URL, {
     </script>
 </body>
 </html>
+
 
 
 
