@@ -99,7 +99,7 @@
 
 <script>
     // 1. 설정 (본인의 GAS 배포 주소가 맞는지 꼭 확인!)
-    const API_URL = "https://script.google.com/macros/s/AKfycbzLxRcWm-fuKdHdHT9UNtQSIKkxpL5GcBqG3qqiYrr1mNLfvqsjn8iCcY6iHqmx_zOK/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbz0OQHc5lQCCozsH_DUSmw8VDVzbDx_sHkqtfX8rCs7GnyZSrdsMtOdjwV7kshUYLqX/exec";
     let userData = null;
 
     /**
@@ -126,43 +126,34 @@
     /**
      * 3. API 통신 엔진
      */
-async function apiRequest(action, data = {}, method = "POST") {
+async function apiRequest(action, data = {}) {
     const response = await fetch(API_URL, {
         method: 'POST',
-        mode: 'cors', // 이 설정이 중요합니다.
+        mode: 'cors', // 중요!
         body: JSON.stringify({ action, ...data }),
-        headers: { 'Content-Type': 'text/plain' } // GAS 통신용 표준
+        headers: { 'Content-Type': 'text/plain' } // GAS 통신 표준
     });
     return await response.json();
 }
 
-    /**
-     * 4. 로그인 실행 함수
-     */
 async function doLogin() {
-    const emailEl = document.getElementById('l-email');
-    const pwEl = document.getElementById('l-pw');
-    const email = emailEl.value.trim().toLowerCase(); 
-    const pw = pwEl.value.trim();
-    
+    const email = document.getElementById('l-email').value.trim();
+    const pw = document.getElementById('l-pw').value.trim();
     if(!email || !pw) return alert("정보를 입력하세요.");
 
-    showLoading(); // 로딩 시작
+    showLoading();
     try {
-        console.log("GAS로 전송 중...");
-        const res = await apiRequest('loginCheck', { email, pw }, 'POST');
-        hideLoading(); // 응답 오면 로딩 종료
-
+        const res = await apiRequest('loginCheck', { email, pw });
+        hideLoading();
         if(res.success) {
             localStorage.setItem('gnpay_user', JSON.stringify(res));
             loginOk(res);
         } else {
-            alert("로그인 실패: " + (res.msg || "아이디/비번 확인"));
+            alert(res.msg);
         }
     } catch (err) {
-        hideLoading(); // 에러 나면 로딩 강제 종료
-        console.error("통신 에러 상세:", err);
-        alert("서버 응답 없음: GAS 배포 설정(모든 사용자)을 확인하세요.");
+        hideLoading();
+        alert("통신 에러: " + err.message);
     }
 }
 
@@ -200,6 +191,7 @@ async function doLogin() {
 </script>
 </body>
 </html>
+
 
 
 
