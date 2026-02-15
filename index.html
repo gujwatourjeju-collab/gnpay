@@ -138,11 +138,29 @@
         </div>
     </div>
 
-    <div id="page-activities" class="page"><div class="p-4"><i class="bi bi-arrow-left fs-3" onclick="showPage('page-main')"></i><h1 class="mt-4">환경 정화 활동</h1><p>준비 중입니다.</p></div></div>
+    <div id="page-activities" class="page">
+    <div class="p-4">
+        <i class="bi bi-arrow-left fs-3" onclick="showPage('page-main')"></i>
+        <h2 class="mt-4 fw-bold">환경 정화 활동 인증</h2>
+        <p class="text-muted">김녕 바다를 깨끗하게! 사진을 찍어 인증하면 1,000P를 드립니다. 🌱</p>
+        
+        <div id="camera-box" class="mt-4 p-5 border rounded-4 text-center bg-white shadow-sm" onclick="document.getElementById('cam-file').click()">
+            <i class="bi bi-camera-fill display-1 text-primary"></i>
+            <p class="mt-3 mb-0 fw-bold">사진 촬영/선택</p>
+        </div>
+        
+        <input type="file" id="cam-file" accept="image/*" capture="camera" style="display:none;" onchange="previewImage(event)">
+        
+        <div id="preview-box" class="mt-4" style="display:none;">
+            <img id="img-preview" class="img-fluid rounded-4 shadow">
+            <button class="fixed-bottom-pill" onclick="uploadPhoto()">이 사진으로 인증 완료</button>
+        </div>
+    </div>
+</div>
     <div id="page-shops" class="page"><div class="p-4"><i class="bi bi-arrow-left fs-3" onclick="showPage('page-main')"></i><h1 class="mt-4">김녕 가맹점</h1><p>준비 중입니다.</p></div></div>
 
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbydQbH0V9jDREBGFTw3lIVJjrOdRlB326ut5q5Pdh1sByf5krVtF92-801Qk5oLlvDR/exec";
+        const API_URL = "https://script.google.com/macros/s/AKfycbyl1fZ2cSKZfvvW0fG6REcbiv0mx2yGwt-9MTZeLFF2TicnHXWauA5dGkuEctmFqVUN/exec";
         let userData = null;
 
         function showPage(id) {
@@ -151,17 +169,25 @@
             window.scrollTo(0, 0);
         }
 
-        function updateUI(data) {
-            userData = data;
-            document.getElementById('u-name-top').innerText = data.name + "님 환영합니다!";
-            document.getElementById('u-points').innerText = Number(data.points).toLocaleString();
-            const qrImg = document.getElementById('qr-img-v2');
-            qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${data.email}`;
-            qrImg.onload = () => { qrImg.style.display = 'inline-block'; document.getElementById('qr-placeholder-v2').style.display = 'none'; };
-            document.getElementById('bar-guest').style.display = 'none';
-            document.getElementById('bar-user').style.display = 'block';
-            document.getElementById('btn-user-qr').style.display = 'flex';
-        }
+function updateUI(data) {
+    userData = data;
+    document.getElementById('u-name-top').innerText = data.name + "님 환영합니다!";
+    document.getElementById('u-points').innerText = Number(data.points).toLocaleString();
+    
+    const qrImg = document.getElementById('qr-img-v2');
+    // 중요: 이메일 대신 서버에서 받은 암호화된 토큰을 QR로 생성
+    const qrData = data.token || data.email; 
+    qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${qrData}`;
+    
+    qrImg.onload = () => { 
+        qrImg.style.display = 'inline-block'; 
+        document.getElementById('qr-placeholder-v2').style.display = 'none'; 
+    };
+    
+    document.getElementById('bar-guest').style.display = 'none';
+    document.getElementById('bar-user').style.display = 'block';
+    document.getElementById('btn-user-qr').style.display = 'flex';
+}
 
        async function doLogin() {
         const email = document.getElementById('l-email').value.trim();
@@ -204,6 +230,7 @@
     </script>
 </body>
 </html>
+
 
 
 
