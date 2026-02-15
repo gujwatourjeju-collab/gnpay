@@ -16,11 +16,13 @@
     <meta property="og:image" content="https://gnpay.my/og-image.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    
     <meta name="theme-color" content="#01b2ad">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    
     <style>
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
         :root { --primary: #01b2ad; --primary-light: #e6f7f6; --dark: #2d3436; --bg: #f7fbfc; }
@@ -52,30 +54,40 @@
         .guest-bar-pill { position: fixed; bottom: 30px; left: 20px; right: 20px; z-index: 1000; display: flex; gap: 10px; }
 
         #btn-user-qr { position: fixed !important; top: 15px !important; right: 15px !important; z-index: 10010 !important; width: 48px !important; height: 48px !important; border-radius: 14px !important; display: none; align-items: center; justify-content: center; background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border: 1px solid rgba(1, 178, 173, 0.1) !important; color: var(--primary); font-size: 24px; padding: 0; }
+        #reader { width: 100%; max-width: 400px; margin: 0 auto; border-radius: 20px; overflow: hidden; }
     </style>
 </head>
 <body>
     <div id="loading-overlay"><div class="spinner"></div><p class="mt-3 fw-bold text-muted">연결 중...</p></div>
-    <button id="btn-user-qr" onclick="handleQrBtnClick()"><i class="bi bi-qr-code"></i></button>
+    <button id="btn-user-qr" onclick="startScanner()"><i class="bi bi-qr-code-scan"></i></button>
 
     <div id="page-main" class="page active">
         <div class="main-welcome">
             <h1>김녕페이</h1>
-            <p>오늘도 김녕을 지켜주세요! 🌱<br>자연과 상생하는 스마트 커뮤니티</p>
+            <p>오늘도 김녕을 지켜주세요! 🌱</p>
         </div>
         <div class="pill-card" onclick="showPage('page-activities')">
             <div class="icon-circle" style="background: var(--primary-light); color: var(--primary);"><i class="bi bi-tree-fill"></i></div>
-            <div><div class="fw-bold fs-5">환경 정화 활동</div><div class="text-muted small">지금 참여하고 리워드 받기</div></div>
+            <div><div class="fw-bold fs-5">환경 정화 활동</div><div class="text-muted small">사진 찍고 리워드 받기</div></div>
         </div>
         <div class="pill-card" onclick="showPage('page-shops')">
             <div class="icon-circle" style="background: #fff3e0; color: #ff9800;"><i class="bi bi-shop"></i></div>
             <div><div class="fw-bold fs-5">김녕 가맹점 찾기</div><div class="text-muted small">포인트 사용처 확인하기</div></div>
         </div>
         <div class="guest-bar-pill" id="bar-guest">
-            <button class="btn btn-primary flex-grow-1 p-3 rounded-pill fw-bold shadow" onclick="showPage('page-login')">로그인</button>
+            <button class="btn btn-primary flex-grow-1 p-3 rounded-pill fw-bold" onclick="showPage('page-login')">로그인</button>
             <button class="btn btn-outline-primary flex-grow-1 p-3 rounded-pill fw-bold bg-white" onclick="alert('준비 중')">회원가입</button>
         </div>
         <button class="fixed-bottom-pill" id="bar-user" style="display:none;" onclick="showPage('page-info')">내 마이페이지 확인</button>
+    </div>
+
+    <div id="page-scanner" class="page">
+        <div class="p-4">
+            <i class="bi bi-arrow-left fs-3" onclick="stopScanner()"></i>
+            <h2 class="mt-4 fw-bold">QR 스캔 인증</h2>
+            <div id="reader"></div>
+            <p class="text-center mt-3 text-muted">인증용 QR을 사각형 안에 맞춰주세요.</p>
+        </div>
     </div>
 
     <div id="page-info" class="page">
@@ -87,34 +99,23 @@
         <div class="qr-card-v2">
             <img id="qr-img-v2" style="display:none;">
             <i id="qr-placeholder-v2" class="bi bi-qr-code" style="font-size:100px; color:#eee;"></i>
-            <p class="small text-muted mt-2">포인트 사용 시 직원에게 보여주세요</p>
+            <p class="small text-muted mt-2">포인트 인증용 내 QR 코드</p>
         </div>
         <div class="pill-card" onclick="showPage('page-main')">
             <div class="icon-circle" style="background: var(--primary-light); color: var(--primary);"><i class="bi bi-house-door-fill"></i></div>
             <div class="fw-bold flex-grow-1">메인으로 돌아가기</div>
-            <i class="bi bi-chevron-right text-muted"></i>
         </div>
         <div class="pill-card mt-2" onclick="handleLogout()">
             <div class="icon-circle" style="background: #ffebee; color: #e74c3c;"><i class="bi bi-power"></i></div>
             <div class="fw-bold flex-grow-1 text-danger">로그아웃</div>
-            <i class="bi bi-chevron-right text-muted"></i>
-        </div>
-    </div>
-
-    <div id="page-login" class="page">
-        <div class="p-4"><i class="bi bi-arrow-left fs-3 me-3" onclick="showPage('page-main')"></i><h5 class="d-inline fw-bold">로그인</h5></div>
-        <div class="container p-4 mt-3">
-            <input type="email" id="l-email" class="form-control mb-3 p-4 rounded-pill border-0 shadow-sm" placeholder="이메일 주소">
-            <input type="password" id="l-pw" class="form-control mb-4 p-4 rounded-pill border-0 shadow-sm" placeholder="비밀번호">
-            <button class="fixed-bottom-pill" onclick="doLogin()">로그인하기</button>
         </div>
     </div>
 
     <div id="page-activities" class="page">
         <div class="p-4">
             <i class="bi bi-arrow-left fs-3" onclick="showPage('page-main')"></i>
-            <h2 class="mt-4 fw-bold">환경 정화 활동 인증</h2>
-            <p class="text-muted">김녕 바다를 깨끗하게! 사진을 찍어 인증하면 1,000P를 드립니다. 🌱</p>
+            <h2 class="mt-4 fw-bold">정화 활동 인증</h2>
+            <p class="text-muted">사진을 찍어 인증하면 1,000P를 드립니다. 🌱</p>
             <div id="camera-box" class="mt-4 p-5 border rounded-4 text-center bg-white shadow-sm" onclick="document.getElementById('cam-file').click()">
                 <i class="bi bi-camera-fill display-1 text-primary"></i>
                 <p class="mt-3 mb-0 fw-bold">사진 촬영/선택</p>
@@ -126,13 +127,21 @@
             </div>
         </div>
     </div>
-    
-    <div id="page-shops" class="page"><div class="p-4"><i class="bi bi-arrow-left fs-3" onclick="showPage('page-main')"></i><h1 class="mt-4">김녕 가맹점</h1><p>준비 중입니다.</p></div></div>
+
+    <div id="page-login" class="page">
+        <div class="p-4"><i class="bi bi-arrow-left fs-3" onclick="showPage('page-main')"></i></div>
+        <div class="container p-4 mt-3">
+            <input type="email" id="l-email" class="form-control mb-3 p-4 rounded-pill border-0 shadow-sm" placeholder="이메일 주소">
+            <input type="password" id="l-pw" class="form-control mb-4 p-4 rounded-pill border-0 shadow-sm" placeholder="비밀번호">
+            <button class="fixed-bottom-pill" onclick="doLogin()">로그인하기</button>
+        </div>
+    </div>
 
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbyl1fZ2cSKZfvvW0fG6REcbiv0mx2yGwt-9MTZeLFF2TicnHXWauA5dGkuEctmFqVUN/exec";
         let userData = null;
         let selectedFileBase64 = null;
+        let html5QrCode = null;
 
         function showPage(id) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -140,14 +149,21 @@
             window.scrollTo(0, 0);
         }
 
-        // 상단 버튼 클릭 시: 마이페이지가 아니면 마이페이지로, 마이페이지면 스캔 알림(또는 기능 확장)
-        function handleQrBtnClick() {
-            const activePage = document.querySelector('.page.active').id;
-            if(activePage === 'page-info') {
-                alert("가맹점용 스캐너 기능은 곧 업데이트됩니다! 📷");
-            } else {
-                showPage('page-info');
-            }
+        // 스캐너 기능
+        function startScanner() {
+            showPage('page-scanner');
+            html5QrCode = new Html5Qrcode("reader");
+            html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, 
+                (decodedText) => {
+                    stopScanner();
+                    alert("인증 완료: " + decodedText);
+                }
+            ).catch(err => alert("카메라 권한 오류"));
+        }
+
+        function stopScanner() {
+            if(html5QrCode) html5QrCode.stop().then(() => showPage('page-main'));
+            else showPage('page-main');
         }
 
         function updateUI(data) {
@@ -163,7 +179,6 @@
             document.getElementById('btn-user-qr').style.display = 'flex';
         }
 
-        // 사진 미리보기 로직
         function previewImage(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -177,7 +192,6 @@
             reader.readAsDataURL(file);
         }
 
-        // 사진 업로드 로직
         async function uploadPhoto() {
             if (!userData) return alert("로그인이 필요합니다.");
             showLoading();
@@ -189,31 +203,22 @@
                 }).then(r => r.json());
                 hideLoading();
                 if (res.success) {
-                    alert("인증 성공! 1,000P가 적립되었습니다. 🌊");
+                    alert("인증 성공! 1,000P 적립 완료 🌊");
                     userData.points = res.newPoints;
                     updateUI(userData);
                     showPage('page-main');
-                    resetActivityPage();
-                } else { alert("실패: " + res.msg); }
+                } else { alert(res.msg); }
             } catch (e) { hideLoading(); alert("통신 에러"); }
-        }
-
-        function resetActivityPage() {
-            document.getElementById('camera-box').style.display = 'block';
-            document.getElementById('preview-box').style.display = 'none';
-            selectedFileBase64 = null;
         }
 
         async function doLogin() {
             const email = document.getElementById('l-email').value.trim();
             const pw = document.getElementById('l-pw').value.trim();
-            if(!email || !pw) return alert("정보를 입력하세요.");
             showLoading();
             try {
                 const res = await fetch(API_URL, {
                     method: 'POST',
-                    body: JSON.stringify({ action: 'loginCheck', email, pw }),
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+                    body: JSON.stringify({ action: 'loginCheck', email, pw })
                 }).then(r => r.json());
                 hideLoading();
                 if(res.success) {
