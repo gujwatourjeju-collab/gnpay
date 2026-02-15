@@ -159,19 +159,35 @@
             document.getElementById('btn-user-qr').style.display = 'flex';
         }
 
-        async function doLogin() {
-            const email = document.getElementById('l-email').value.trim();
-            const pw = document.getElementById('l-pw').value.trim();
-            if(!email || !pw) return alert("정보를 입력하세요.");
-            showLoading();
-            try {
-                const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'loginCheck', email, pw }), headers: { 'Content-Type': 'text/plain' } }).then(r => r.json());
-                hideLoading();
-                if(res.success) { localStorage.setItem('gnpay_user', JSON.stringify(res)); updateUI(res); showPage('page-main'); }
-                else { alert(res.msg); }
-            } catch (e) { hideLoading(); alert("통신 에러"); }
+       async function doLogin() {
+        const email = document.getElementById('l-email').value.trim();
+        const pw = document.getElementById('l-pw').value.trim();
+        if(!email || !pw) return alert("정보를 입력하세요.");
+        
+        showLoading();
+        try {
+            // GAS는 응답 속도가 느릴 수 있으므로 타임아웃 처리가 있으면 좋지만 일단 표준형으로 보완
+            const response = await fetch(API_URL, { 
+                method: 'POST', 
+                body: JSON.stringify({ action: 'loginCheck', email, pw }), 
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' } 
+            });
+            const res = await response.json();
+            
+            hideLoading();
+            if(res.success) { 
+                localStorage.setItem('gnpay_user', JSON.stringify(res)); 
+                updateUI(res); 
+                showPage('page-main'); 
+            } else { 
+                alert(res.msg); 
+            }
+        } catch (e) { 
+            hideLoading(); 
+            console.error(e);
+            alert("서버 통신에 실패했습니다. 네트워크를 확인해주세요."); 
         }
-
+    }
         function handleLogout() { if(confirm("로그아웃 하시겠습니까?")) { localStorage.removeItem('gnpay_user'); location.reload(); } }
         function showLoading() { document.getElementById('loading-overlay').style.display = 'flex'; }
         function hideLoading() { document.getElementById('loading-overlay').style.display = 'none'; }
@@ -184,6 +200,7 @@
     </script>
 </body>
 </html>
+
 
 
 
