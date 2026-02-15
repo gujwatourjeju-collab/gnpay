@@ -47,11 +47,9 @@
         .qr-card-v2 { background: white; border-radius: 35px; width: 240px; margin: 0 auto 35px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); text-align: center; }
         .qr-card-v2 img { width: 100%; border-radius: 20px; }
 
-        /* 하단 알약형 버튼 디자인 통일 */
         .fixed-bottom-pill { position: fixed; bottom: 30px; left: 20px; right: 20px; z-index: 1000; background: var(--primary); color: white; border-radius: 50px; padding: 18px; text-align: center; font-weight: 700; font-size: 1.1rem; border: none; box-shadow: 0 10px 25px rgba(1, 178, 173, 0.4); transition: all 0.2s; text-decoration: none; }
         .fixed-bottom-pill:active { transform: scale(0.95); background: #009a95; color: white; }
         
-        /* 비로그인 하단 바 버튼 스타일 */
         .guest-bar-pill { position: fixed; bottom: 30px; left: 20px; right: 20px; z-index: 1000; display: flex; gap: 10px; }
         .btn-guest { flex: 1; position: static !important; }
 
@@ -65,17 +63,16 @@
     <div id="page-main" class="page active">
         <div class="main-welcome">
             <h1>김녕페이</h1>
-            <p>오늘도 김녕을 지켜주세요! 🌱<br>자연과 상생하는 스마트 커뮤니티</p>
+            <p>오늘도 김녕을 지켜주세요! 🌱</p>
         </div>
         <div class="pill-card" onclick="showPage('page-activities')">
             <div class="icon-circle" style="background: var(--primary-light); color: var(--primary);"><i class="bi bi-tree-fill"></i></div>
-            <div><div class="fw-bold fs-5">환경 정화 활동</div><div class="text-muted small">지금 참여하고 리워드 받기</div></div>
+            <div><div class="fw-bold fs-5">환경 정화 활동</div><div class="text-muted small">사진 찍고 리워드 받기</div></div>
         </div>
         <div class="pill-card" onclick="showPage('page-shops')">
             <div class="icon-circle" style="background: #fff3e0; color: #ff9800;"><i class="bi bi-shop"></i></div>
             <div><div class="fw-bold fs-5">김녕 가맹점 찾기</div><div class="text-muted small">포인트 사용처 확인하기</div></div>
         </div>
-        
         <div class="guest-bar-pill" id="bar-guest">
             <button class="fixed-bottom-pill btn-guest" onclick="showPage('page-login')">로그인</button>
             <button class="fixed-bottom-pill btn-guest" style="background: linear-gradient(135deg, #6c757d, #495057);" onclick="showPage('page-signup')">회원가입</button>
@@ -83,72 +80,11 @@
         <button class="fixed-bottom-pill" id="bar-user" style="display:none;" onclick="showPage('page-info')">내 마이페이지 확인</button>
     </div>
 
-    <div id="page-info" class="page">
-        <div class="info-header">
-            <h4 id="u-name-top">환영합니다!</h4>
-            <p class="small opacity-75">사용 가능 포인트</p>
-            <h1><span id="u-points">0</span> P</h1>
-        </div>
-        <div class="qr-card-v2">
-            <img id="qr-img-v2" style="display:none;">
-            <i id="qr-placeholder-v2" class="bi bi-qr-code" style="font-size:100px; color:#eee;"></i>
-            <p class="small text-muted mt-2">포인트 사용 시 직원에게 보여주세요</p>
-        </div>
-        <div class="pill-card" onclick="showPage('page-main')">
-            <div class="icon-circle" style="background: var(--primary-light); color: var(--primary);"><i class="bi bi-house-door-fill"></i></div>
-            <div class="fw-bold flex-grow-1">메인으로 돌아가기</div>
-        </div>
-        <div class="pill-card mt-2" onclick="handleLogout()">
-            <div class="icon-circle" style="background: #ffebee; color: #e74c3c;"><i class="bi bi-power"></i></div>
-            <div class="fw-bold flex-grow-1 text-danger">로그아웃</div>
-        </div>
-    </div>
-
-    <div id="page-login" class="page">
-        <div class="p-4"><i class="bi bi-arrow-left fs-3" onclick="showPage('page-main')"></i><h5 class="d-inline fw-bold ms-3">로그인</h5></div>
-        <div class="container p-4 mt-3">
-            <input type="email" id="l-email" class="form-control mb-3 p-4 rounded-pill border-0 shadow-sm" placeholder="이메일 주소">
-            <input type="password" id="l-pw" class="form-control mb-4 p-4 rounded-pill border-0 shadow-sm" placeholder="비밀번호">
-            <button class="fixed-bottom-pill" onclick="doLogin()">로그인하기</button>
-        </div>
-    </div>
-
-    <div id="page-signup" class="page">
-        <div class="p-4"><i class="bi bi-arrow-left fs-3" onclick="showPage('page-main')"></i><h5 class="d-inline fw-bold ms-3">회원가입</h5></div>
-        <div class="container p-4">
-            <input type="text" id="s-name" class="form-control mb-3 p-3 rounded-pill border-0 shadow-sm" placeholder="이름">
-            <input type="email" id="s-email" class="form-control mb-3 p-3 rounded-pill border-0 shadow-sm" placeholder="이메일">
-            <input type="password" id="s-pw" class="form-control mb-3 p-3 rounded-pill border-0 shadow-sm" placeholder="비밀번호">
-            <input type="tel" id="s-phone" class="form-control mb-3 p-3 rounded-pill border-0 shadow-sm" placeholder="전화번호">
-            <button class="fixed-bottom-pill" onclick="doSignup()">가입 완료</button>
-        </div>
-    </div>
-
-    <div id="page-activities" class="page">
-        <div class="p-4">
-            <i class="bi bi-arrow-left fs-3" onclick="showPage('page-main')"></i>
-            <h2 class="mt-4 fw-bold">환경 정화 활동 인증</h2>
-            <p class="text-muted">사진을 촬영하여 인증해주세요. 🌱</p>
-            <div id="camera-box" class="mt-4 p-5 border rounded-4 text-center bg-white shadow-sm" onclick="document.getElementById('cam-file').click()">
-                <i class="bi bi-camera-fill display-1 text-primary"></i>
-                <p class="mt-3 mb-0 fw-bold">사진 촬영하기</p>
-            </div>
-            <input type="file" id="cam-file" accept="image/*" capture="camera" style="display:none;" onchange="previewImage(event)">
-            <div id="preview-box" class="mt-4" style="display:none;">
-                <img id="img-preview" class="img-fluid rounded-4 shadow">
-                <button class="fixed-bottom-pill" onclick="uploadPhoto()">이 사진으로 인증 완료</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="page-shops" class="page"><div class="p-4"><i class="bi bi-arrow-left fs-3" onclick="showPage('page-main')"></i><h1 class="mt-4">김녕 가맹점</h1><p>준비 중입니다.</p></div></div>
-
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbwzaol9eAZTls87Gv-CVAD0pYIFXhjDBMDunJbnR9lAKmtOXhyXnQsDw0LuEZIMGGtU/exec";
+        const API_URL = "https://script.google.com/macros/s/AKfycbyl1fZ2cSKZfvvW0fG6REcbiv0mx2yGwt-9MTZeLFF2TicnHXWauA5dGkuEctmFqVUN/exec";
         let userData = null;
         let selectedFileBase64 = null;
-
-        function showPage(id) {
+ function showPage(id) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             window.scrollTo(0, 0);
@@ -252,6 +188,9 @@
             if (saved) updateUI(JSON.parse(saved));
             hideLoading();
         };
+
+        // 필수 함수들: showPage, updateUI, doLogin, doSignup, previewImage, uploadPhoto, resetActivityPage, handleLogout, showLoading, hideLoading
+        // (하나도 빠짐없이 모두 포함되어야 함)
     </script>
 </body>
 </html>
