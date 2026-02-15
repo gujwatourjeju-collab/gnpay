@@ -12,36 +12,38 @@
         :root { --primary: #01b2ad; --primary-light: #e6f7f6; --dark: #2d3436; --bg: #f7fbfc; }
         body { font-family: 'Pretendard', sans-serif; background-color: var(--bg); color: var(--dark); margin:0; padding-top: env(safe-area-inset-top, 20px) !important; padding-bottom: env(safe-area-inset-bottom, 20px) !important; min-height: 100vh; overflow-x: hidden; }
         
+        /* 로딩/애니메이션 */
         #loading-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(255,255,255,0.9); z-index:10000; display:none; flex-direction:column; align-items:center; justify-content:center; }
         .spinner { width: 45px; height: 45px; border: 4px solid var(--primary-light); border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
         .page { display: none; min-height: 100vh; animation: fadeData 0.3s ease-out; padding-bottom: 120px; }
         .active { display: block; }
         @keyframes fadeData { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* 메인 페이지 전용 디자인 */
-        #page-main { background: linear-gradient(135deg, #f7fbfc 60%, var(--primary-light) 100%); padding-top: 20px; }
-        .main-welcome { padding: 30px 25px; }
+        /* [메인 페이지 스타일] 마이페이지와 패밀리룩 */
+        #page-main { background: linear-gradient(135deg, #f7fbfc 60%, var(--primary-light) 100%); }
+        .main-welcome { padding: 40px 25px 20px; }
         .main-welcome h1 { font-size: 2.2rem; font-weight: 800; color: var(--primary); margin-bottom: 5px; }
-        .main-pill { background: white; border-radius: 30px; margin: 15px 20px; padding: 20px; display: flex; align-items: center; box-shadow: 0 8px 20px rgba(1, 178, 173, 0.08); border: 1px solid rgba(1, 178, 173, 0.05); transition: all 0.2s; cursor: pointer; }
-        .main-pill:active { transform: translateY(2px); }
-        .main-pill-icon { width: 55px; height: 55px; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-right: 18px; }
-        .main-pill-body .title { font-weight: 700; font-size: 1.1rem; color: var(--dark); }
-        .main-pill-body .desc { font-size: 0.85rem; color: #888; }
+        
+        /* 알약형 버튼 (사용자님 기능 버튼) */
+        .main-pill { background: white; border-radius: 30px; margin: 12px 20px; padding: 20px; display: flex; align-items: center; box-shadow: 0 8px 20px rgba(1, 178, 173, 0.08); border: 1px solid rgba(1, 178, 173, 0.05); cursor: pointer; transition: all 0.2s; }
+        .main-pill:active { transform: scale(0.97); }
+        .pill-icon-circle { width: 50px; height: 50px; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; margin-right: 18px; }
+        .pill-body .title { font-weight: 700; font-size: 1.05rem; color: var(--dark); }
+        .pill-body .desc { font-size: 0.85rem; color: #888; margin-top: 2px; }
 
-        /* 마이 페이지 전용 디자인 */
+        /* [마이 페이지 스타일] */
         #page-info { background: linear-gradient(180deg, var(--primary) 0%, #34c7c2 30%, var(--bg) 60%) !important; padding-top: 40px; }
         .info-header { text-align: center; color: white; margin-bottom: 30px; }
-        .info-header h1 { font-size: 2.6rem; font-weight: 800; margin: 10px 0; }
-        .qr-card-v2 { background: white; border-radius: 30px; width: 240px; margin: 0 auto 40px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; }
+        .info-header h1 { font-size: 2.6rem; font-weight: 800; }
+        .qr-card-v2 { background: white; border-radius: 30px; width: 240px; margin: 0 auto 35px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; }
         .qr-card-v2 img { width: 100%; border-radius: 15px; }
-        .menu-pill { background: white; border-radius: 50px; margin: 12px 25px; padding: 12px 20px; display: flex; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); cursor: pointer; transition: transform 0.2s; }
-        .pill-icon { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; margin-right: 15px; }
-        .pill-title { flex-grow: 1; font-weight: 600; color: #444; }
-        
-        #btn-user-qr { position: fixed; top: 15px; right: 15px; z-index: 10010; width: 48px; height: 48px; border-radius: 14px; display: none; align-items: center; justify-content: center; background: white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border:none; font-size: 24px; }
+        .info-pill { background: white; border-radius: 50px; margin: 10px 25px; padding: 12px 20px; display: flex; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); cursor: pointer; }
+
+        /* 하단 고정바 & 헤더 */
+        .fixed-bottom { background: white; border-top: 1px solid #eee; z-index: 1000; }
         .nav-header { padding: 20px; display: flex; align-items: center; background: white; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 100; }
+        #btn-user-qr { position: fixed; top: 15px; right: 15px; z-index: 10010; width: 48px; height: 48px; border-radius: 14px; display: none; background: white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border:none; font-size: 24px; }
     </style>
 </head>
 <body>
@@ -49,51 +51,62 @@
     <button id="btn-user-qr" onclick="showPage('page-info')"><i class="bi bi-qr-code"></i></button>
 
     <div id="page-main" class="page active">
-        <div class="main-welcome"><h1>김녕페이</h1><p>자연과 상생하는 스마트 커뮤니티 🌱</p></div>
+        <div class="main-welcome">
+            <h1 class="fw-bold">김녕페이</h1>
+            <p class="text-muted small">자연과 상생하는 스마트 커뮤니티 🌱</p>
+        </div>
+
         <div class="main-pill" onclick="showPage('page-activities')">
-            <div class="main-pill-icon" style="background: var(--primary-light); color: var(--primary);"><i class="bi bi-geo-alt-fill"></i></div>
-            <div class="main-pill-body"><div class="title">환경 정화 활동</div><div class="desc">지금 참여하고 포인트 받기</div></div>
+            <div class="pill-icon-circle" style="background: var(--primary-light); color: var(--primary);"><i class="bi bi-geo-alt-fill"></i></div>
+            <div class="pill-body"><div class="title">환경 정화 활동</div><div class="desc">지금 바로 참여하고 포인트 받기</div></div>
         </div>
+
         <div class="main-pill" onclick="showPage('page-shops')">
-            <div class="main-pill-icon" style="background: #fff3e0; color: #ff9800;"><i class="bi bi-shop"></i></div>
-            <div class="main-pill-body"><div class="title">김녕 가맹점 찾기</div><div class="desc">주변 포인트 사용처 확인</div></div>
+            <div class="pill-icon-circle" style="background: #fff3e0; color: #ff9800;"><i class="bi bi-shop"></i></div>
+            <div class="pill-body"><div class="title">김녕 가맹점 찾기</div><div class="desc">내 주변 포인트 사용처 확인</div></div>
         </div>
-        <div class="fixed-bottom p-4 bg-white border-top d-flex justify-content-between" id="bar-guest">
-            <button class="btn btn-primary w-50 me-2 p-3 rounded-4" onclick="showPage('page-login')">로그인</button>
-            <button class="btn btn-outline-primary w-50 p-3 rounded-4" onclick="alert('준비중')">회원가입</button>
+
+        <div class="fixed-bottom p-4 d-flex justify-content-between" id="bar-guest">
+            <button class="btn btn-primary w-50 me-2 p-3 rounded-4 fw-bold" onclick="showPage('page-login')">로그인</button>
+            <button class="btn btn-outline-primary w-50 p-3 rounded-4 fw-bold" onclick="alert('회원가입은 준비 중입니다.')">회원가입</button>
         </div>
-        <div class="fixed-bottom p-4 bg-white border-top" id="bar-user" style="display:none;">
-            <button class="btn btn-primary w-100 p-3 rounded-4" onclick="showPage('page-info')">내 마이페이지 확인</button>
+        <div class="fixed-bottom p-4" id="bar-user" style="display:none;">
+            <button class="btn btn-primary w-100 p-3 rounded-4 fw-bold" onclick="showPage('page-info')">내 마이페이지 확인</button>
         </div>
     </div>
 
     <div id="page-login" class="page">
-        <div class="nav-header"><i class="bi bi-arrow-left" onclick="showPage('page-main')"></i><h5 class="mb-0 fw-bold">로그인</h5></div>
-        <div class="container p-4">
-            <input type="email" id="l-email" class="form-control mb-3 p-3" placeholder="이메일 주소">
-            <input type="password" id="l-pw" class="form-control mb-4 p-3" placeholder="비밀번호">
-            <button class="btn btn-primary w-100 p-3 rounded-4" onclick="doLogin()">로그인하기</button>
+        <div class="nav-header"><i class="bi bi-arrow-left fs-3 me-3" onclick="showPage('page-main')"></i><h5 class="mb-0 fw-bold">로그인</h5></div>
+        <div class="container p-4 mt-3">
+            <input type="email" id="l-email" class="form-control mb-3 p-3 shadow-sm border-0" placeholder="이메일 주소" style="border-radius: 15px;">
+            <input type="password" id="l-pw" class="form-control mb-4 p-3 shadow-sm border-0" placeholder="비밀번호" style="border-radius: 15px;">
+            <button class="btn btn-primary w-100 p-3 rounded-4 fw-bold shadow" onclick="doLogin()">로그인하기</button>
         </div>
     </div>
 
     <div id="page-info" class="page">
-        <div class="info-header"><h4 id="u-name-top">환영합니다!</h4><p>사용 가능 포인트</p><h1><span id="u-points">0</span> P</h1></div>
+        <div class="info-header">
+            <h4 id="u-name-top">환영합니다!</h4>
+            <p class="small opacity-75">사용 가능 포인트</p>
+            <h1><span id="u-points">0</span> P</h1>
+        </div>
         <div class="qr-card-v2">
             <img id="qr-img-v2" style="display:none;"><i id="qr-placeholder-v2" class="bi bi-qr-code" style="font-size: 100px; color: #eee;"></i>
-            <p class="small text-muted mt-2">포인트 사용 시 직원에게 보여주세요</p>
+            <p class="small text-muted mt-2">직원에게 보여주세요</p>
         </div>
-        <div class="menu-pill" onclick="showPage('page-main')">
-            <div class="pill-icon" style="background: var(--primary);"><i class="bi bi-house-door-fill"></i></div>
-            <div class="pill-title">메인으로</div>
-        </div>
-        <div class="menu-pill" onclick="handleLogout()">
-            <div class="pill-icon" style="background: #e74c3c;"><i class="bi bi-power"></i></div>
-            <div class="pill-title" style="color: #e74c3c;">로그아웃</div>
-        </div>
+        <div class="info-pill" onclick="alert('준비 중')"><div class="pill-icon-circle me-3" style="width:35px; height:35px; background:var(--primary); color:white; font-size:1rem;"><i class="bi bi-gear-fill"></i></div><div class="fw-bold flex-grow-1">개인정보 설정</div><div class="text-muted small">#05</div></div>
+        <div class="info-pill mt-2" onclick="showPage('page-main')"><div class="pill-icon-circle me-3" style="width:35px; height:35px; background:#a2d2d1; color:white; font-size:1rem;"><i class="bi bi-house-door-fill"></i></div><div class="fw-bold flex-grow-1">메인으로</div><div class="text-muted small">#33</div></div>
+        <div class="info-pill mt-2" onclick="handleLogout()"><div class="pill-icon-circle me-3" style="width:35px; height:35px; background:#e74c3c; color:white; font-size:1rem;"><i class="bi bi-power"></i></div><div class="fw-bold flex-grow-1 text-danger">로그아웃</div><div class="text-danger small">#OFF</div></div>
     </div>
 
-    <div id="page-activities" class="page"><div class="nav-header"><i class="bi bi-arrow-left" onclick="showPage('page-main')"></i><h5>정화 활동</h5></div></div>
-    <div id="page-shops" class="page"><div class="nav-header"><i class="bi bi-arrow-left" onclick="showPage('page-main')"></i><h5>가맹점</h5></div></div>
+    <div id="page-activities" class="page">
+        <div class="nav-header"><i class="bi bi-arrow-left fs-3 me-3" onclick="showPage('page-main')"></i><h5 class="mb-0 fw-bold">환경 정화 활동</h5></div>
+        <div class="p-4 text-center mt-5"><i class="bi bi-camera-fill display-1 text-muted mb-3"></i><h4 class="fw-bold">활동 사진 인증</h4><p class="text-muted">인증 사진을 찍어 올려주세요.</p><button class="btn btn-primary w-100 p-3 rounded-4 mt-3" onclick="alert('카메라 기능 연결 예정')">사진 촬영하기</button></div>
+    </div>
+    <div id="page-shops" class="page">
+        <div class="nav-header"><i class="bi bi-arrow-left fs-3 me-3" onclick="showPage('page-main')"></i><h5 class="mb-0 fw-bold">김녕 가맹점</h5></div>
+        <div class="p-5 text-center text-muted mt-5"><i class="bi bi-shop display-4 mb-3"></i><p>가맹점을 준비 중입니다.</p></div>
+    </div>
 
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbydQbH0V9jDREBGFTw3lIVJjrOdRlB326ut5q5Pdh1sByf5krVtF92-801Qk5oLlvDR/exec";
@@ -101,20 +114,17 @@
 
         function showPage(id) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            const target = document.getElementById(id);
-            if (target) target.classList.add('active');
+            document.getElementById(id).classList.add('active');
             window.scrollTo(0, 0);
         }
 
         function updateUI(data) {
+            userData = data;
             document.getElementById('u-name-top').innerText = data.name + "님 환영합니다!";
             document.getElementById('u-points').innerText = Number(data.points).toLocaleString();
             const qrImg = document.getElementById('qr-img-v2');
             qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${data.email}`;
-            qrImg.onload = () => {
-                qrImg.style.display = 'inline-block';
-                document.getElementById('qr-placeholder-v2').style.display = 'none';
-            };
+            qrImg.onload = () => { qrImg.style.display = 'inline-block'; document.getElementById('qr-placeholder-v2').style.display = 'none'; };
             document.getElementById('bar-guest').style.display = 'none';
             document.getElementById('bar-user').style.display = 'block';
             document.getElementById('btn-user-qr').style.display = 'flex';
@@ -126,21 +136,13 @@
             if(!email || !pw) return alert("입력하세요.");
             showLoading();
             try {
-                const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'loginCheck', email, pw }) }).then(r => r.json());
+                const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'loginCheck', email, pw }), headers: { 'Content-Type': 'text/plain' } }).then(r => r.json());
                 hideLoading();
-                if(res.success) {
-                    localStorage.setItem('gnpay_user', JSON.stringify(res));
-                    updateUI(res);
-                    showPage('page-main');
-                } else alert(res.msg);
-            } catch (e) { hideLoading(); alert("통신에러"); }
+                if(res.success) { localStorage.setItem('gnpay_user', JSON.stringify(res)); updateUI(res); showPage('page-main'); } else alert(res.msg);
+            } catch (e) { hideLoading(); alert("통신 에러"); }
         }
 
-        function handleLogout() {
-            localStorage.removeItem('gnpay_user');
-            location.reload();
-        }
-
+        function handleLogout() { if(confirm("로그아웃 하시겠습니까?")) { localStorage.removeItem('gnpay_user'); location.reload(); } }
         function showLoading() { document.getElementById('loading-overlay').style.display = 'flex'; }
         function hideLoading() { document.getElementById('loading-overlay').style.display = 'none'; }
 
