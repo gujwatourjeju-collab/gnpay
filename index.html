@@ -5,16 +5,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>김녕페이 2.0</title>
-    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-    
     <style>
-        /* 기존 스타일 그대로 유지 (생략 없이 모두 포함) */
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
         :root { --primary: #01b2ad; --primary-light: #e6f7f6; --dark: #2d3436; --bg: #f7fbfc; }
-        body { font-family: 'Pretendard', sans-serif; background-color: var(--bg); color: var(--dark); margin:0; padding-top: env(safe-area-inset-top, 20px) !important; padding-bottom: env(safe-area-inset-bottom, 20px) !important; min-height: 100vh; box-sizing: border-box; display: flex; flex-direction: column; overflow-x: hidden; }
+        body { font-family: 'Pretendard', sans-serif; background-color: var(--bg); color: var(--dark); margin:0; padding-top: env(safe-area-inset-top, 20px) !important; padding-bottom: env(safe-area-inset-bottom, 20px) !important; min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
         #loading-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(255,255,255,0.9); z-index:10000; display:none; flex-direction:column; align-items:center; justify-content:center; }
         .spinner { width: 45px; height: 45px; border: 4px solid var(--primary-light); border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -23,30 +20,20 @@
         #btn-user-qr { position: fixed !important; top: 15px !important; right: 15px !important; z-index: 10010 !important; width: 48px !important; height: 48px !important; border-radius: 14px !important; display: none; align-items: center; justify-content: center; background: white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); color: var(--dark); border:none; font-size: 24px; }
         .info-card { background: linear-gradient(135deg, #01b2ad 0%, #008a86 100%) !important; padding: 30px 20px 20px !important; border-radius: 0 0 40px 40px !important; color: white !important; text-align: center; margin-bottom: 20px; }
         .qr-area { background: white !important; padding: 15px !important; border-radius: 25px !important; box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important; margin: 20px auto 10px !important; width: fit-content; }
-        /* ... (추가 스타일들 생략 없이 사용 가능) ... */
     </style>
 </head>
 <body>
-
     <div id="loading-overlay"><div class="spinner"></div><p class="mt-3 fw-bold text-muted">연결 중...</p></div>
-    <button id="btn-user-qr" onclick="openUserScanner()"><i class="bi bi-qr-code-scan"></i></button>
+    <button id="btn-user-qr" onclick="showPage('page-user-scan')"><i class="bi bi-qr-code-scan"></i></button>
 
     <div id="page-main" class="page active">
-    <div class="landing-box p-4">
-        <h1 class="main-title fw-bold" style="color:var(--primary); font-size:38px;">김녕페이</h1>
-        <p class="text-muted mb-5">GIMNYEONG PAY 🌱</p>
-        <button class="btn w-100 p-4 mb-3 bg-white shadow-sm rounded-4 text-start d-flex align-items-center" onclick="checkAuthAndGo('page-activities')">
-            <i class="bi bi-tree-fill me-3 fs-3 text-primary"></i> <b>현재 진행 중인 활동</b>
-        </button>
-    </div> <div class="bottom-auth-bar fixed-bottom p-4 bg-white border-top d-flex justify-content-between" id="bar-guest">
-        <button class="btn btn-primary w-50 me-2 p-3 rounded-4" onclick="showPage('page-login')">로그인</button>
-        <button class="btn btn-outline-primary w-50 p-3 rounded-4" onclick="showPage('page-join')">회원가입</button>
-    </div>
-    
-    <div class="bottom-auth-bar fixed-bottom p-4 bg-white border-top" id="bar-user" style="display:none;">
-        <button class="btn btn-primary w-100 p-3 rounded-4" onclick="showPage('page-info')">내 정보 및 QR 확인</button>
-    </div>
-</div>
+        <div class="landing-box p-4">
+            <h1 class="main-title fw-bold" style="color:var(--primary); font-size:38px;">김녕페이</h1>
+            <p class="text-muted mb-5">GIMNYEONG PAY 🌱</p>
+            <button class="btn w-100 p-4 mb-3 bg-white shadow-sm rounded-4 text-start d-flex align-items-center" onclick="alert('준비 중입니다.')">
+                <i class="bi bi-tree-fill me-3 fs-3 text-primary"></i> <b>현재 진행 중인 활동</b>
+            </button>
+        </div>
         <div class="bottom-auth-bar fixed-bottom p-4 bg-white border-top d-flex justify-content-between" id="bar-guest">
             <button class="btn btn-primary w-50 me-2 p-3 rounded-4" onclick="showPage('page-login')">로그인</button>
             <button class="btn btn-outline-primary w-50 p-3 rounded-4" onclick="showPage('page-join')">회원가입</button>
@@ -57,154 +44,88 @@
     </div>
 
     <div id="page-login" class="page">
-    <div class="p-4"><i class="bi bi-chevron-left fs-2" onclick="showPage('page-main')"></i></div>
-    <div class="container px-4">
-        <h2 class="fw-bold mb-5">로그인</h2>
-        <input type="email" id="l-email" class="form-control mb-3 p-3" 
-               placeholder="이메일 주소" autocapitalize="none" spellcheck="false">
-        <input type="password" id="l-pw" class="form-control mb-4 p-3" 
-               placeholder="비밀번호" autocapitalize="none">
-        <button class="btn btn-primary w-100 p-3 rounded-4" onclick="doLogin()">로그인하기</button>
+        <div class="p-4"><i class="bi bi-chevron-left fs-2" onclick="showPage('page-main')"></i></div>
+        <div class="container px-4">
+            <h2 class="fw-bold mb-5">로그인</h2>
+            <input type="email" id="l-email" class="form-control mb-3 p-3" placeholder="이메일 주소" autocapitalize="none">
+            <input type="password" id="l-pw" class="form-control mb-4 p-3" placeholder="비밀번호" autocapitalize="none">
+            <button class="btn btn-primary w-100 p-3 rounded-4" onclick="doLogin()">로그인하기</button>
+        </div>
     </div>
-</div>
-
-<div id="page-join" class="page">
-    <div class="p-4"><i class="bi bi-chevron-left fs-2" onclick="showPage('page-main')"></i></div>
-    <div class="container px-4">
-        <h2 class="fw-bold mb-4">회원가입</h2>
-        <input type="text" id="j-name" class="form-control mb-2" placeholder="성함">
-        <input type="email" id="j-email" class="form-control mb-2" placeholder="이메일 (ID)">
-        <input type="password" id="j-pw" class="form-control mb-2" placeholder="비밀번호">
-        <input type="text" id="j-phone" class="form-control mb-2" placeholder="휴대폰">
-        <input type="text" id="j-birth" class="form-control mb-2" placeholder="생년월일 8자리">
-        <button class="btn btn-primary w-100 mt-4 p-3 rounded-4" onclick="handleJoin()">가입 완료하기</button>
-    </div>
-</div>
 
     <div id="page-info" class="page">
         <div class="info-card">
             <h5 id="u-name-hi">환영합니다!</h5>
             <h1 class="display-5 fw-bold"><span id="u-points">0</span> P</h1>
-            <div class="qr-area"><img id="qr-img" style="width:190px; display:none;"><div id="qr-spinner" class="spinner-border text-primary"></div></div>
+            <div class="qr-area"><img id="qr-img" style="width:190px;"><div id="qr-spinner" class="spinner-border text-primary" style="display:none;"></div></div>
         </div>
         <div class="p-4">
             <button class="btn w-100 p-3 mb-2 bg-white shadow-sm rounded-4 text-start" onclick="handleLogout()">로그아웃</button>
         </div>
     </div>
 
-    <div id="page-user-scan" class="page">
-        <div class="p-4"><i class="bi bi-chevron-left fs-2" onclick="showPage('page-main')"></i></div>
-        <div id="user-reader" class="mx-auto" style="width:300px;"></div>
-    </div>
+    <script>
+        const API_URL = "https://script.google.com/macros/s/AKfycbydQbH0V9jDREBGFTw3lIVJjrOdRlB326ut5q5Pdh1sByf5krVtF92-801Qk5oLlvDR/exec";
+        let userData = null;
 
-<script>
-    // 1. 설정 (본인의 GAS 배포 주소가 맞는지 꼭 확인!)
-    const API_URL = "https://script.google.com/macros/s/AKfycbz0OQHc5lQCCozsH_DUSmw8VDVzbDx_sHkqtfX8rCs7GnyZSrdsMtOdjwV7kshUYLqX/exec";
-    let userData = null;
-
-    /**
-     * 2. 페이지 전환 함수
-     * 에러 방지를 위해 스크립트 최상단에 배치합니다.
-     */
-    function showPage(id) {
-        console.log("페이지 이동 시도:", id);
-        
-        // 모든 페이지에서 active 클래스 제거
-        const pages = document.querySelectorAll('.page');
-        pages.forEach(p => p.classList.remove('active'));
-        
-        // 대상 페이지에 active 클래스 추가
-        const target = document.getElementById(id);
-        if (target) {
-            target.classList.add('active');
-            window.scrollTo(0, 0);
-        } else {
-            console.error("해당 ID를 가진 페이지가 없습니다:", id);
+        function showPage(id) {
+            const pages = document.querySelectorAll('.page');
+            pages.forEach(p => p.classList.remove('active'));
+            const target = document.getElementById(id);
+            if (target) { target.classList.add('active'); window.scrollTo(0, 0); }
         }
-    }
 
-    /**
-     * 3. API 통신 엔진
-     */
-async function apiRequest(action, data = {}) {
-    const response = await fetch(API_URL, {
-        method: 'POST',
-        mode: 'cors', // 중요!
-        body: JSON.stringify({ action, ...data }),
-        headers: { 'Content-Type': 'text/plain' } // GAS 통신 표준
-    });
-    return await response.json();
-}
-
-async function doLogin() {
-    const email = document.getElementById('l-email').value.trim();
-    const pw = document.getElementById('l-pw').value.trim();
-    if(!email || !pw) return alert("정보를 입력하세요.");
-
-    showLoading();
-    try {
-        const res = await apiRequest('loginCheck', { email, pw });
-        hideLoading();
-        if(res.success) {
-            localStorage.setItem('gnpay_user', JSON.stringify(res));
-            loginOk(res);
-        } else {
-            alert(res.msg);
+        async function apiRequest(action, data = {}) {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                mode: 'cors',
+                body: JSON.stringify({ action, ...data }),
+                headers: { 'Content-Type': 'text/plain' }
+            });
+            return await response.json();
         }
-    } catch (err) {
-        hideLoading();
-        alert("통신 에러: " + err.message);
-    }
-}
 
-    function loginOk(data) {
-        userData = data;
-        document.getElementById('u-name-hi').innerText = data.name + "님";
-        document.getElementById('u-points').innerText = Number(data.points).toLocaleString();
-        
-        document.getElementById('bar-guest').style.display = 'none';
-        document.getElementById('bar-user').style.display = 'block';
-        
-        const qrBtn = document.getElementById('btn-user-qr');
-        if (qrBtn) qrBtn.style.display = 'flex';
-        
-        showPage('page-main');
-    }
-
-    function handleLogout() {
-        if (!confirm("로그아웃 하시겠습니까?")) return;
-        localStorage.removeItem('gnpay_user');
-        location.reload();
-    }
-
-    function showLoading() { document.getElementById('loading-overlay').style.display = 'flex'; }
-    function hideLoading() { document.getElementById('loading-overlay').style.display = 'none'; }
-
-    // 5. 페이지 로드 시 초기화
-    window.onload = function() {
-        const savedUser = localStorage.getItem('gnpay_user');
-        if (savedUser) {
-            loginOk(JSON.parse(savedUser));
+        async function doLogin() {
+            const email = document.getElementById('l-email').value.trim();
+            const pw = document.getElementById('l-pw').value.trim();
+            if(!email || !pw) return alert("정보를 입력하세요.");
+            showLoading();
+            try {
+                const res = await apiRequest('loginCheck', { email, pw });
+                hideLoading();
+                if(res.success) {
+                    localStorage.setItem('gnpay_user', JSON.stringify(res));
+                    loginOk(res);
+                } else { alert(res.msg); }
+            } catch (err) {
+                hideLoading();
+                alert("통신 에러가 발생했습니다. GAS 배포 설정을 확인하세요.");
+            }
         }
-        hideLoading();
-    };
-</script>
+
+        function loginOk(data) {
+            userData = data;
+            document.getElementById('u-name-hi').innerText = data.name + "님";
+            document.getElementById('u-points').innerText = Number(data.points).toLocaleString();
+            document.getElementById('bar-guest').style.display = 'none';
+            document.getElementById('bar-user').style.display = 'block';
+            document.getElementById('btn-user-qr').style.display = 'flex';
+            showPage('page-main');
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('gnpay_user');
+            location.reload();
+        }
+
+        function showLoading() { document.getElementById('loading-overlay').style.display = 'flex'; }
+        function hideLoading() { document.getElementById('loading-overlay').style.display = 'none'; }
+
+        window.onload = function() {
+            const savedUser = localStorage.getItem('gnpay_user');
+            if (savedUser) loginOk(JSON.parse(savedUser));
+            hideLoading();
+        };
+    </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
