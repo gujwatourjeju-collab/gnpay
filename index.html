@@ -188,7 +188,69 @@ function updateUI(data) {
     document.getElementById('bar-user').style.display = 'block';
     document.getElementById('btn-user-qr').style.display = 'flex';
 }
+function previewImage(event) {
+    const file = event.target.files[0];
+    if (!file) return;
 
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        selectedFileBase64 = e.target.result.split(',')[1]; // Base64 데이터만 추출
+        
+        // UI 전환
+        document.getElementById('camera-box').style.display = 'none';
+        document.getElementById('preview-box').style.display = 'block';
+        document.getElementById('img-preview').src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+}
+
+// 2. 사진 업로드 및 포인트 적립 요청 함수
+async function uploadPhoto() {
+    if (!userData) return alert("로그인이 필요합니다.");
+    if (!selectedFileBase64) return alert("사진을 촬영해주세요.");
+
+    showLoading();
+    try {
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            body: JSON.stringify({
+                action: 'uploadPhoto',
+                email: userData.email,
+                name: userData.name,
+                image: selectedFileBase64
+            }),
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+        });
+        const res = await response.json();
+        
+        hideLoading();
+        if (res.success) {
+            alert("인증 성공! 1,000P가 적립되었습니다. 🌊");
+            // 포인트 실시간 업데이트
+            userData.points = res.newPoints;
+            localStorage.setItem('gnpay_user', JSON.stringify(userData));
+            updateUI(userData);
+            showPage('page-main');
+            
+            // 활동 페이지 초기화
+            resetActivityPage();
+        } else {
+            alert("인증 실패: " + res.msg);
+        }
+    } catch (e) {
+        hideLoading();
+        console.error(e);
+        alert("통신 에러가 발생했습니다.");
+    }
+}
+
+// 활동 페이지 리셋 (다시 들어올 때를 위해)
+function resetActivityPage() {
+    document.getElementById('camera-box').style.display = 'block';
+    document.getElementById('preview-box').style.display = 'none';
+    document.getElementById('cam-file').value = "";
+    selectedFileBase64 = null;
+}
        async function doLogin() {
         const email = document.getElementById('l-email').value.trim();
         const pw = document.getElementById('l-pw').value.trim();
@@ -230,6 +292,7 @@ function updateUI(data) {
     </script>
 </body>
 </html>
+
 
 
 
