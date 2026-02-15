@@ -128,18 +128,18 @@
      * 4. 로그인 실행 함수
      */
 async function doLogin() {
-    // 1. 입력값 가져오기 및 '전처리' (모바일 이슈 해결의 핵심)
-    const rawEmail = document.getElementById('l-email').value;
-    const rawPw = document.getElementById('l-pw').value;
+    const emailEl = document.getElementById('l-email');
+    const pwEl = document.getElementById('l-pw');
     
-    // 앞뒤 공백 제거(.trim) 및 이메일 소문자 강제 변환(.toLowerCase)
-    const email = rawEmail.trim().toLowerCase(); 
-    const pw = rawPw.trim();
+    // 1. 전처리: 앞뒤 공백 제거(.trim) 및 이메일 강제 소문자화(.toLowerCase)
+    const email = emailEl.value.trim().toLowerCase(); 
+    const pw = pwEl.value.trim();
     
     if(!email || !pw) return alert("정보를 입력하세요.");
 
     showLoading();
     try {
+        // 2. 서버 통신
         const res = await apiRequest('loginCheck', { email, pw }, 'POST');
         hideLoading();
 
@@ -147,12 +147,12 @@ async function doLogin() {
             localStorage.setItem('gnpay_user', JSON.stringify(res));
             loginOk(res);
         } else {
-            // 서버에서 온 메시지가 FAIL이면 모바일 입력값 확인 유도
-            alert("로그인 실패: 입력하신 정보를 다시 확인해주세요.");
+            // 상세 에러 확인을 위해 서버 메시지 출력
+            alert("로그인 실패: " + (res.msg || "아이디 또는 비번이 일치하지 않습니다."));
         }
     } catch (err) {
         hideLoading();
-        alert("네트워크 연결을 확인해주세요.");
+        alert("네트워크 연결 실패: " + err.message);
     }
 }
 
@@ -190,6 +190,7 @@ async function doLogin() {
 </script>
 </body>
 </html>
+
 
 
 
