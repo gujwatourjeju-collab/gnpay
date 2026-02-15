@@ -5,85 +5,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>김녕페이 2.0</title>
-
     <link rel="icon" href="https://gnpay.my/log.png" type="image/png">
-    <meta property="og:title" content="김녕페이 2.0">
-    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    
     <style>
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
-        
-        :root { 
-            --primary: #01b2ad; 
-            --primary-grad: linear-gradient(135deg, #01b2ad 0%, #00d2ff 100%);
-            --bg-grad: linear-gradient(180deg, #e6f7f6 0%, #f8fcfc 40%, #ffffff 100%);
-        }
-
-        body { 
-            font-family: 'Pretendard', sans-serif; 
-            background: var(--bg-grad); 
-            margin:0; padding: env(safe-area-inset-top, 20px) 0 140px 0;
-            min-height: 100vh; color: #1a1a1a;
-        }
-
-        /* 네비게이션 및 공통 */
-        .top-nav { display: flex; justify-content: space-between; align-items: flex-start; padding: 40px 25px 10px; }
-        .auth-links { display: flex; gap: 12px; margin-top: 5px; }
-        .auth-link { font-size: 0.85rem; font-weight: 700; color: #888; text-decoration: none; cursor: pointer; }
-
-        /* 입력 폼 스타일 */
-        .custom-input {
-            border: none; border-radius: 16px; background: white; padding: 16px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.03); margin-bottom: 15px;
-        }
+        :root { --primary: #01b2ad; --primary-grad: linear-gradient(135deg, #01b2ad 0%, #00d2ff 100%); --bg-grad: linear-gradient(180deg, #e6f7f6 0%, #f8fcfc 40%, #ffffff 100%); }
+        body { font-family: 'Pretendard', sans-serif; background: var(--bg-grad); margin:0; padding: env(safe-area-inset-top, 20px) 0 140px 0; min-height: 100vh; color: #1a1a1a; }
+        .top-nav { display: flex; justify-content: space-between; align-items: center; padding: 40px 25px 10px; }
+        .auth-links { display: flex; gap: 5px; align-items: center; }
+        .auth-link { font-size: 0.85rem; font-weight: 700; color: #888; text-decoration: none; cursor: pointer; padding: 8px 5px; line-height: 1; white-space: nowrap; }
+        .custom-input { border: none; border-radius: 16px; background: white; padding: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); margin-bottom: 15px; }
         .form-label { font-size: 0.8rem; font-weight: 700; color: #666; margin-left: 5px; margin-bottom: 5px; }
-
-        /* 카드 및 버튼 */
-        .dashboard-card {
-            background: white; margin: 0 20px 30px; padding: 30px; border-radius: 28px;
-            box-shadow: 0 15px 35px rgba(1, 178, 173, 0.15);
-            display: flex; justify-content: space-between; align-items: center; cursor: pointer;
-        }
+        .dashboard-card { background: white; margin: 0 20px 30px; padding: 30px; border-radius: 28px; box-shadow: 0 15px 35px rgba(1, 178, 173, 0.15); display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
         .amount-text { font-size: 2.2rem; font-weight: 900; background: var(--primary-grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .btn-scan { 
-            width: 100%; padding: 20px; border-radius: 24px; font-weight: 800; border: none; 
-            color: white; background: var(--primary-grad); 
-            box-shadow: 0 12px 24px rgba(1, 178, 173, 0.3);
-            display: flex; align-items: center; justify-content: center; gap: 10px;
-        }
+        .btn-scan { width: 100%; padding: 20px; border-radius: 24px; font-weight: 800; border: none; color: white; background: var(--primary-grad); box-shadow: 0 12px 24px rgba(1, 178, 173, 0.3); display: flex; align-items: center; justify-content: center; gap: 10px; }
         .fixed-footer-nav { position: fixed; bottom: 35px; left: 20px; right: 20px; z-index: 1000; }
-        
         .page { display: none; animation: fadeIn 0.3s ease-in-out; }
         .active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* QR 및 로딩 */
-        #loading-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255, 255, 255, 0.9); z-index: 10000;
-            display: none; justify-content: center; align-items: center; flex-direction: column;
-        }
-        #qr-focus-layer {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.85); z-index: 9999; display: none;
-            flex-direction: column; align-items: center; justify-content: center;
-        }
+        #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.9); z-index: 10000; display: none; justify-content: center; align-items: center; flex-direction: column; }
+        #qr-focus-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; }
         .qr-wrapper { position: relative; width: 100%; display: flex; justify-content: center; align-items: center; }
-        .qr-logo-box {
-            position: absolute; width: 60px; height: 60px; background: var(--primary-grad);
-            border-radius: 16px; border: 2px solid white; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            overflow: hidden; display: flex; align-items: center; justify-content: center;
-        }
+        .qr-logo-box { position: absolute; width: 60px; height: 60px; background: var(--primary-grad); border-radius: 16px; border: 2px solid white; box-shadow: 0 4px 12px rgba(0,0,0,0.2); overflow: hidden; display: flex; align-items: center; justify-content: center; }
         .qr-logo-box img { width: 100%; height: 100%; object-fit: contain; }
- .bi-patch-check-fill, .bi-bag-heart-fill {
-    background: var(--primary-grad);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    /* ▼ 이 한 줄을 꼭 추가하세요! ▼ */
-    display: inline-block; 
-}
+        .bi-patch-check-fill, .bi-bag-heart-fill, .bi-person-vcard-fill, .bi-journal-check { background: var(--primary-grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: inline-block; }
     </style>
 </head>
 <body>
@@ -111,195 +57,97 @@
         <div class="top-nav">
             <div>
                 <img src="https://gnpay.my/log.png" style="width: 85px; margin-bottom: 8px;">
-                <div style="color:var(--primary); font-weight:900; font-size:1.4rem; letter-spacing:-0.5px; margin-bottom: 5px; margin-left: 10px;">
-                김녕페이 2.0
-               </div>
+                <div style="color:var(--primary); font-weight:900; font-size:1.4rem; letter-spacing:-0.5px; margin-bottom: 5px; margin-left: 10px;">김녕페이 2.0</div>
             </div>
             <div class="auth-links" id="auth-area"></div>
         </div>
-
         <div class="pb-4" style="padding-left: 35px; padding-right: 25px;">
             <h1 class="fw-bolder mt-2" id="welcome-message">함께 만드는<br><strong>푸른 김녕 Wave</strong></h1>
         </div>
-
         <div class="dashboard-card" id="qr-trigger">
-            <div>
-                <div class="small fw-bold text-muted">MY POINTS</div>
-                <div class="amount-text" id="main-u-points">0</div>
-            </div>
-            <div style="background: var(--primary-grad); color:white; width:50px; height:50px; border-radius:18px; display:flex; align-items:center; justify-content:center; font-size:1.5rem;">
-                <i class="bi bi-qr-code"></i>
-            </div>
+            <div><div class="small fw-bold text-muted">MY POINTS</div><div class="amount-text" id="main-u-points">0</div></div>
+            <div style="background: var(--primary-grad); color:white; width:50px; height:50px; border-radius:18px; display:flex; align-items:center; justify-content:center; font-size:1.5rem;"><i class="bi bi-qr-code"></i></div>
         </div>
-
         <div class="px-4 mb-5" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-            <div class="p-4 bg-white text-center shadow-sm rounded-4 border" onclick="alert('준비 중')">
-                <i class="bi bi-patch-check-fill fs-1"></i>
-                <div class="fw-bold mt-2">정화 활동</div>
-            </div>
-            <div class="p-4 bg-white text-center shadow-sm rounded-4 border" onclick="alert('준비 중')">
-                <i class="bi bi-bag-heart-fill fs-1"></i>
-                <div class="fw-bold mt-2">가맹점</div>
-            </div>
+            <div class="p-4 bg-white text-center shadow-sm rounded-4 border" onclick="alert('준비 중')"><i class="bi bi-patch-check-fill fs-1"></i><div class="fw-bold mt-2">정화 활동</div></div>
+            <div class="p-4 bg-white text-center shadow-sm rounded-4 border" onclick="alert('준비 중')"><i class="bi bi-bag-heart-fill fs-1"></i><div class="fw-bold mt-2">가맹점</div></div>
         </div>
-
-        <div class="fixed-footer-nav">
-            <button class="btn-scan" onclick="handleScan()">
-                <i class="bi bi-camera-fill fs-4"></i> 인증용 QR 스캔하기
-            </button>
-        </div>
+        <div class="fixed-footer-nav"><button class="btn-scan" onclick="handleScan()"><i class="bi bi-camera-fill fs-4"></i> 인증용 QR 스캔하기</button></div>
     </div>
 
     <div id="page-login" class="page">
         <div class="top-nav">
-            <div>
-                <img src="https://gnpay.my/log.png" style="width: 85px !important; height: auto !important; display: block; margin-bottom: 8px; margin-left: -5px;">
-                <div style="color:var(--primary); font-weight:900; font-size:1.3rem; letter-spacing:-0.5px;">김녕페이 2.0</div>
-            </div>
-            <div class="fs-2 text-secondary" style="cursor:pointer;" onclick="showPage('page-main')">
-                <i class="bi bi-x"></i>
-            </div>
-        </div> <div class="px-4 mt-4"> <h1 class="fw-bolder mb-5" style="line-height: 1.3;">반가워요!<br><strong>로그인 해주세요</strong></h1>
-            
-            <div class="mb-4">
-                <div class="form-label ps-1">이메일</div>
-                <input type="email" id="login-email" class="form-control custom-input" placeholder="user@gnpay.my">
-            </div>
-            
-            <div class="mb-5">
-                <div class="form-label ps-1">비밀번호</div>
-                <input type="password" id="login-pw" class="form-control custom-input" placeholder="비밀번호">
-            </div>
-
-            <button class="btn-scan w-100" onclick="submitLogin()">
-                로그인하기
-            </button>
-            
-            <div class="text-center mt-4">
-                <span class="text-muted small">아직 계정이 없으신가요?</span>
-                <span class="fw-bold ms-2" style="color:var(--primary); cursor:pointer;" onclick="showPage('page-signup')">회원가입</span>
-            </div>
-         </div>
+            <div><img src="https://gnpay.my/log.png" style="width: 85px; margin-bottom: 8px;"><div style="color:var(--primary); font-weight:900; font-size:1.4rem; letter-spacing:-0.5px; margin-left: 10px;">김녕페이 2.0</div></div>
+            <div class="fs-2 text-secondary" style="cursor:pointer; padding: 10px;" onclick="showPage('page-main')"><i class="bi bi-x"></i></div>
+        </div>
+        <div class="px-4 mt-4">
+            <h1 class="fw-bolder mb-5">반가워요!<br><strong>로그인 해주세요</strong></h1>
+            <input type="email" id="login-email" class="form-control custom-input" placeholder="이메일">
+            <input type="password" id="login-pw" class="form-control custom-input" placeholder="비밀번호">
+            <button class="btn-scan w-100" onclick="submitLogin()">로그인하기</button>
+            <div class="text-center mt-4"><span class="text-muted small">계정이 없으신가요?</span><span class="fw-bold ms-2" style="color:var(--primary); cursor:pointer;" onclick="showPage('page-signup')">회원가입</span></div>
+        </div>
     </div>
 
     <div id="page-signup" class="page">
         <div class="top-nav">
-            <div>
-                <div class="fw-bold text-secondary" onclick="showPage('page-login')"> < 뒤로가기</div>
-            </div>
-            <div style="color:var(--primary); font-weight:900; font-size:1.3rem;">회원가입</div>
+            <div><img src="https://gnpay.my/log.png" style="width: 85px; margin-bottom: 8px;"><div style="color:var(--primary); font-weight:900; font-size:1.4rem; letter-spacing:-0.5px; margin-left: 10px;">김녕페이 2.0</div></div>
+            <div class="fs-2 text-secondary" style="cursor:pointer; padding: 10px;" onclick="showPage('page-main')"><i class="bi bi-x"></i></div>
         </div>
-        <div class="px-4 mt-2" style="padding-bottom: 100px; overflow-y: auto;">
-            <div class="row">
-                <div class="col-6">
-                    <div class="form-label">이름</div>
-                    <input type="text" id="reg-name" class="form-control custom-input">
-                </div>
-                <div class="col-6">
-                    <div class="form-label">생년월일(6자리)</div>
-                    <input type="number" id="reg-birth" class="form-control custom-input" placeholder="900101">
-                </div>
-            </div>
-
-            <div class="form-label">이메일 (아이디)</div>
-            <input type="email" id="reg-email" class="form-control custom-input" placeholder="example@email.com">
-
-            <div class="form-label">비밀번호</div>
-            <input type="password" id="reg-pw" class="form-control custom-input">
-
-            <div class="form-label">전화번호</div>
-            <input type="tel" id="reg-phone" class="form-control custom-input" placeholder="010-0000-0000">
-
-            <div class="row">
-                <div class="col-6">
-                    <div class="form-label">성별</div>
-                    <select id="reg-gender" class="form-control custom-input">
-                        <option value="남">남성</option>
-                        <option value="여">여성</option>
-                    </select>
-                </div>
-                <div class="col-6">
-                    <div class="form-label">소속</div>
-                    <input type="text" id="reg-affil" class="form-control custom-input" placeholder="학교/직장">
-                </div>
-            </div>
-
-            <div class="form-label">주소</div>
-            <input type="text" id="reg-addr" class="form-control custom-input" placeholder="제주시 구좌읍...">
-
-            <button class="btn-scan w-100 mt-4" onclick="submitSignup()">가입하기</button>
+        <div class="px-4 mt-4">
+            <h1 class="fw-bolder mb-4">새로운 시작!<br><strong>정보를 입력하세요</strong></h1>
+            <input type="text" id="reg-name" class="form-control custom-input" placeholder="이름">
+            <input type="email" id="reg-email" class="form-control custom-input" placeholder="이메일">
+            <input type="password" id="reg-pw" class="form-control custom-input" placeholder="비밀번호">
+            <input type="tel" id="reg-phone" class="form-control custom-input" placeholder="전화번호">
+            <button class="btn-scan w-100 mt-2" onclick="submitSignup()">가입하기</button>
         </div>
     </div>
 
-    <script>
-        // [중요] 여기에 새로 배포한 웹 앱 URL을 넣으세요!
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbxoUd_3fgEkeGTGOSi-5MvwLif16zRiRcPLHvNj_pjrFXFPtM2SQLNFwslJOQ7xrp48/exec";
+    <div id="page-mypage" class="page">
+        <div class="top-nav">
+            <div class="fw-bold text-secondary" style="cursor:pointer; padding:10px;" onclick="showPage('page-main')"><i class="bi bi-chevron-left"></i> 홈으로</div>
+            <div style="color:var(--primary); font-weight:900; font-size:1.3rem;">마이페이지</div>
+        </div>
+        
+        <div class="bg-white p-4 mx-3 rounded-5 text-center shadow-lg border mt-3">
+            <div class="fw-bold mb-3 small" style="color:var(--primary)">GIMNYEONG PASS</div>
+            <div class="qr-wrapper">
+                <img id="my-qr-img" src="" style="width: 60%; border-radius: 15px;">
+                <div class="qr-logo-box" style="width:40px; height:40px;"><img src="https://gnpay.my/log2.png"></div>
+            </div>
+            <div class="mt-3">
+                <div class="amount-text" id="my-u-points" style="font-size: 1.8rem;">0</div>
+                <div class="small text-muted fw-bold">나의 에코 포인트</div>
+            </div>
+        </div>
 
+        <div class="px-4 mt-4" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <div class="p-4 bg-white text-center shadow-sm rounded-4 border" onclick="alert('준비 중')">
+                <i class="bi bi-person-vcard-fill fs-1"></i>
+                <div class="fw-bold mt-2" style="font-size:0.9rem;">내 정보 확인</div>
+            </div>
+            <div class="p-4 bg-white text-center shadow-sm rounded-4 border" onclick="alert('준비 중')">
+                <i class="bi bi-journal-check fs-1"></i>
+                <div class="fw-bold mt-2" style="font-size:0.9rem;">활동 내역</div>
+            </div>
+        </div>
+        
+        <div class="px-4 mt-4 text-center">
+            <button class="btn btn-link text-danger text-decoration-none small" onclick="logout()">로그아웃</button>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <script>
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbx4b_7Af83uBEERmz7cjGB4ooTADffbwX8eTN0H6tranviyLTmhawDyEDBIEv8hAfkf/exec";
         let userData = JSON.parse(localStorage.getItem('gnpay_user')) || { isLoggedIn: false, points: 0 };
         const loading = document.getElementById('loading-overlay');
 
         function showPage(pageId) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(pageId).classList.add('active');
-            window.scrollTo(0,0);
-        }
-
-        // 로그인
-        async function submitLogin() {
-            const email = document.getElementById('login-email').value;
-            const pw = document.getElementById('login-pw').value;
-            if(!email || !pw) return alert("정보를 입력해주세요.");
-
-            loading.style.display = 'flex';
-            try {
-                const res = await fetch(GAS_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({ type: 'login', email: email, password: pw })
-                }).then(r => r.json());
-
-                if (res.result === 'success') {
-                    userData = { isLoggedIn: true, ...res.user };
-                    localStorage.setItem('gnpay_user', JSON.stringify(userData));
-                    updateUI();
-                    showPage('page-main');
-                } else {
-                    alert(res.message);
-                }
-            } catch (e) { alert("오류가 발생했습니다."); }
-            loading.style.display = 'none';
-        }
-
-        // 회원가입
-        async function submitSignup() {
-            const data = {
-                type: 'signup',
-                name: document.getElementById('reg-name').value,
-                email: document.getElementById('reg-email').value,
-                password: document.getElementById('reg-pw').value,
-                phone: document.getElementById('reg-phone').value,
-                birth: document.getElementById('reg-birth').value,
-                gender: document.getElementById('reg-gender').value,
-                affil: document.getElementById('reg-affil').value,
-                addr: document.getElementById('reg-addr').value
-            };
-
-            if(!data.name || !data.email || !data.password) return alert("필수 정보를 모두 입력해주세요.");
-
-            loading.style.display = 'flex';
-            try {
-                const res = await fetch(GAS_URL, {
-                    method: 'POST',
-                    body: JSON.stringify(data)
-                }).then(r => r.json());
-
-                if (res.result === 'success') {
-                    alert("가입이 완료되었습니다! 로그인 해주세요.");
-                    showPage('page-login');
-                } else {
-                    alert(res.message);
-                }
-            } catch (e) { alert("가입 중 오류가 발생했습니다."); }
-            loading.style.display = 'none';
+            window.scrollTo(0, 0);
         }
 
         function updateUI() {
@@ -308,38 +156,95 @@
             document.getElementById('main-u-points').innerText = Number(userData.points || 0).toLocaleString();
 
             if (userData.isLoggedIn) {
-                authArea.innerHTML = `<span class="auth-link" style="color:var(--primary)">${userData.name}님</span><span class="auth-link" onclick="logout()">로그아웃</span>`;
+                authArea.innerHTML = `<span class="auth-link" style="color:var(--primary); font-weight:800;" onclick="goToMyPage()">${userData.name}님</span><span style="color:#eee; font-size:0.7rem;">|</span><span class="auth-link" onclick="logout()">로그아웃</span>`;
                 welcome.innerHTML = `${userData.name}님, 오늘도<br><strong>푸른 김녕을 지켜요!</strong>`;
             } else {
-                authArea.innerHTML = `<span class="auth-link" onclick="showPage('page-signup')">회원가입</span><span class="auth-link text-dark" onclick="showPage('page-login')">로그인</span>`;
+                authArea.innerHTML = `<span class="auth-link" onclick="showPage('page-signup')">회원가입</span><span style="color:#eee; font-size:0.7rem;">|</span><span class="auth-link text-dark" onclick="showPage('page-login')">로그인</span>`;
                 welcome.innerHTML = `함께 만드는<br><strong>푸른 김녕 Wave</strong>`;
             }
         }
 
+        function goToMyPage() {
+            document.getElementById('my-u-points').innerText = Number(userData.points || 0).toLocaleString();
+            document.getElementById('my-qr-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${userData.email}`;
+            showPage('page-mypage');
+        }
+
+        async function submitLogin() {
+            const email = document.getElementById('login-email').value;
+            const pw = document.getElementById('login-pw').value;
+            if(!email || !pw) return alert("입력해주세요.");
+            loading.style.display='flex';
+            try {
+                const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ type: 'login', email, password: pw }) }).then(r => r.json());
+                if (res.result === 'success') {
+                    userData = { isLoggedIn: true, ...res.user };
+                    localStorage.setItem('gnpay_user', JSON.stringify(userData));
+                    updateUI();
+                    showPage('page-main');
+                } else { alert(res.message); }
+            } catch (e) { alert("오류"); }
+            loading.style.display='none';
+        }
+
+        async function submitSignup() {
+            const data = { type: 'signup', name: document.getElementById('reg-name').value, email: document.getElementById('reg-email').value, password: document.getElementById('reg-pw').value, phone: document.getElementById('reg-phone').value };
+            loading.style.display='flex';
+            try {
+                const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(data) }).then(r => r.json());
+                if (res.result === 'success') { alert("가입 성공!"); showPage('page-login'); } else { alert(res.message); }
+            } catch (e) { alert("오류"); }
+            loading.style.display='none';
+        }
+
+        async function handleScan() {
+            if (!userData.isLoggedIn) { showPage('page-login'); return; }
+            const scannerModal = document.getElementById('scanner-modal');
+            if(!scannerModal) return alert("스캐너 설정 오류");
+            scannerModal.style.display = 'block';
+            const html5QrCode = new Html5Qrcode("reader");
+            html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, async (decodedText) => {
+                html5QrCode.stop().then(() => { scannerModal.style.display = 'none'; });
+                processAddPoints(100, "환경 정화 활동");
+            });
+        }
+
+        async function processAddPoints(amount, action) {
+            loading.style.display = 'flex';
+            try {
+                const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ type: 'addPoints', email: userData.email, amount: amount, action: action }) }).then(r => r.json());
+                if (res.result === 'success') {
+                    alert(amount + "포인트 적립!");
+                    userData.points = res.newPoints;
+                    localStorage.setItem('gnpay_user', JSON.stringify(userData));
+                    updateUI();
+                }
+            } catch (e) { alert("적립 오류"); }
+            loading.style.display = 'none';
+        }
+
         function logout() {
-            if(confirm('로그아웃 하시겠습니까?')) {
+            if (confirm('로그아웃?')) {
                 localStorage.removeItem('gnpay_user');
-                userData = { isLoggedIn: false };
+                userData = { isLoggedIn: false, points: 0 };
                 updateUI();
+                showPage('page-main');
             }
         }
 
-        function handleScan() {
-            if(!userData.isLoggedIn) { showPage('page-login'); return; }
-            alert("카메라 스캐너 실행 (준비중)");
-        }
-
-        // QR Trigger
-        const qrLayer = document.getElementById('qr-focus-layer');
         document.getElementById('qr-trigger').onclick = (e) => {
-            if(!userData.isLoggedIn) { showPage('page-login'); return; }
-            e.stopPropagation();
+            if (!userData.isLoggedIn) { showPage('page-login'); return; }
             document.getElementById('focus-points').innerText = Number(userData.points).toLocaleString();
             document.getElementById('qr-img-large').src = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${userData.email}`;
-            qrLayer.style.display = 'flex';
+            document.getElementById('qr-focus-layer').style.display = 'flex';
         };
 
         window.onload = updateUI;
     </script>
+
+    <div id="scanner-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:black; z-index:20000;">
+        <div id="reader" style="width:100%; height:80vh;"></div>
+        <button class="btn btn-light" style="position:absolute; bottom:50px; left:50%; transform:translateX(-50%);" onclick="document.getElementById('scanner-modal').style.display='none'">닫기</button>
+    </div>
 </body>
 </html>
