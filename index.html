@@ -126,24 +126,43 @@ body { font-family: 'Pretendard', sans-serif; background-color: var(--bg); color
         </div>
     </div>
 
-    <div id="page-info" class="page">
-        <div class="info-card">
-            <h5 id="u-name-hi">환영합니다!</h5>
-            <h1 class="display-5 fw-bold mb-4"><span id="u-points">0</span> P</h1>
-            <div class="qr-area">
-                <img id="qr-img" style="width:160px; height:160px; display:none;">
-                <i id="qr-placeholder" class="bi bi-qr-code" style="font-size: 100px; color: #eee;"></i>
-            </div>
-        </div>
-        <div class="p-4">
-            <button class="btn w-100 p-3 mb-2 bg-white shadow-sm rounded-4 text-start text-danger" onclick="handleLogout()">
-                <i class="bi bi-box-arrow-right me-2"></i> 로그아웃
-            </button>
-            <button class="btn w-100 p-3 mb-2 bg-white shadow-sm rounded-4 text-start" onclick="showPage('page-main')">
-                <i class="bi bi-house me-2"></i> 메인으로 돌아가기
-            </button>
-        </div>
+<div id="page-info" class="page">
+    <div class="info-header">
+        <h4 id="u-name-top">김녕님 환원니단!</h4>
+        <p>확천 가영 픔비트</p>
+        <h1><span id="u-points">0</span> P</h1>
     </div>
+
+    <div class="qr-card-v2">
+        <img id="qr-img-v2" src="" alt="QR" style="display:none;">
+        <i id="qr-placeholder-v2" class="bi bi-qr-code" style="font-size: 100px; color: #eee;"></i>
+        <p>결제 시 매장 점원에게 보여주세요</p>
+    </div>
+
+    <div class="menu-pill" onclick="alert('준비 중입니다.')">
+        <div class="pill-icon" style="background: #008a86;"><i class="bi bi-gear-fill"></i></div>
+        <div class="pill-title">개인정보 설정</div>
+        <div class="pill-id">#05</div>
+    </div>
+
+    <div class="menu-pill" onclick="alert('준비 중입니다.')">
+        <div class="pill-icon" style="background: #01b2ad;"><i class="bi bi-search"></i></div>
+        <div class="pill-title">포인트 내역</div>
+        <div class="pill-id">#00</div>
+    </div>
+
+    <div class="menu-pill" onclick="showPage('page-main')">
+        <div class="pill-icon" style="background: #a2d2d1;"><i class="bi bi-house-door-fill"></i></div>
+        <div class="pill-title">메인으로</div>
+        <div class="pill-id">#33</div>
+    </div>
+
+    <div class="menu-pill" onclick="handleLogout()">
+        <div class="pill-icon" style="background: #e74c3c;"><i class="bi bi-power"></i></div>
+        <div class="pill-title" style="color: #e74c3c;">로그아웃</div>
+        <div class="pill-id" style="color: #e74c3c;">#OFF</div>
+    </div>
+</div>
 
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbydQbH0V9jDREBGFTw3lIVJjrOdRlB326ut5q5Pdh1sByf5krVtF92-801Qk5oLlvDR/exec";
@@ -158,6 +177,26 @@ body { font-family: 'Pretendard', sans-serif; background-color: var(--bg); color
                 window.scrollTo(0, 0); 
             }
         }
+        function loginOk(data) {
+    userData = data;
+    // 상단 이름과 포인트 업데이트
+    document.getElementById('u-name-top').innerText = data.name + "님 환원니단!";
+    document.getElementById('u-points').innerText = Number(data.points).toLocaleString();
+    
+    // QR 코드 생성 및 표시 (ID 확인!)
+    const qrImg = document.getElementById('qr-img-v2');
+    if(qrImg) {
+        qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${data.email}`;
+        qrImg.style.display = 'inline-block';
+        document.getElementById('qr-placeholder-v2').style.display = 'none';
+    }
+
+    // 나머지 UI 제어...
+    document.getElementById('bar-guest').style.display = 'none';
+    document.getElementById('bar-user').style.display = 'block';
+    document.getElementById('btn-user-qr').style.display = 'flex';
+    showPage('page-main');
+}
 
         async function doLogin() {
             const email = document.getElementById('l-email').value.trim();
@@ -221,4 +260,5 @@ body { font-family: 'Pretendard', sans-serif; background-color: var(--bg); color
     </script>
 </body>
 </html>
+
 
