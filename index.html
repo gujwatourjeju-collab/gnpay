@@ -152,97 +152,118 @@ function goToSignup() {
     // API_URL은 아까 배포한 그 주소입니다.
     window.open("https://script.google.com/macros/s/AKfycby97aRP9k5XuS8G4UlWxiLFW7OWl3x0wd1C9SrWXLkvOL1MXvkyGmwQXrjNFWp5uuJq/exec", '회원가입', 'width=400,height=600');
 }
-        hideLoading();
-        
-        // 서버 대답을 기다리지 않고 일단 성공 메시지를 띄웁니다.
-        alert("가입 요청을 보냈습니다! 시트를 확인해 보세요.");
-        showPage('page-login');
+        hideLoading();<script>
+    const API_URL = "https://script.google.com/macros/s/AKfycby97aRP9k5XuS8G4UlWxiLFW7OWl3x0wd1C9SrWXLkvOL1MXvkyGmwQXrjNFWp5uuJq/exec";
+    let userData = null;
+    let selectedFileBase64 = null;
 
-    } catch (e) {
-        hideLoading();
-        alert("통신 에러가 발생했습니다: " + e.message);
+    function showPage(id) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        window.scrollTo(0, 0);
     }
-}
 
-        async function doLogin() {
-            const email = document.getElementById('l-email').value.trim();
-            const pw = document.getElementById('l-pw').value.trim();
-            showLoading();
-            try {
-                const res = await fetch(API_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({ action: 'loginCheck', email, pw })
-                }).then(r => r.json());
-                hideLoading();
-                if(res.success) {
-                    localStorage.setItem('gnpay_user', JSON.stringify(res));
-                    updateUI(res);
-                    showPage('page-main');
-                } else { alert(res.msg); }
-            } catch (e) { hideLoading(); alert("로그인 에러"); }
-        }
+    // [핵심] 회원가입은 이제 팝업(또는 이동)으로 해결! 
+    // '준비 중' 팝업의 근원을 차단합니다.
+    function goToSignup() {
+        // 팝업이 차단될 수 있으니 location.href로 확실하게 보냅니다.
+        // 만약 팝업을 원하시면 window.open(API_URL, '_blank'); 로 쓰세요.
+        location.href = API_URL;
+    }
 
-        function updateUI(data) {
-            userData = data;
-            document.getElementById('u-name-top').innerText = data.name + "님";
-            document.getElementById('u-points').innerText = Number(data.points).toLocaleString();
-            document.getElementById('qr-img-v2').src = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${data.token || data.email}`;
-            document.getElementById('qr-img-v2').style.display = 'inline-block';
-            document.getElementById('qr-placeholder-v2').style.display = 'none';
-            document.getElementById('bar-guest').style.display = 'none';
-            document.getElementById('bar-user').style.display = 'block';
-            document.getElementById('btn-user-qr').style.display = 'flex';
-        }
+    // 기존의 복잡했던 doSignup() 함수는 아예 삭제했습니다. 
+    // HTML 상단의 '가입 완료' 버튼의 onclick을 goToSignup()으로 바꾸거나 
+    // 아래와 같이 doSignup을 단순 연결용으로만 둡니다.
+    function doSignup() {
+        goToSignup();
+    }
 
-        function previewImage(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                selectedFileBase64 = e.target.result.split(',')[1];
-                document.getElementById('camera-box').style.display = 'none';
-                document.getElementById('preview-box').style.display = 'block';
-                document.getElementById('img-preview').src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        }
-
-        async function uploadPhoto() {
-            showLoading();
-            try {
-                const res = await fetch(API_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({ action: 'uploadPhoto', email: userData.email, name: userData.name, image: selectedFileBase64 })
-                }).then(r => r.json());
-                hideLoading();
-                if(res.success) {
-                    alert("적립 완료!");
-                    userData.points = res.newPoints;
-                    updateUI(userData);
-                    showPage('page-main');
-                    resetActivityPage();
-                }
-            } catch (e) { hideLoading(); alert("업로드 에러"); }
-        }
-
-        function resetActivityPage() {
-            document.getElementById('camera-box').style.display = 'block';
-            document.getElementById('preview-box').style.display = 'none';
-            selectedFileBase64 = null;
-        }
-
-        function handleLogout() { localStorage.removeItem('gnpay_user'); location.reload(); }
-        function showLoading() { document.getElementById('loading-overlay').style.display = 'flex'; }
-        function hideLoading() { document.getElementById('loading-overlay').style.display = 'none'; }
-
-        window.onload = () => {
-            const saved = localStorage.getItem('gnpay_user');
-            if (saved) updateUI(JSON.parse(saved));
+    async function doLogin() {
+        const email = document.getElementById('l-email').value.trim();
+        const pw = document.getElementById('l-pw').value.trim();
+        if(!email || !pw) { alert("이메일과 비밀번호를 입력하세요."); return; }
+        
+        showLoading();
+        try {
+            const res = await fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'loginCheck', email, pw })
+            }).then(r => r.json());
+            
             hideLoading();
+            if(res.success) {
+                localStorage.setItem('gnpay_user', JSON.stringify(res));
+                updateUI(res);
+                showPage('page-main');
+            } else { 
+                alert(res.msg || "로그인 실패"); 
+            }
+        } catch (e) { 
+            hideLoading(); 
+            alert("로그인 중 통신 에러가 발생했습니다."); 
+        }
+    }
+
+    function updateUI(data) {
+        userData = data;
+        document.getElementById('u-name-top').innerText = data.name + "님";
+        document.getElementById('u-points').innerText = Number(data.points).toLocaleString();
+        document.getElementById('qr-img-v2').src = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${data.token || data.email}`;
+        document.getElementById('qr-img-v2').style.display = 'inline-block';
+        document.getElementById('qr-placeholder-v2').style.display = 'none';
+        document.getElementById('bar-guest').style.display = 'none';
+        document.getElementById('bar-user').style.display = 'block';
+        document.getElementById('btn-user-qr').style.display = 'flex';
+    }
+
+    function previewImage(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            selectedFileBase64 = e.target.result.split(',')[1];
+            document.getElementById('camera-box').style.display = 'none';
+            document.getElementById('preview-box').style.display = 'block';
+            document.getElementById('img-preview').src = e.target.result;
         };
-    </script>
+        reader.readAsDataURL(file);
+    }
+
+    async function uploadPhoto() {
+        if(!userData) return;
+        showLoading();
+        try {
+            const res = await fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'uploadPhoto', email: userData.email, name: userData.name, image: selectedFileBase64 })
+            }).then(r => r.json());
+            hideLoading();
+            if(res.success) {
+                alert("적립 완료!");
+                userData.points = res.newPoints;
+                updateUI(userData);
+                showPage('page-main');
+                resetActivityPage();
+            }
+        } catch (e) { hideLoading(); alert("업로드 에러"); }
+    }
+
+    function resetActivityPage() {
+        document.getElementById('camera-box').style.display = 'block';<br>        document.getElementById('preview-box').style.display = 'none';<br>        selectedFileBase64 = null;<br>    }
+
+    function handleLogout() { localStorage.removeItem('gnpay_user'); location.reload(); }
+    function showLoading() { document.getElementById('loading-overlay').style.display = 'flex'; }
+    function hideLoading() { document.getElementById('loading-overlay').style.display = 'none'; }
+
+    window.onload = () => {
+        const saved = localStorage.getItem('gnpay_user');
+        if (saved) updateUI(JSON.parse(saved));
+        hideLoading();
+    };
+</script>
 </body>
 </html>
+
 
 
 
