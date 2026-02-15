@@ -261,7 +261,16 @@ function goToSignup() {
     function handleLogout() { localStorage.removeItem('gnpay_user'); location.reload(); }
     function showLoading() { document.getElementById('loading-overlay').style.display = 'flex'; }
     function hideLoading() { document.getElementById('loading-overlay').style.display = 'none'; }
-
+function goToSignupFinal() {
+    // 사장님 배포 주소 (직접 쳤을 때 양식 떴던 그 주소!)
+    const targetUrl = "https://script.google.com/macros/s/AKfycby97aRP9k5XuS8G4UlWxiLFW7OWl3x0wd1C9SrWXLkvOL1MXvkyGmwQXrjNFWp5uuJq/exec";
+    
+    console.log("회원가입 버튼 클릭됨 - 주소 이동 시작");
+    
+    // 팝업이고 뭐고 다 치우고, 그냥 현재 창에서 바로 날려버립니다.
+    // 이렇게 하면 '준비 중' 팝업이 뜰 물리적 공간 자체가 사라집니다.
+    window.location.href = targetUrl;
+}
     window.onload = () => {
         const saved = localStorage.getItem('gnpay_user');
         if (saved) updateUI(JSON.parse(saved));
@@ -270,6 +279,7 @@ function goToSignup() {
 </script>
 </body>
 </html>
+
 
 
 
