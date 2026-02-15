@@ -32,13 +32,21 @@
     <button id="btn-user-qr" onclick="openUserScanner()"><i class="bi bi-qr-code-scan"></i></button>
 
     <div id="page-main" class="page active">
-        <div class="landing-box p-4">
-            <h1 class="main-title fw-bold" style="color:var(--primary); font-size:38px;">김녕페이</h1>
-            <p class="text-muted mb-5">GIMNYEONG PAY 🌱</p>
-            <button class="btn w-100 p-4 mb-3 bg-white shadow-sm rounded-4 text-start d-flex align-items-center" onclick="checkAuthAndGo('page-activities')">
-                <i class="bi bi-tree-fill me-3 fs-3 text-primary"></i> <b>현재 진행 중인 활동</b>
-            </button>
-            </div>
+    <div class="landing-box p-4">
+        <h1 class="main-title fw-bold" style="color:var(--primary); font-size:38px;">김녕페이</h1>
+        <p class="text-muted mb-5">GIMNYEONG PAY 🌱</p>
+        <button class="btn w-100 p-4 mb-3 bg-white shadow-sm rounded-4 text-start d-flex align-items-center" onclick="checkAuthAndGo('page-activities')">
+            <i class="bi bi-tree-fill me-3 fs-3 text-primary"></i> <b>현재 진행 중인 활동</b>
+        </button>
+    </div> <div class="bottom-auth-bar fixed-bottom p-4 bg-white border-top d-flex justify-content-between" id="bar-guest">
+        <button class="btn btn-primary w-50 me-2 p-3 rounded-4" onclick="showPage('page-login')">로그인</button>
+        <button class="btn btn-outline-primary w-50 p-3 rounded-4" onclick="showPage('page-join')">회원가입</button>
+    </div>
+    
+    <div class="bottom-auth-bar fixed-bottom p-4 bg-white border-top" id="bar-user" style="display:none;">
+        <button class="btn btn-primary w-100 p-3 rounded-4" onclick="showPage('page-info')">내 정보 및 QR 확인</button>
+    </div>
+</div>
         <div class="bottom-auth-bar fixed-bottom p-4 bg-white border-top d-flex justify-content-between" id="bar-guest">
             <button class="btn btn-primary w-50 me-2 p-3 rounded-4" onclick="showPage('page-login')">로그인</button>
             <button class="btn btn-outline-primary w-50 p-3 rounded-4" onclick="showPage('page-join')">회원가입</button>
@@ -205,6 +213,7 @@ async function doLogin() {
 </script>
 </body>
 </html>
+
 
 
 
