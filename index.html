@@ -24,7 +24,7 @@
     <style>
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
         :root { --primary: #01b2ad; --primary-light: #e6f7f6; --dark: #2d3436; --bg: #f7fbfc; }
-        body { font-family: 'Pretendard', sans-serif; background-color: var(--bg); color: var(--dark); margin:0; padding-top: env(safe-area-inset-top, 20px) !important; padding-bottom: env(safe-area-inset-bottom, 20px) !important; min-height: 100vh; overflow-x: hidden; }
+        body { font-family: 'Pretendard', sans-serif; background-color: var(--bg); color: var(--dark); margin:0; padding-top: env(safe-area-inset-top, 20px) !important; padding-bottom: env(safe-area-inset-bottom, 20px) !important; min-height: 100vh; }
         
         #loading-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(255,255,255,0.9); z-index:10000; display:none; flex-direction:column; align-items:center; justify-content:center; }
         .spinner { width: 45px; height: 45px; border: 4px solid var(--primary-light); border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
@@ -35,7 +35,6 @@
         @keyframes fadeData { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .pill-card { background: white; border-radius: 100px; margin: 15px 20px; padding: 18px 25px; display: flex; align-items: center; box-shadow: 0 10px 25px rgba(1, 178, 173, 0.12); border: 1px solid rgba(255,255,255,0.8); transition: all 0.2s; cursor: pointer; }
-        .pill-card:active { transform: scale(0.96); }
         .icon-circle { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; margin-right: 18px; flex-shrink: 0; }
 
         #page-main { background: linear-gradient(160deg, #ffffff 20%, #e0f4f3 60%, #b2e6e4 100%); }
@@ -47,13 +46,13 @@
         .qr-card-v2 { background: white; border-radius: 35px; width: 240px; margin: 0 auto 35px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); text-align: center; }
         .qr-card-v2 img { width: 100%; border-radius: 20px; }
 
-        .fixed-bottom-pill { position: fixed; bottom: 30px; left: 20px; right: 20px; z-index: 1000; background: var(--primary); color: white; border-radius: 50px; padding: 18px; text-align: center; font-weight: 700; font-size: 1.1rem; border: none; box-shadow: 0 10px 25px rgba(1, 178, 173, 0.4); transition: all 0.2s; text-decoration: none; }
-        .fixed-bottom-pill:active { transform: scale(0.95); background: #009a95; color: white; }
+        .fixed-bottom-pill { position: fixed; bottom: 30px; left: 20px; right: 20px; z-index: 1000; background: var(--primary); color: white; border-radius: 50px; padding: 18px; text-align: center; font-weight: 700; font-size: 1.1rem; border: none; box-shadow: 0 10px 25px rgba(1, 178, 173, 0.4); transition: all 0.2s; text-decoration: none; cursor: pointer; }
+        .fixed-bottom-pill:active { transform: scale(0.95); opacity: 0.9; }
         
         .guest-bar-pill { position: fixed; bottom: 30px; left: 20px; right: 20px; z-index: 1000; display: flex; gap: 10px; }
         .btn-guest { flex: 1; position: static !important; }
 
-        #btn-user-qr { position: fixed !important; top: 15px !important; right: 15px !important; z-index: 10010 !important; width: 48px !important; height: 48px !important; border-radius: 14px !important; display: none; align-items: center; justify-content: center; background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border: 1px solid rgba(1, 178, 173, 0.1) !important; color: var(--primary); font-size: 24px; padding: 0; }
+        #btn-user-qr { position: fixed; top: 15px; right: 15px; z-index: 10010; width: 48px; height: 48px; border-radius: 14px; display: none; align-items: center; justify-content: center; background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border: 1px solid rgba(1, 178, 173, 0.1); color: var(--primary); font-size: 24px; padding: 0; }
     </style>
 </head>
 <body>
@@ -73,6 +72,7 @@
             <div class="icon-circle" style="background: #fff3e0; color: #ff9800;"><i class="bi bi-shop"></i></div>
             <div><div class="fw-bold fs-5">김녕 가맹점 찾기</div><div class="text-muted small">포인트 사용처 확인하기</div></div>
         </div>
+        
         <div class="guest-bar-pill" id="bar-guest">
             <button class="fixed-bottom-pill btn-guest" onclick="showPage('page-login')">로그인</button>
             <button class="fixed-bottom-pill btn-guest" style="background: linear-gradient(135deg, #6c757d, #495057);" onclick="showPage('page-signup')">회원가입</button>
@@ -80,33 +80,103 @@
         <button class="fixed-bottom-pill" id="bar-user" style="display:none;" onclick="showPage('page-info')">내 마이페이지 확인</button>
     </div>
 
+    <div id="page-signup" class="page">
+        <div class="p-4"><i class="bi bi-arrow-left fs-3" onclick="showPage('page-main')"></i><h5 class="d-inline fw-bold ms-3">회원가입</h5></div>
+        <div class="container p-4">
+            <div class="mb-3"><input type="text" id="s-name" class="form-control p-3 rounded-pill border-0 shadow-sm" placeholder="이름 (실명)"></div>
+            <div class="mb-3"><input type="email" id="s-email" class="form-control p-3 rounded-pill border-0 shadow-sm" placeholder="이메일 주소"></div>
+            <div class="mb-3"><input type="password" id="s-pw" class="form-control p-3 rounded-pill border-0 shadow-sm" placeholder="비밀번호"></div>
+            <div class="mb-3"><input type="tel" id="s-phone" class="form-control p-3 rounded-pill border-0 shadow-sm" placeholder="전화번호 (010-0000-0000)"></div>
+            <div class="mb-3"><input type="date" id="s-birth" class="form-control p-3 rounded-pill border-0 shadow-sm"></div>
+            <div class="mb-4">
+                <select id="s-gender" class="form-select p-3 rounded-pill border-0 shadow-sm">
+                    <option value="남">남성</option>
+                    <option value="여">여성</option>
+                </select>
+            </div>
+            <button class="fixed-bottom-pill" onclick="doSignup()">가입 완료</button>
+        </div>
+    </div>
+
+    <div id="page-info" class="page">
+        <div class="info-header">
+            <h4 id="u-name-top">환영합니다!</h4>
+            <h1><span id="u-points">0</span> P</h1>
+        </div>
+        <div class="qr-card-v2">
+            <img id="qr-img-v2" style="display:none;">
+            <i id="qr-placeholder-v2" class="bi bi-qr-code" style="font-size:100px; color:#eee;"></i>
+        </div>
+        <div class="pill-card" onclick="showPage('page-main')">
+            <div class="icon-circle" style="background: var(--primary-light); color: var(--primary);"><i class="bi bi-house-door-fill"></i></div>
+            <div class="fw-bold">메인으로 돌아가기</div>
+        </div>
+        <div class="pill-card mt-2" onclick="handleLogout()">
+            <div class="icon-circle" style="background: #ffebee; color: #e74c3c;"><i class="bi bi-power"></i></div>
+            <div class="fw-bold text-danger">로그아웃</div>
+        </div>
+    </div>
+
+    <div id="page-login" class="page">
+        <div class="p-4"><i class="bi bi-arrow-left fs-3" onclick="showPage('page-main')"></i><h5 class="d-inline fw-bold ms-3">로그인</h5></div>
+        <div class="container p-4 mt-3">
+            <input type="email" id="l-email" class="form-control mb-3 p-4 rounded-pill border-0 shadow-sm" placeholder="이메일">
+            <input type="password" id="l-pw" class="form-control mb-4 p-4 rounded-pill border-0 shadow-sm" placeholder="비밀번호">
+            <button class="fixed-bottom-pill" onclick="doLogin()">로그인하기</button>
+        </div>
+    </div>
+
+    <div id="page-activities" class="page">
+        <div class="p-4">
+            <i class="bi bi-arrow-left fs-3" onclick="showPage('page-main')"></i>
+            <h2 class="mt-4 fw-bold">환경 정화 인증</h2>
+            <div id="camera-box" class="mt-4 p-5 border rounded-4 text-center bg-white shadow-sm" onclick="document.getElementById('cam-file').click()">
+                <i class="bi bi-camera-fill display-1 text-primary"></i>
+                <p class="mt-3 mb-0 fw-bold">사진 촬영</p>
+            </div>
+            <input type="file" id="cam-file" accept="image/*" capture="camera" style="display:none;" onchange="previewImage(event)">
+            <div id="preview-box" class="mt-4" style="display:none;">
+                <img id="img-preview" class="img-fluid rounded-4 shadow">
+                <button class="fixed-bottom-pill" onclick="uploadPhoto()">인증 완료</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbyl1fZ2cSKZfvvW0fG6REcbiv0mx2yGwt-9MTZeLFF2TicnHXWauA5dGkuEctmFqVUN/exec";
         let userData = null;
         let selectedFileBase64 = null;
- function showPage(id) {
+
+        function showPage(id) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             window.scrollTo(0, 0);
         }
 
-        function updateUI(data) {
-            userData = data;
-            document.getElementById('u-name-top').innerText = data.name + "님 환영합니다!";
-            document.getElementById('u-points').innerText = Number(data.points).toLocaleString();
-            const qrImg = document.getElementById('qr-img-v2');
-            const qrData = data.token || data.email; 
-            qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${qrData}`;
-            qrImg.onload = () => { qrImg.style.display = 'inline-block'; document.getElementById('qr-placeholder-v2').style.display = 'none'; };
-            document.getElementById('bar-guest').style.display = 'none';
-            document.getElementById('bar-user').style.display = 'block';
-            document.getElementById('btn-user-qr').style.display = 'flex';
+        async function doSignup() {
+            const name = document.getElementById('s-name').value.trim();
+            const email = document.getElementById('s-email').value.trim();
+            const pw = document.getElementById('s-pw').value.trim();
+            const phone = document.getElementById('s-phone').value.trim();
+            const birth = document.getElementById('s-birth').value;
+            const gender = document.getElementById('s-gender').value;
+
+            if(!name || !email || !pw) return alert("필수 정보를 입력하세요.");
+            showLoading();
+            try {
+                const res = await fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'signup', name, email, pw, phone, birth, gender })
+                }).then(r => r.json());
+                hideLoading();
+                if(res.success) { alert("가입 성공! 로그인해 주세요."); showPage('page-login'); }
+                else { alert(res.msg); }
+            } catch (e) { hideLoading(); alert("서버 통신 에러"); }
         }
 
         async function doLogin() {
             const email = document.getElementById('l-email').value.trim();
             const pw = document.getElementById('l-pw').value.trim();
-            if(!email || !pw) return alert("정보를 입력하세요.");
             showLoading();
             try {
                 const res = await fetch(API_URL, {
@@ -119,32 +189,26 @@
                     updateUI(res);
                     showPage('page-main');
                 } else { alert(res.msg); }
-            } catch (e) { hideLoading(); alert("통신 에러"); }
+            } catch (e) { hideLoading(); alert("로그인 실패"); }
         }
 
-        async function doSignup() {
-            const name = document.getElementById('s-name').value.trim();
-            const email = document.getElementById('s-email').value.trim();
-            const pw = document.getElementById('s-pw').value.trim();
-            const phone = document.getElementById('s-phone').value.trim();
-            if(!name || !email || !pw) return alert("필수 정보를 입력하세요.");
-            showLoading();
-            try {
-                const res = await fetch(API_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({ action: 'signup', name, email, pw, phone })
-                }).then(r => r.json());
-                hideLoading();
-                if(res.success) { alert("가입 성공! 로그인해주세요."); showPage('page-login'); }
-                else { alert(res.msg); }
-            } catch (e) { hideLoading(); alert("가입 중 오류"); }
+        function updateUI(data) {
+            userData = data;
+            document.getElementById('u-name-top').innerText = data.name + "님";
+            document.getElementById('u-points').innerText = Number(data.points).toLocaleString();
+            document.getElementById('qr-img-v2').src = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${data.token || data.email}`;
+            document.getElementById('qr-img-v2').style.display = 'inline-block';
+            document.getElementById('qr-placeholder-v2').style.display = 'none';
+            document.getElementById('bar-guest').style.display = 'none';
+            document.getElementById('bar-user').style.display = 'block';
+            document.getElementById('btn-user-qr').style.display = 'flex';
         }
 
         function previewImage(event) {
             const file = event.target.files[0];
             if (!file) return;
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = (e) => {
                 selectedFileBase64 = e.target.result.split(',')[1];
                 document.getElementById('camera-box').style.display = 'none';
                 document.getElementById('preview-box').style.display = 'block';
@@ -154,32 +218,21 @@
         }
 
         async function uploadPhoto() {
-            if (!userData) return alert("로그인이 필요합니다.");
             showLoading();
-            try {
-                const res = await fetch(API_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({ action: 'uploadPhoto', email: userData.email, name: userData.name, image: selectedFileBase64 }),
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' }
-                }).then(r => r.json());
-                hideLoading();
-                if (res.success) {
-                    alert("인증 성공! 1,000P 적립 완료");
-                    userData.points = res.newPoints;
-                    updateUI(userData);
-                    showPage('page-main');
-                    resetActivityPage();
-                } else { alert(res.msg); }
-            } catch (e) { hideLoading(); alert("통신 에러"); }
+            const res = await fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'uploadPhoto', email: userData.email, name: userData.name, image: selectedFileBase64 })
+            }).then(r => r.json());
+            hideLoading();
+            if(res.success) {
+                alert("적립 완료!");
+                userData.points = res.newPoints;
+                updateUI(userData);
+                showPage('page-main');
+            }
         }
 
-        function resetActivityPage() {
-            document.getElementById('camera-box').style.display = 'block';
-            document.getElementById('preview-box').style.display = 'none';
-            selectedFileBase64 = null;
-        }
-
-        function handleLogout() { if(confirm("로그아웃 하시겠습니까?")) { localStorage.removeItem('gnpay_user'); location.reload(); } }
+        function handleLogout() { localStorage.removeItem('gnpay_user'); location.reload(); }
         function showLoading() { document.getElementById('loading-overlay').style.display = 'flex'; }
         function hideLoading() { document.getElementById('loading-overlay').style.display = 'none'; }
 
@@ -188,9 +241,6 @@
             if (saved) updateUI(JSON.parse(saved));
             hideLoading();
         };
-
-        // 필수 함수들: showPage, updateUI, doLogin, doSignup, previewImage, uploadPhoto, resetActivityPage, handleLogout, showLoading, hideLoading
-        // (하나도 빠짐없이 모두 포함되어야 함)
     </script>
 </body>
 </html>
