@@ -149,7 +149,6 @@
         }
 
 async function doSignup() {
-    alert("이건 진짜 2.0 버전이다!!!"); // <--- 이 줄을 추가
     const name = document.getElementById('s-name').value.trim();
     const email = document.getElementById('s-email').value.trim();
     const pw = document.getElementById('s-pw').value.trim();
@@ -161,17 +160,32 @@ async function doSignup() {
         alert("이름, 이메일, 비밀번호는 필수입니다.");
         return;
     }
-            showLoading();
-            try {
-                const res = await fetch(API_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({ action: 'signup', name, email, pw, phone, birth, gender })
-                }).then(r => r.json());
-                hideLoading();
-                if(res.success) { alert("가입 성공! 로그인해 주세요."); showPage('page-login'); }
-                else { alert(res.msg); }
-            } catch (e) { hideLoading(); alert("가입 실패: 서버 연결 확인"); }
-        }
+
+    showLoading();
+    try {
+        // no-cors 모드는 응답을 읽지는 못하지만, 요청은 무조건 서버로 보냅니다.
+        await fetch(API_URL, {
+            method: 'POST',
+            mode: 'no-cors', 
+            cache: 'no-cache',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                action: 'signup', 
+                name, email, pw, phone, birth, gender 
+            })
+        });
+
+        hideLoading();
+        
+        // 서버 대답을 기다리지 않고 일단 성공 메시지를 띄웁니다.
+        alert("가입 요청을 보냈습니다! 시트를 확인해 보세요.");
+        showPage('page-login');
+
+    } catch (e) {
+        hideLoading();
+        alert("통신 에러가 발생했습니다: " + e.message);
+    }
+}
 
         async function doLogin() {
             const email = document.getElementById('l-email').value.trim();
@@ -252,6 +266,7 @@ async function doSignup() {
     </script>
 </body>
 </html>
+
 
 
 
