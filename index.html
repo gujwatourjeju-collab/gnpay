@@ -115,23 +115,31 @@
         };
 
         // 3. 로그인 함수
-        async function doLogin() {
-            const email = document.getElementById('l-email').value;
-            const pw = document.getElementById('l-pw').value;
-            if(!email || !pw) return alert("정보를 입력하세요.");
+      async function doLogin() {
+    const email = document.getElementById('l-email').value.trim();
+    const pw = document.getElementById('l-pw').value.trim();
+    
+    if(!email || !pw) return alert("정보를 입력하세요.");
 
-            showLoading();
-            const res = await apiRequest('loginCheck', { email, pw }, 'POST');
-            hideLoading();
+    showLoading();
+    try {
+        const res = await apiRequest('loginCheck', { email, pw }, 'POST');
+        hideLoading();
 
-            if(res.success) {
-                localStorage.setItem('gnpay_user', JSON.stringify(res));
-                loginOk(res);
-                alert(res.name + "님 환영합니다!");
-            } else {
-                alert("로그인 정보가 틀립니다.");
-            }
+        console.log("서버 응답:", res); // 개발자 도구(F12)에서 확인 가능
+
+        if(res.success) {
+            localStorage.setItem('gnpay_user', JSON.stringify(res));
+            loginOk(res);
+        } else {
+            // 서버에서 보낸 에러 메시지 출력
+            alert("로그인 실패: " + (res.msg || "아이디 또는 비번을 확인하세요."));
         }
+    } catch (err) {
+        hideLoading();
+        alert("네트워크 오류가 발생했습니다: " + err.message);
+    }
+}
 
         function loginOk(data) {
             userData = data;
@@ -195,5 +203,6 @@
     </script>
 </body>
 </html>
+
 
 
