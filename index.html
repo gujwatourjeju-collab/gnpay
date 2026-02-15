@@ -153,29 +153,27 @@
 async function doLogin() {
     const emailEl = document.getElementById('l-email');
     const pwEl = document.getElementById('l-pw');
-    
-    // 1. 전처리: 앞뒤 공백 제거(.trim) 및 이메일 강제 소문자화(.toLowerCase)
     const email = emailEl.value.trim().toLowerCase(); 
     const pw = pwEl.value.trim();
     
     if(!email || !pw) return alert("정보를 입력하세요.");
 
-    showLoading();
+    showLoading(); // 로딩 시작
     try {
-        // 2. 서버 통신
+        console.log("GAS로 전송 중...");
         const res = await apiRequest('loginCheck', { email, pw }, 'POST');
-        hideLoading();
+        hideLoading(); // 응답 오면 로딩 종료
 
         if(res.success) {
             localStorage.setItem('gnpay_user', JSON.stringify(res));
             loginOk(res);
         } else {
-            // 상세 에러 확인을 위해 서버 메시지 출력
-            alert("로그인 실패: " + (res.msg || "아이디 또는 비번이 일치하지 않습니다."));
+            alert("로그인 실패: " + (res.msg || "아이디/비번 확인"));
         }
     } catch (err) {
-        hideLoading();
-        alert("네트워크 연결 실패: " + err.message);
+        hideLoading(); // 에러 나면 로딩 강제 종료
+        console.error("통신 에러 상세:", err);
+        alert("서버 응답 없음: GAS 배포 설정(모든 사용자)을 확인하세요.");
     }
 }
 
@@ -213,6 +211,7 @@ async function doLogin() {
 </script>
 </body>
 </html>
+
 
 
 
