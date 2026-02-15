@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ㅎ<!DOCTYPE html>
 <html lang="ko">
 <head>
     <base target="_top">
@@ -72,7 +72,11 @@
         
         <div class="guest-bar-pill" id="bar-guest">
             <button class="fixed-bottom-pill btn-guest" onclick="showPage('page-login')">로그인</button>
-            <button class="fixed-bottom-pill btn-guest" style="background: linear-gradient(135deg, #6c757d, #495057);" onclick="showPage('page-signup')">회원가입</button>
+            <button class="fixed-bottom-pill btn-guest" 
+        style="background: linear-gradient(135deg, #6c757d, #495057);" 
+        onclick="goToSignupFinal()">
+    회원가입
+</button>
         </div>
         <button class="fixed-bottom-pill" id="bar-user" style="display:none;" onclick="showPage('page-info')">내 마이페이지 확인</button>
     </div>
@@ -266,6 +270,7 @@ function goToSignup() {
 </script>
 </body>
 </html>
+
 
 
 
