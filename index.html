@@ -81,6 +81,87 @@
         const API_URL = "https://script.google.com/macros/s/AKfycbxa5kxK5F-npcc8ZptsxHa2eF6f3QWwtHLJvLgwOlcyk9gOV1o8bZV1Qabqa75DQ5o5/exec;
 
         let userData = null;
+        // 1. 설정: 본인의 GAS 주소를 꼭 확인하세요!
+    const API_URL = "https://script.google.com/macros/s/AKfycbxFXFfnJytQfHrV9Jd5rN8449pbY-ympQtGqYzr7qxXkNUq3OO9G0a015PwlJ60YLmN/exec";
+    let userData = null;
+
+    // 2. 페이지 전환 함수 (현재 에러의 핵심 원인 해결)
+    function showPage(id) {
+        console.log("페이지 전환 시도:", id);
+        // 모든 페이지 숨김
+        const pages = document.querySelectorAll('.page');
+        pages.forEach(p => p.classList.remove('active'));
+        
+        // 타겟 페이지 표시
+        const target = document.getElementById(id);
+        if(target) {
+            target.classList.add('active');
+            window.scrollTo(0,0);
+        } else {
+            console.error("해당 ID의 페이지가 없습니다:", id);
+        }
+    }
+
+    // 3. API 통신 엔진
+    async function apiRequest(action, data = {}, method = "GET") {
+        const url = new URL(API_URL);
+        let options = { method: method, mode: 'cors' };
+
+        if (method === "GET") {
+            url.searchParams.append("action", action);
+            for (let key in data) url.searchParams.append(key, data[key]);
+        } else {
+            options.body = JSON.stringify({ action, ...data });
+            options.headers = { 'Content-Type': 'text/plain' }; 
+        }
+
+        const response = await fetch(url, options);
+        return await response.json();
+    }
+
+    // 4. 로그인 실행 함수
+    async function doLogin() {
+        const email = document.getElementById('l-email').value.trim();
+        const pw = document.getElementById('l-pw').value.trim();
+        
+        if(!email || !pw) return alert("정보를 입력하세요.");
+
+        showLoading();
+        try {
+            const res = await apiRequest('loginCheck', { email, pw }, 'POST');
+            hideLoading();
+
+            if(res.success) {
+                localStorage.setItem('gnpay_user', JSON.stringify(res));
+                loginOk(res);
+                alert(res.name + "님 환영합니다!");
+            } else {
+                alert("로그인 정보가 틀립니다.");
+            }
+        } catch (err) {
+            hideLoading();
+            alert("서버 연결 실패: " + err.message);
+        }
+    }
+
+    function loginOk(data) {
+        userData = data;
+        document.getElementById('u-name-hi').innerText = data.name + "님";
+        document.getElementById('u-points').innerText = Number(data.points).toLocaleString();
+        document.getElementById('bar-guest').style.display = 'none';
+        document.getElementById('bar-user').style.display = 'block';
+        showPage('page-main');
+    }
+
+    function showLoading() { document.getElementById('loading-overlay').style.display = 'flex'; }
+    function hideLoading() { document.getElementById('loading-overlay').style.display = 'none'; }
+
+    // 초기 로드 시 실행
+    window.onload = function() {
+        const savedUser = localStorage.getItem('gnpay_user');
+        if (savedUser) loginOk(JSON.parse(savedUser));
+        hideLoading();
+    };
 
         // 1. API 통신 핵심 엔진 (Fetch 방식)
         async function apiRequest(action, data = {}, method = "GET") {
@@ -203,6 +284,7 @@
     </script>
 </body>
 </html>
+
 
 
 
