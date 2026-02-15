@@ -1,304 +1,73 @@
-ㅎ<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
     <base target="_top">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>김녕페이 2.0</title>
-
-    <link rel="icon" href="https://img.icons8.com/fluency/48/01b2ad/leaf.png" type="image/png">
-    <link rel="apple-touch-icon" href="https://img.icons8.com/fluency/180/01b2ad/leaf.png">
-
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://gnpay.my/">
-    <meta property="og:title" content="김녕페이 2.0">
-    <meta property="og:description" content="자연과 상생하는 스마트 커뮤니티, 김녕 Wave">
-    <meta property="og:image" content="https://gnpay.my/og-image.png">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
-    <meta name="theme-color" content="#01b2ad">
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    
     <style>
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
         :root { --primary: #01b2ad; --primary-light: #e6f7f6; --dark: #2d3436; --bg: #f7fbfc; }
-        body { font-family: 'Pretendard', sans-serif; background-color: var(--bg); color: var(--dark); margin:0; padding-top: env(safe-area-inset-top, 20px) !important; padding-bottom: env(safe-area-inset-bottom, 20px) !important; min-height: 100vh; }
-        
-        #loading-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(255,255,255,0.9); z-index:10000; display:none; flex-direction:column; align-items:center; justify-content:center; }
-        .spinner { width: 45px; height: 45px; border: 4px solid var(--primary-light); border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
-        .page { display: none; min-height: 100vh; animation: fadeData 0.3s ease-out; padding-bottom: 150px; }
+        body { font-family: 'Pretendard', sans-serif; background-color: var(--bg); color: var(--dark); margin:0; padding: 20px; }
+        .page { display: none; min-height: 100vh; }
         .active { display: block; }
-        @keyframes fadeData { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        .pill-card { background: white; border-radius: 100px; margin: 15px 20px; padding: 18px 25px; display: flex; align-items: center; box-shadow: 0 10px 25px rgba(1, 178, 173, 0.12); border: 1px solid rgba(255,255,255,0.8); transition: all 0.2s; cursor: pointer; }
-        .pill-card:active { transform: scale(0.96); }
-        .icon-circle { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; margin-right: 18px; flex-shrink: 0; }
-
-        #page-main { background: linear-gradient(160deg, #ffffff 20%, #e0f4f3 60%, #b2e6e4 100%); }
-        .main-welcome { padding: 50px 25px 30px; }
-        .main-welcome h1 { font-size: 2.6rem; font-weight: 800; color: var(--primary); margin-bottom: 8px; letter-spacing: -1.5px; }
-
-        #page-info { background: linear-gradient(180deg, var(--primary) 0%, #34c7c2 30%, var(--bg) 60%) !important; padding-top: 40px; }
-        .info-header { text-align: center; color: white; margin-bottom: 30px; }
-        .qr-card-v2 { background: white; border-radius: 35px; width: 240px; margin: 0 auto 35px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); text-align: center; }
-        .qr-card-v2 img { width: 100%; border-radius: 20px; }
-
-        .fixed-bottom-pill { position: fixed; bottom: 30px; left: 20px; right: 20px; z-index: 1000; background: var(--primary); color: white; border-radius: 50px; padding: 18px; text-align: center; font-weight: 700; font-size: 1.1rem; border: none; box-shadow: 0 10px 25px rgba(1, 178, 173, 0.4); transition: all 0.2s; text-decoration: none; cursor: pointer; }
-        .fixed-bottom-pill:active { transform: scale(0.95); opacity: 0.9; }
-        
-        .guest-bar-pill { position: fixed; bottom: 30px; left: 20px; right: 20px; z-index: 1000; display: flex; gap: 10px; }
-        .btn-guest { flex: 1; position: static !important; }
-
-        #btn-user-qr { position: fixed; top: 15px; right: 15px; z-index: 10010; width: 48px; height: 48px; border-radius: 14px; display: none; align-items: center; justify-content: center; background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border: 1px solid rgba(1, 178, 173, 0.1); color: var(--primary); font-size: 24px; padding: 0; }
+        .fixed-bottom-pill { width: 100%; background: var(--primary); color: white; border-radius: 50px; padding: 18px; text-align: center; font-weight: 700; border: none; margin-top: 10px; }
     </style>
 </head>
 <body>
-    <div id="loading-overlay"><div class="spinner"></div><p class="mt-3 fw-bold text-muted">연결 중...</p></div>
-    <button id="btn-user-qr" onclick="showPage('page-info')"><i class="bi bi-qr-code"></i></button>
+    <div style="margin-bottom: 30px; border: 3px solid black; padding: 10px; background: #fff;">
+        <p style="font-weight: bold; color: red;">▼ 이 버튼이 진짜 회원가입 링크입니다</p>
+        <button type="button" 
+                style="width: 100%; height: 100px; background: red; color: white; font-size: 28px; font-weight: bold; border-radius: 20px; cursor: pointer;" 
+                onclick="location.href='https://script.google.com/macros/s/AKfycby97aRP9k5XuS8G4UlWxiLFW7OWl3x0wd1C9SrWXLkvOL1MXvkyGmwQXrjNFWp5uuJq/exec'">
+            회원가입 시작하기
+        </button>
+    </div>
 
     <div id="page-main" class="page active">
         <div class="main-welcome">
             <h1>김녕페이</h1>
             <p>오늘도 김녕을 지켜주세요! 🌱</p>
         </div>
-        <div class="pill-card" onclick="showPage('page-activities')">
-            <div class="icon-circle" style="background: var(--primary-light); color: var(--primary);"><i class="bi bi-tree-fill"></i></div>
-            <div><div class="fw-bold fs-5">환경 정화 활동</div><div class="text-muted small">사진 찍고 리워드 받기</div></div>
-        </div>
-        
-        <div class="guest-bar-pill" id="bar-guest">
-            <button class="fixed-bottom-pill btn-guest" onclick="showPage('page-login')">로그인</button>
-            <button class="fixed-bottom-pill btn-guest" 
-        style="background: linear-gradient(135deg, #6c757d, #495057);" 
-        onclick="goToSignupFinal()">
-    회원가입
-</button>
-        </div>
-        <button class="fixed-bottom-pill" id="bar-user" style="display:none;" onclick="showPage('page-info')">내 마이페이지 확인</button>
+        <button class="fixed-bottom-pill" onclick="showPage('page-login')">로그인하러 가기</button>
     </div>
-
-    <div id="page-signup" class="page">
-        <div class="p-4"><i class="bi bi-arrow-left fs-3" onclick="showPage('page-main')"></i><h5 class="d-inline fw-bold ms-3">회원가입</h5></div>
-        <div class="container p-4">
-            <input type="text" id="s-name" class="form-control mb-3 p-3 rounded-pill border-0 shadow-sm" placeholder="이름 (실명)">
-            <input type="email" id="s-email" class="form-control mb-3 p-3 rounded-pill border-0 shadow-sm" placeholder="이메일 주소">
-            <input type="password" id="s-pw" class="form-control mb-3 p-3 rounded-pill border-0 shadow-sm" placeholder="비밀번호">
-            <input type="tel" id="s-phone" class="form-control mb-3 p-3 rounded-pill border-0 shadow-sm" placeholder="전화번호 (010-0000-0000)">
-            <input type="date" id="s-birth" class="form-control mb-3 p-3 rounded-pill border-0 shadow-sm">
-            <select id="s-gender" class="form-select mb-4 p-3 rounded-pill border-0 shadow-sm">
-                <option value="남">남성</option>
-                <option value="여">여성</option>
-            </select>
-            <button class="fixed-bottom-pill" onclick="doSignup()">가입 완료</button>
-        </div>
-    </div>
-
-    <div id="page-info" class="page">
-        <div class="info-header">
-            <h4 id="u-name-top">환영합니다!</h4>
-            <h1><span id="u-points">0</span> P</h1>
-        </div>
-        <div class="qr-card-v2">
-            <img id="qr-img-v2" style="display:none;">
-            <i id="qr-placeholder-v2" class="bi bi-qr-code" style="font-size:100px; color:#eee;"></i>
-        </div>
-        <div class="pill-card" onclick="showPage('page-main')">
-            <div class="icon-circle" style="background: var(--primary-light); color: var(--primary);"><i class="bi bi-house-door-fill"></i></div>
-            <div class="fw-bold">메인으로 돌아가기</div>
-        </div>
-        <div class="pill-card mt-2" onclick="handleLogout()">
-            <div class="icon-circle" style="background: #ffebee; color: #e74c3c;"><i class="bi bi-power"></i></div>
-            <div class="fw-bold text-danger">로그아웃</div>
-        </div>
-    </div>
-    <div style="padding: 20px;">
-    <button type="button" 
-            style="width: 100%; height: 80px; background: red; color: white; font-size: 24px; font-weight: bold; border: 5px solid black; border-radius: 20px;" 
-            onclick="location.href='https://script.google.com/macros/s/AKfycby97aRP9k5XuS8G4UlWxiLFW7OWl3x0wd1C9SrWXLkvOL1MXvkyGmwQXrjNFWp5uuJq/exec'">
-        여기를 눌러보세요 (강제이동)
-    </button>
-</div>
 
     <div id="page-login" class="page">
-        <div class="p-4"><i class="bi bi-arrow-left fs-3" onclick="showPage('page-main')"></i><h5 class="d-inline fw-bold ms-3">로그인</h5></div>
-        <div class="container p-4 mt-3">
-            <input type="email" id="l-email" class="form-control mb-3 p-4 rounded-pill border-0 shadow-sm" placeholder="이메일">
-            <input type="password" id="l-pw" class="form-control mb-4 p-4 rounded-pill border-0 shadow-sm" placeholder="비밀번호">
+        <div class="container mt-3">
+            <h5 class="fw-bold">로그인</h5>
+            <input type="email" id="l-email" class="form-control mb-3 p-3" placeholder="이메일">
+            <input type="password" id="l-pw" class="form-control mb-4 p-3" placeholder="비밀번호">
             <button class="fixed-bottom-pill" onclick="doLogin()">로그인하기</button>
-        </div>
-    </div>
-
-    <div id="page-activities" class="page">
-        <div class="p-4">
-            <i class="bi bi-arrow-left fs-3" onclick="showPage('page-main')"></i>
-            <h2 class="mt-4 fw-bold">환경 정화 인증</h2>
-            <div id="camera-box" class="mt-4 p-5 border rounded-4 text-center bg-white shadow-sm" onclick="document.getElementById('cam-file').click()">
-                <i class="bi bi-camera-fill display-1 text-primary"></i>
-                <p class="mt-3 mb-0 fw-bold">사진 촬영</p>
-            </div>
-            <input type="file" id="cam-file" accept="image/*" capture="camera" style="display:none;" onchange="previewImage(event)">
-            <div id="preview-box" class="mt-4" style="display:none;">
-                <img id="img-preview" class="img-fluid rounded-4 shadow">
-                <button class="fixed-bottom-pill" onclick="uploadPhoto()">인증 완료</button>
-            </div>
+            <button class="fixed-bottom-pill" style="background: #6c757d;" onclick="showPage('page-main')">뒤로가기</button>
         </div>
     </div>
 
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbxwcbIxXWXzOzS1gUXtGW-z3wjwvBIx0G60o0I7iH2LRwkgstcH_rnt2JPxZjEHlITg/exec";
-        let userData = null;
-        let selectedFileBase64 = null;
+        const API_URL = "https://script.google.com/macros/s/AKfycby97aRP9k5XuS8G4UlWxiLFW7OWl3x0wd1C9SrWXLkvOL1MXvkyGmwQXrjNFWp5uuJq/exec";
 
         function showPage(id) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(id).classList.add('active');
-            window.scrollTo(0, 0);
         }
 
-function goToSignup() {
-    const URL = "https://script.google.com/macros/s/AKfycbxwcbIxXWXzOzS1gUXtGW-z3wjwvBIx0G60o0I7iH2LRwkgstcH_rnt2JPxZjEHlITg/exec";
-    
-    // 팝업창 띄우지 말고, 그냥 현재 페이지를 구글 양식으로 날려버리세요.
-    // 이러면 '준비 중' 팝업 자체가 뜰 틈이 없습니다.
-    location.href = URL;
-}
-        hideLoading();<script>
-    const API_URL = "https://script.google.com/macros/s/AKfycby97aRP9k5XuS8G4UlWxiLFW7OWl3x0wd1C9SrWXLkvOL1MXvkyGmwQXrjNFWp5uuJq/exec";
-    let userData = null;
-    let selectedFileBase64 = null;
-
-    function showPage(id) {
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        window.scrollTo(0, 0);
-    }
-
-    // [핵심] 회원가입은 이제 팝업(또는 이동)으로 해결! 
-    // '준비 중' 팝업의 근원을 차단합니다.
-    function goToSignup() {
-        // 팝업이 차단될 수 있으니 location.href로 확실하게 보냅니다.
-        // 만약 팝업을 원하시면 window.open(API_URL, '_blank'); 로 쓰세요.
-        location.href = API_URL;
-    }
-
-    // 기존의 복잡했던 doSignup() 함수는 아예 삭제했습니다. 
-    // HTML 상단의 '가입 완료' 버튼의 onclick을 goToSignup()으로 바꾸거나 
-    // 아래와 같이 doSignup을 단순 연결용으로만 둡니다.
-    function doSignup() {
-        goToSignup();
-    }
-
-    async function doLogin() {
-        const email = document.getElementById('l-email').value.trim();
-        const pw = document.getElementById('l-pw').value.trim();
-        if(!email || !pw) { alert("이메일과 비밀번호를 입력하세요."); return; }
-        
-        showLoading();
-        try {
-            const res = await fetch(API_URL, {
-                method: 'POST',
-                body: JSON.stringify({ action: 'loginCheck', email, pw })
-            }).then(r => r.json());
-            
-            hideLoading();
-            if(res.success) {
-                localStorage.setItem('gnpay_user', JSON.stringify(res));
-                updateUI(res);
-                showPage('page-main');
-            } else { 
-                alert(res.msg || "로그인 실패"); 
-            }
-        } catch (e) { 
-            hideLoading(); 
-            alert("로그인 중 통신 에러가 발생했습니다."); 
+        async function doLogin() {
+            const email = document.getElementById('l-email').value.trim();
+            const pw = document.getElementById('l-pw').value.trim();
+            if(!email || !pw) { alert("입력해주세요."); return; }
+            try {
+                const res = await fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'loginCheck', email, pw })
+                }).then(r => r.json());
+                if(res.success) {
+                    alert(res.name + "님 환영합니다!");
+                    localStorage.setItem('gnpay_user', JSON.stringify(res));
+                    location.reload();
+                } else { alert(res.msg); }
+            } catch (e) { alert("서버 연결 실패"); }
         }
-    }
-
-    function updateUI(data) {
-        userData = data;
-        document.getElementById('u-name-top').innerText = data.name + "님";
-        document.getElementById('u-points').innerText = Number(data.points).toLocaleString();
-        document.getElementById('qr-img-v2').src = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${data.token || data.email}`;
-        document.getElementById('qr-img-v2').style.display = 'inline-block';
-        document.getElementById('qr-placeholder-v2').style.display = 'none';
-        document.getElementById('bar-guest').style.display = 'none';
-        document.getElementById('bar-user').style.display = 'block';
-        document.getElementById('btn-user-qr').style.display = 'flex';
-    }
-
-    function previewImage(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            selectedFileBase64 = e.target.result.split(',')[1];
-            document.getElementById('camera-box').style.display = 'none';
-            document.getElementById('preview-box').style.display = 'block';
-            document.getElementById('img-preview').src = e.target.result;
-        };
-        reader.readAsDataURL(file);
-    }
-
-    async function uploadPhoto() {
-        if(!userData) return;
-        showLoading();
-        try {
-            const res = await fetch(API_URL, {
-                method: 'POST',
-                body: JSON.stringify({ action: 'uploadPhoto', email: userData.email, name: userData.name, image: selectedFileBase64 })
-            }).then(r => r.json());
-            hideLoading();
-            if(res.success) {
-                alert("적립 완료!");
-                userData.points = res.newPoints;
-                updateUI(userData);
-                showPage('page-main');
-                resetActivityPage();
-            }
-        } catch (e) { hideLoading(); alert("업로드 에러"); }
-    }
-
-    function resetActivityPage() {
-        document.getElementById('camera-box').style.display = 'block';<br>        document.getElementById('preview-box').style.display = 'none';<br>        selectedFileBase64 = null;<br>    }
-
-    function handleLogout() { localStorage.removeItem('gnpay_user'); location.reload(); }
-    function showLoading() { document.getElementById('loading-overlay').style.display = 'flex'; }
-    function hideLoading() { document.getElementById('loading-overlay').style.display = 'none'; }
-function goToSignupFinal() {
-    // 사장님 배포 주소 (직접 쳤을 때 양식 떴던 그 주소!)
-    const targetUrl = "https://script.google.com/macros/s/AKfycby97aRP9k5XuS8G4UlWxiLFW7OWl3x0wd1C9SrWXLkvOL1MXvkyGmwQXrjNFWp5uuJq/exec";
-    
-    console.log("회원가입 버튼 클릭됨 - 주소 이동 시작");
-    
-    // 팝업이고 뭐고 다 치우고, 그냥 현재 창에서 바로 날려버립니다.
-    // 이렇게 하면 '준비 중' 팝업이 뜰 물리적 공간 자체가 사라집니다.
-    window.location.href = targetUrl;
-}
-    window.onload = () => {
-        const saved = localStorage.getItem('gnpay_user');
-        if (saved) updateUI(JSON.parse(saved));
-        hideLoading();
-    };
-</script>
+    </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
