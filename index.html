@@ -242,7 +242,7 @@
 
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script>
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbzXxDKFSdIsOUe8jI0_YVKFVRkRltIcvlxO-67-ccjVhWBAuGhjyw09sNXJ5Bnddxmf/exec";
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbzqlbNrlp2CMtyyLuMbPzGkbafPacGKvqd9eY31UBnhuXZ8qzmG7MRE6G3Vt2BSWCKY/exec";
         
         let userData = JSON.parse(localStorage.getItem('gnpay_user')) || { isLoggedIn: false, points: 0 };
         let selectedImages = [];
@@ -270,11 +270,12 @@
             }
         }
 
-        function goToMyPage() {
-            document.getElementById('my-u-points').innerText = Number(userData.points || 0).toLocaleString();
-            document.getElementById('my-qr-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${userData.email}`;
-            showPage('page-mypage');
-        }
+function goToMyPage() {
+    document.getElementById('my-u-points').innerText = Number(userData.points || 0).toLocaleString();
+    // [수정] data=${userData.email} -> data=${userData.uid}
+    document.getElementById('my-qr-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${userData.uid}`;
+    showPage('page-mypage');
+}
 
         async function submitLogin() {
             const email = document.getElementById('login-email').value;
@@ -430,12 +431,13 @@
 
         function logout() { if(confirm('로그아웃 하시겠습니까?')) { localStorage.removeItem('gnpay_user'); location.reload(); } }
 
-        document.getElementById('qr-trigger').onclick = (e) => {
-            if (!userData.isLoggedIn) { showPage('page-login'); return; }
-            document.getElementById('focus-points').innerText = Number(userData.points).toLocaleString();
-            document.getElementById('qr-img-large').src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${userData.email}`;
-            document.getElementById('qr-focus-layer').style.display = 'flex';
-        };
+document.getElementById('qr-trigger').onclick = (e) => {
+    if (!userData.isLoggedIn) { showPage('page-login'); return; }
+    document.getElementById('focus-points').innerText = Number(userData.points).toLocaleString();
+    // [수정] data=${userData.email} -> data=${userData.uid}
+    document.getElementById('qr-img-large').src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${userData.uid}`;
+    document.getElementById('qr-focus-layer').style.display = 'flex';
+};
 
         window.onload = updateUI;
     </script>
