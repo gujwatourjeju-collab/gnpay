@@ -74,35 +74,29 @@
         <div id="user-reader" class="mx-auto" style="width:300px;"></div>
     </div>
 
-    <script>
-        /**
-         * ⚠️ [가장 중요] 본인의 GAS 웹 앱 URL을 여기에 넣으세요!
-         */
-        const API_URL = "https://script.google.com/macros/s/AKfycbxa5kxK5F-npcc8ZptsxHa2eF6f3QWwtHLJvLgwOlcyk9gOV1o8bZV1Qabqa75DQ5o5/exec;
-
-        let userData = null;
-        // 1. 설정: 본인의 GAS 주소를 꼭 확인하세요!
-    const API_URL = "https://script.google.com/macros/s/AKfycbxFXFfnJytQfHrV9Jd5rN8449pbY-ympQtGqYzr7qxXkNUq3OO9G0a015PwlJ60YLmN/exec";
+<script>
+    // 1. 공통 설정
+    const API_URL = "https://script.google.com/macros/s/AKfycbxa5kxK5F-npcc8ZptsxHa2eF6f3QWwtHLJvLgwOlcyk9gOV1o8bZV1Qabqa75DQ5o5/exec";
     let userData = null;
 
-    // 2. 페이지 전환 함수 (현재 에러의 핵심 원인 해결)
+    // 2. 페이지 전환 함수 (가장 먼저 선언)
     function showPage(id) {
-        console.log("페이지 전환 시도:", id);
-        // 모든 페이지 숨김
+        console.log("페이지 이동 요청:", id);
+        // 모든 페이지에서 active 클래스 제거
         const pages = document.querySelectorAll('.page');
         pages.forEach(p => p.classList.remove('active'));
         
-        // 타겟 페이지 표시
+        // 대상 페이지에 active 클래스 추가
         const target = document.getElementById(id);
         if(target) {
             target.classList.add('active');
             window.scrollTo(0,0);
         } else {
-            console.error("해당 ID의 페이지가 없습니다:", id);
+            console.error("ID가 '" + id + "'인 페이지를 찾을 수 없습니다.");
         }
     }
 
-    // 3. API 통신 엔진
+    // 3. API 통신 함수
     async function apiRequest(action, data = {}, method = "GET") {
         const url = new URL(API_URL);
         let options = { method: method, mode: 'cors' };
@@ -119,12 +113,17 @@
         return await response.json();
     }
 
-    // 4. 로그인 실행 함수
+    // 4. 로그인 로직
     async function doLogin() {
-        const email = document.getElementById('l-email').value.trim();
-        const pw = document.getElementById('l-pw').value.trim();
+        const emailInput = document.getElementById('l-email');
+        const pwInput = document.getElementById('l-pw');
         
-        if(!email || !pw) return alert("정보를 입력하세요.");
+        if(!emailInput || !pwInput) return alert("입력창을 찾을 수 없습니다.");
+        
+        const email = emailInput.value.trim();
+        const pw = pwInput.value.trim();
+        
+        if(!email || !pw) return alert("이메일과 비밀번호를 입력해주세요.");
 
         showLoading();
         try {
@@ -140,150 +139,40 @@
             }
         } catch (err) {
             hideLoading();
-            alert("서버 연결 실패: " + err.message);
+            alert("서버 통신 중 오류가 발생했습니다.");
+            console.error(err);
         }
     }
 
     function loginOk(data) {
         userData = data;
-        document.getElementById('u-name-hi').innerText = data.name + "님";
+        document.getElementById('u-name-hi').innerText = data.name + "님 환영합니다!";
         document.getElementById('u-points').innerText = Number(data.points).toLocaleString();
+        
+        // 버튼 및 바 상태 변경
         document.getElementById('bar-guest').style.display = 'none';
         document.getElementById('bar-user').style.display = 'block';
+        if(document.getElementById('btn-user-qr')) {
+            document.getElementById('btn-user-qr').style.display = 'flex';
+        }
         showPage('page-main');
     }
 
     function showLoading() { document.getElementById('loading-overlay').style.display = 'flex'; }
     function hideLoading() { document.getElementById('loading-overlay').style.display = 'none'; }
 
-    // 초기 로드 시 실행
+    // 5. 초기화
     window.onload = function() {
         const savedUser = localStorage.getItem('gnpay_user');
-        if (savedUser) loginOk(JSON.parse(savedUser));
+        if (savedUser) {
+            loginOk(JSON.parse(savedUser));
+        }
         hideLoading();
     };
-
-        // 1. API 통신 핵심 엔진 (Fetch 방식)
-        async function apiRequest(action, data = {}, method = "GET") {
-            const url = new URL(API_URL);
-            let options = { method: method, mode: 'cors' };
-
-            if (method === "GET") {
-                url.searchParams.append("action", action);
-                for (let key in data) url.searchParams.append(key, data[key]);
-            } else {
-                options.body = JSON.stringify({ action, ...data });
-                // GAS 통신 시 브라우저 보안 이슈를 최소화하기 위해 text/plain 사용
-                options.headers = { 'Content-Type': 'text/plain' }; 
-            }
-
-            try {
-                const response = await fetch(url, options);
-                return await response.json();
-            } catch (err) {
-                console.error("통신 에러:", err);
-                return { success: false, msg: "서버 연결에 실패했습니다." };
-            }
-        }
-
-        // 2. 페이지 로드 시 자동 로그인 체크
-        window.onload = function() {
-            const savedUser = localStorage.getItem('gnpay_user');
-            if (savedUser) {
-                loginOk(JSON.parse(savedUser));
-            }
-            hideLoading();
-        };
-
-        // 3. 로그인 함수
-      async function doLogin() {
-    const email = document.getElementById('l-email').value.trim();
-    const pw = document.getElementById('l-pw').value.trim();
-    
-    if(!email || !pw) return alert("정보를 입력하세요.");
-
-    showLoading();
-    try {
-        const res = await apiRequest('loginCheck', { email, pw }, 'POST');
-        hideLoading();
-
-        console.log("서버 응답:", res); // 개발자 도구(F12)에서 확인 가능
-
-        if(res.success) {
-            localStorage.setItem('gnpay_user', JSON.stringify(res));
-            loginOk(res);
-        } else {
-            // 서버에서 보낸 에러 메시지 출력
-            alert("로그인 실패: " + (res.msg || "아이디 또는 비번을 확인하세요."));
-        }
-    } catch (err) {
-        hideLoading();
-        alert("네트워크 오류가 발생했습니다: " + err.message);
-    }
-}
-
-        function loginOk(data) {
-            userData = data;
-            document.getElementById('u-name-hi').innerText = data.name + "님";
-            document.getElementById('u-points').innerText = Number(data.points).toLocaleString();
-            document.getElementById('bar-guest').style.display = 'none';
-            document.getElementById('bar-user').style.display = 'block';
-            document.getElementById('btn-user-qr').style.display = 'flex';
-            
-            // QR 생성
-            const qrImg = document.getElementById('qr-img');
-            qrImg.src = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&color=01b2ad&data=" + encodeURIComponent(data.email);
-            qrImg.onload = () => {
-                qrImg.style.display = 'inline-block';
-                document.getElementById('qr-spinner').style.display = 'none';
-            };
-            showPage('page-main');
-        }
-
-        function handleLogout() {
-            localStorage.removeItem('gnpay_user');
-            location.reload();
-        }
-
-        function showPage(id) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-        }
-
-        function showLoading() { document.getElementById('loading-overlay').style.display = 'flex'; }
-        function hideLoading() { document.getElementById('loading-overlay').style.display = 'none'; }
-
-        // 4. 네이티브 QR 스캐너 (Vercel에서 직접 작동)
-        let html5QrCode = null;
-        async function openUserScanner() {
-            showPage('page-user-scan');
-            html5QrCode = new Html5Qrcode("user-reader");
-            await html5QrCode.start(
-                { facingMode: "environment" }, 
-                { fps: 10, qrbox: 250 },
-                async (decodedText) => {
-                    await html5QrCode.stop();
-                    processScanResult(decodedText);
-                }
-            );
-        }
-
-        async function processScanResult(txt) {
-            try {
-                const url = new URL(txt);
-                const sid = url.searchParams.get("sid");
-                showLoading();
-                const res = await apiRequest('processUserQR', { email: userData.email, stationId: sid }, 'POST');
-                hideLoading();
-                alert(res.msg);
-                showPage('page-main');
-            } catch(e) {
-                alert("올바른 QR이 아닙니다.");
-            }
-        }
-    </script>
+</script>
 </body>
 </html>
+
 
 
 
