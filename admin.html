@@ -441,7 +441,7 @@
             <div style="margin-bottom: 25px;">
                 <div style="color: var(--primary); font-size: 0.7rem; font-weight: 800; letter-spacing: 3px; margin-bottom: 5px; opacity: 0.8;">GIMNYEONG PASS</div>
                 <div style="color: #1a1a1a; font-size: 1.6rem; font-weight: 900; letter-spacing: -1px;">
-                    <span id="mypage-user-name">사용자</span>님, 반가워요!
+                <span id="mypage-user-name" style="color:var(--primary)"></span>님, 반가워요!
                 </div>
             </div>
 
@@ -828,7 +828,11 @@ function updateTab(element) {
         let html5QrCode;
 
 function showPage(pageId) {
-    // 1. [원본 유지] 로그인 안 됐을 때 검문
+    // 1. [순서 변경] 데이터부터 최신으로 읽어옵니다 (이름 누락 방지 핵심)
+    const saved = localStorage.getItem('gnpay_user');
+    if (saved) userData = JSON.parse(saved);
+
+    // 2. [원본 유지] 로그인 검문 로직
     if (!userData.isLoggedIn && 
         pageId !== 'page-main' && 
         pageId !== 'page-partners' && 
@@ -839,16 +843,26 @@ function showPage(pageId) {
         pageId = 'page-login'; 
     }
 
-    // 2. [원본 유지] 페이지 전환
+    // 3. [핵심 추가] 마이페이지 진입 시 이름 강제 주입
+    if (pageId === 'page-mypage') {
+        setTimeout(() => {
+            const nameEl = document.getElementById('mypage-user-name');
+            if (nameEl && userData.name) {
+                nameEl.innerText = userData.name; // '사용자'가 나올 틈을 안 줌
+            }
+        }, 10);
+    }
+
+    // 4. [원본 유지] 페이지 전환 및 스크롤 상단 이동
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     const target = document.getElementById(pageId);
     if(target) target.classList.add('active');
     window.scrollTo(0, 0);
 
-    // 3. [추가] 하단바 아이콘 불 켜기 (페이지와 동기화)
-    syncTabBar(pageId);
+    // 5. [추가] 하단바 아이콘 동기화 (불 켜기)
+    if (typeof syncTabBar === 'function') syncTabBar(pageId);
 
-    // 4. [원본 유지] 로그인 또는 회원가입 페이지일 때만 하단바 숨기기
+    // 6. [원본 유지] 하단바 표시/숨김 제어
     const tabBar = document.querySelector('.floating-tab-bar');
     if (tabBar) {
         if (pageId === 'page-login' || pageId === 'page-signup') {
