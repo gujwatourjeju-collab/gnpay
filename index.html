@@ -21,11 +21,14 @@
     body { 
     font-family: 'Pretendard', sans-serif; 
     background: var(--bg-grad); 
-    margin:0; 
-    padding: env(safe-area-inset-top, 20px) 0 100px 0; /* 아이폰 노치만큼 알아서 띄움 */
+    margin: 0; 
+    /* 핵심: env 기능을 써서 아이폰 노치(Safe Area) 높이를 강제로 확보합니다 */
+    padding-top: calc(env(safe-area-inset-top, 20px) + 15px) !important; 
+    padding-bottom: 100px;
     min-height: 100vh; 
     color: #1a1a1a; 
     overflow-x: hidden; 
+    position: relative; 
 }
     
     .top-nav { 
