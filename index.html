@@ -441,7 +441,7 @@
             <div style="margin-bottom: 25px;">
                 <div style="color: var(--primary); font-size: 0.7rem; font-weight: 800; letter-spacing: 3px; margin-bottom: 5px; opacity: 0.8;">GIMNYEONG PASS</div>
                 <div style="color: #1a1a1a; font-size: 1.6rem; font-weight: 900; letter-spacing: -1px;">
-                    <span id="mypage-user-name">사용자</span>님, 반가워요!
+                <span id="mypage-user-name" style="color:var(--primary)"></span>님, 반가워요!
                 </div>
             </div>
 
@@ -788,33 +788,35 @@
     <script>
         const GAS_URL = "https://script.google.com/macros/s/AKfycbx3n_w3jRXlNE1ht7zsg5WYv358AnGnFg61_AltbfPUnvlm7u3KjPtSRmDkAXrDPA/exec";
 function updateTab(element) {
-    // 1. 모든 탭에서 active 클래스 제거 (불 끄기)
-    document.querySelectorAll('.tab-item').forEach(tab => {
-        tab.classList.remove('active');
-    });
-
-    // 2. 클릭한 탭에 active 추가 (불 켜기 + 쫀득한 애니메이션 발동)
+    document.querySelectorAll('.tab-item').forEach(tab => tab.classList.remove('active'));
     element.classList.add('active');
 
-    // 3. [핵심] 마이페이지로 갈 때 QR 코드를 즉시 로딩함
-    // 탭 안의 글자가 '내정보'인지 확인합니다.
     const tabName = element.querySelector('span')?.innerText;
     
     if (tabName === '내정보') {
+        refreshUserData(); // [핵심] 클릭하는 순간 저장된 데이터를 다시 읽어옴
+        
         if (userData && userData.isLoggedIn) {
-            // 마이페이지 포인트 애니메이션 0부터 시작하도록 세팅
+            // 1. 이름 강제 주입 (가장 중요한 부분!)
+            const nameDisplay = document.getElementById('mypage-user-name');
+            if (nameDisplay) {
+                // userData.name이 있으면 쓰고, 없으면 로컬스토리지 직접 뒤져서라도 넣음
+                nameDisplay.innerText = userData.name || JSON.parse(localStorage.getItem('gnpay_user')).name || "사용자";
+            }
+
+            // 2. 포인트 애니메이션
             const myPointEl = document.getElementById('my-u-points');
             if (myPointEl) {
                 myPointEl.innerText = "0";
                 animateValue('my-u-points', 0, Number(userData.points || 0), 1000);
             }
-            // 사장님의 웅장한 QR 생성 호출
+
+            // 3. QR 코드 생성
             const qrImg = document.getElementById('my-qr-img');
-            if (qrImg) {
+            if (qrImg && userData.uid) {
                 qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${userData.uid}`;
             }
-        } else if (!userData.isLoggedIn) {
-            // 로그인 안 됐으면 로그인 페이지로 강제 이동
+        } else {
             showPage('page-login');
         }
     }
@@ -826,7 +828,11 @@ function updateTab(element) {
         let html5QrCode;
 
 function showPage(pageId) {
-    // 1. 로그인 안 됐을 때 검문 (사장님 기존 로직)
+    // 1. [순서 변경] 데이터부터 최신으로 읽어옵니다 (이름 누락 방지 핵심)
+    const saved = localStorage.getItem('gnpay_user');
+    if (saved) userData = JSON.parse(saved);
+
+    // 2. [원본 유지] 로그인 검문 로직
     if (!userData.isLoggedIn && 
         pageId !== 'page-main' && 
         pageId !== 'page-partners' && 
@@ -837,13 +843,26 @@ function showPage(pageId) {
         pageId = 'page-login'; 
     }
 
-    // 2. 페이지 전환
+    // 3. [핵심 추가] 마이페이지 진입 시 이름 강제 주입
+    if (pageId === 'page-mypage') {
+        setTimeout(() => {
+            const nameEl = document.getElementById('mypage-user-name');
+            if (nameEl && userData.name) {
+                nameEl.innerText = userData.name; // '사용자'가 나올 틈을 안 줌
+            }
+        }, 10);
+    }
+
+    // 4. [원본 유지] 페이지 전환 및 스크롤 상단 이동
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     const target = document.getElementById(pageId);
     if(target) target.classList.add('active');
     window.scrollTo(0, 0);
 
-    // [핵심] 3. 로그인 또는 회원가입 페이지일 때만 하단바 숨기기
+    // 5. [추가] 하단바 아이콘 동기화 (불 켜기)
+    if (typeof syncTabBar === 'function') syncTabBar(pageId);
+
+    // 6. [원본 유지] 하단바 표시/숨김 제어
     const tabBar = document.querySelector('.floating-tab-bar');
     if (tabBar) {
         if (pageId === 'page-login' || pageId === 'page-signup') {
@@ -1371,6 +1390,29 @@ function renderAppLogs() {
             </div>
         `;
     }).join('');
+}
+function syncTabBar(pageId) {
+    // 1. 일단 모든 버튼의 불을 싹 끕니다 (초기화)
+    document.querySelectorAll('.tab-item').forEach(tab => {
+        tab.classList.remove('active');
+    });
+
+    // 2. 현재 페이지 ID를 보고 몇 번째 버튼을 켤지 결정합니다
+    let targetIdx = -1; // 기본값은 -1 (아무것도 안 켬)
+    if (pageId === 'page-main') targetIdx = 0;         // 홈
+    else if (pageId === 'page-history') targetIdx = 1;  // 내역
+    else if (pageId === 'page-guide') targetIdx = 2;    // 안내
+    else if (pageId === 'page-mypage') targetIdx = 3;   // 내정보
+
+    // 3. 만약 하단바에 있는 페이지라면 해당 번호 아이콘만 불을 켭니다
+    const tabItems = document.querySelectorAll('.tab-item');
+    if (targetIdx !== -1 && tabItems[targetIdx]) {
+        tabItems[targetIdx].classList.add('active');
+    }
+}
+function refreshUserData() {
+    const saved = localStorage.getItem('gnpay_user');
+    if (saved) userData = JSON.parse(saved);
 }
 </script>
 </body>
