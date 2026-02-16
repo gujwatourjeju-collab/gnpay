@@ -788,33 +788,35 @@
     <script>
         const GAS_URL = "https://script.google.com/macros/s/AKfycbx3n_w3jRXlNE1ht7zsg5WYv358AnGnFg61_AltbfPUnvlm7u3KjPtSRmDkAXrDPA/exec";
 function updateTab(element) {
-    // 1. 모든 탭에서 active 클래스 제거 (불 끄기)
-    document.querySelectorAll('.tab-item').forEach(tab => {
-        tab.classList.remove('active');
-    });
-
-    // 2. 클릭한 탭에 active 추가 (불 켜기 + 쫀득한 애니메이션 발동)
+    document.querySelectorAll('.tab-item').forEach(tab => tab.classList.remove('active'));
     element.classList.add('active');
 
-    // 3. [핵심] 마이페이지로 갈 때 QR 코드를 즉시 로딩함
-    // 탭 안의 글자가 '내정보'인지 확인합니다.
     const tabName = element.querySelector('span')?.innerText;
     
     if (tabName === '내정보') {
+        refreshUserData(); // [핵심] 클릭하는 순간 저장된 데이터를 다시 읽어옴
+        
         if (userData && userData.isLoggedIn) {
-            // 마이페이지 포인트 애니메이션 0부터 시작하도록 세팅
+            // 1. 이름 강제 주입 (가장 중요한 부분!)
+            const nameDisplay = document.getElementById('mypage-user-name');
+            if (nameDisplay) {
+                // userData.name이 있으면 쓰고, 없으면 로컬스토리지 직접 뒤져서라도 넣음
+                nameDisplay.innerText = userData.name || JSON.parse(localStorage.getItem('gnpay_user')).name || "사용자";
+            }
+
+            // 2. 포인트 애니메이션
             const myPointEl = document.getElementById('my-u-points');
             if (myPointEl) {
                 myPointEl.innerText = "0";
                 animateValue('my-u-points', 0, Number(userData.points || 0), 1000);
             }
-            // 사장님의 웅장한 QR 생성 호출
+
+            // 3. QR 코드 생성
             const qrImg = document.getElementById('my-qr-img');
-            if (qrImg) {
+            if (qrImg && userData.uid) {
                 qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${userData.uid}`;
             }
-        } else if (!userData.isLoggedIn) {
-            // 로그인 안 됐으면 로그인 페이지로 강제 이동
+        } else {
             showPage('page-login');
         }
     }
@@ -1393,6 +1395,10 @@ function syncTabBar(pageId) {
     if (targetIdx !== -1 && tabItems[targetIdx]) {
         tabItems[targetIdx].classList.add('active');
     }
+}
+function refreshUserData() {
+    const saved = localStorage.getItem('gnpay_user');
+    if (saved) userData = JSON.parse(saved);
 }
 </script>
 </body>
