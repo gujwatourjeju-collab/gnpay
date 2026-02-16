@@ -12,26 +12,28 @@
         
         body { font-family: 'Pretendard', sans-serif; background: #f4f7f7; margin:0; padding: 0 0 100px 0; color: #1a1a1a; overflow-x: hidden; }
         
-        /* [로그인 페이지 감성 통일] */
+        /* 로그인 페이지 */
         #login-page { position: fixed; top:0; left:0; width:100%; height:100%; background: var(--bg-grad); z-index:20000; display:flex; flex-direction:column; justify-content:center; padding:40px; }
         .login-logo { width: 100px; margin-bottom: 10px; }
         .custom-input { border: none; border-radius: 16px; background: white; padding: 18px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); margin-bottom: 15px; width: 100%; }
         .btn-grad { background: var(--primary-grad); color: white; border: none; padding: 18px; border-radius: 20px; font-weight: 800; width: 100%; box-shadow: 0 8px 20px rgba(1, 178, 173, 0.25); }
 
-        /* [메인 관리 화면] */
+        /* 메인 헤더 & 네비 (3등분 꽉 차게) */
         .admin-header { padding: 25px 20px 10px; background: white; border-radius: 0 0 30px 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center; }
-        .admin-nav { display: flex; gap: 8px; padding: 15px; overflow-x: auto; background: #f4f7f7; position: sticky; top: 0; z-index: 100; }
-        .nav-btn { background: white; border: 1px solid #ddd; padding: 10px 18px; border-radius: 15px; font-weight: 700; white-space: nowrap; color: #666; }
+        .admin-nav { display: flex; gap: 8px; padding: 15px; background: #f4f7f7; position: sticky; top: 0; z-index: 100; width: 100%; }
+        .nav-btn { flex: 1; background: white; border: 1px solid #ddd; padding: 12px 5px; border-radius: 15px; font-weight: 700; color: #666; font-size: 0.85rem; text-align: center; }
         .nav-btn.active { background: var(--primary-grad); color: white; border: none; box-shadow: 0 5px 15px rgba(1, 178, 173, 0.3); }
         
+        /* 리스트 카드 */
         .admin-card { background: white; margin: 0 15px 15px; padding: 18px; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); border: 1px solid #eee; }
         .pending-img { width: 100%; border-radius: 12px; margin-top: 10px; border: 1px solid #eee; }
-        
-        .btn-approve { background: var(--primary-grad); color: white; border: none; flex: 1; padding: 12px; border-radius: 12px; font-weight: 800; }
-        .btn-reject { background: #eee; color: #666; border: none; flex: 1; padding: 12px; border-radius: 12px; font-weight: 800; }
-        
         .page { display: none; } .active { display: block; }
-        #admin-reader { width: 100%; height: 350px; border-radius: 25px; overflow: hidden; background: #000; }
+        
+        /* 스캐너 풀스크린 */
+        #scanner-modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:black; z-index:30000; }
+        #admin-reader { width:100%; height:100%; }
+        .scanner-close-btn { position:absolute; bottom:50px; left:50%; transform:translateX(-50%); padding: 15px 40px; border-radius: 20px; background: white; border: none; font-weight: 800; z-index: 30001; }
+
         #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 10000; display: none; justify-content: center; align-items: center; flex-direction: column; }
     </style>
 </head>
@@ -59,7 +61,7 @@
         <div class="admin-nav">
             <button class="nav-btn active" id="btn-approval" onclick="showTab('approval')">신청 승인</button>
             <button class="nav-btn" id="btn-users" onclick="showTab('users')">회원 관리</button>
-            <button class="nav-btn" id="btn-scanner" onclick="showTab('scanner')">현장 스캐너</button>
+            <button class="nav-btn" id="btn-scanner" onclick="openScanner()">현장 스캐너</button>
         </div>
 
         <div id="tab-approval" class="page active">
@@ -71,15 +73,36 @@
             <div class="px-3 mb-2"><input type="text" id="user-search" class="custom-input" placeholder="회원 이름 또는 고유코드" onkeyup="filterUsers()"></div>
             <div id="user-list" class="px-2"></div>
         </div>
+    </div>
 
-        <div id="tab-scanner" class="page">
-            <div class="px-3"><div id="admin-reader"></div><div id="scan-result-card" class="admin-card mt-2" style="display:none;"></div></div>
+    <div id="scanner-modal">
+        <div id="admin-reader"></div>
+        <button class="scanner-close-btn" onclick="closeScanner()">닫기</button>
+    </div>
+
+    <div class="modal fade" id="scanResultModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 rounded-5 shadow-lg">
+                <div class="modal-body p-4 text-center">
+                    <h5 class="fw-bold mb-1" id="scan-res-name">사용자명</h5>
+                    <div class="badge bg-light text-dark mb-3" id="scan-res-uid">CODE</div>
+                    <div class="bg-light p-3 rounded-4 mb-3">
+                        <div class="small text-muted fw-bold">보유 포인트</div>
+                        <div class="h3 fw-bold text-primary mb-0" id="scan-res-points">0</div>
+                    </div>
+                    <div class="input-group mb-3">
+                        <input type="number" id="scan-adjust-amount" class="form-control form-control-lg border-0 bg-light" placeholder="변경할 포인트 (+/-)">
+                        <button class="btn btn-primary px-4 fw-bold" onclick="adjustPointsFromScan()">적용</button>
+                    </div>
+                    <button class="btn btn-link text-muted text-decoration-none" data-bs-dismiss="modal">취소</button>
+                </div>
+            </div>
         </div>
     </div>
 
     <div class="modal fade" id="userEditModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 rounded-5">
+            <div class="modal-content border-0 rounded-5 shadow-lg">
                 <div class="modal-body p-4">
                     <h5 class="fw-bold mb-4" id="edit-user-name">정보 수정</h5>
                     <div class="small fw-bold text-muted mb-1">포인트 조정 (직접 입력)</div>
@@ -88,7 +111,7 @@
                     <input type="text" id="edit-phone" class="custom-input mb-3">
                     <div class="small fw-bold text-muted mb-1">소속</div>
                     <input type="text" id="edit-org" class="custom-input mb-3">
-                    <button class="btn-grad" onclick="saveUserInfo()">수정 내용 저장</button>
+                    <button class="btn-grad mt-2" onclick="saveUserInfo()">수정 내용 저장</button>
                 </div>
             </div>
         </div>
@@ -101,114 +124,88 @@
         const ADMIN_EMAILS = ["idamco@naver.com"];
         let allUsers = [];
         let html5QrCode;
+        let scannedUid = "";
         let selectedUserEmail = "";
 
-        // [로그인 유지 체크]
         window.onload = () => {
             const savedAdmin = localStorage.getItem('gn_admin_session');
             if(savedAdmin) {
                 document.getElementById('login-page').style.display='none';
                 document.getElementById('admin-content').style.display='block';
+                loadUsers(); // 로그인 되어있으면 바로 유저 로드
             }
         };
 
         async function adminLogin() {
             const email = document.getElementById('admin-email').value;
             const pw = document.getElementById('admin-pw').value;
-            if(!ADMIN_EMAILS.includes(email)) return alert("허용되지 않은 관리자입니다.");
-            
+            if(!ADMIN_EMAILS.includes(email)) return alert("관리자 권한이 없습니다.");
             toggleLoading(true);
-            const res = await fetch(GAS_URL, {method:'POST', body:JSON.stringify({type:'login', email, password:pw})}).then(r=>r.json());
-            if(res.result === 'success') {
-                localStorage.setItem('gn_admin_session', email); // 세션 저장
-                document.getElementById('login-page').style.display='none';
-                document.getElementById('admin-content').style.display='block';
-            } else alert("비번 틀림");
+            try {
+                const res = await fetch(GAS_URL, {method:'POST', body:JSON.stringify({type:'login', email, password:pw})}).then(r=>r.json());
+                if(res.result === 'success') {
+                    localStorage.setItem('gn_admin_session', email);
+                    document.getElementById('login-page').style.display='none';
+                    document.getElementById('admin-content').style.display='block';
+                    loadUsers();
+                } else alert("비밀번호가 틀립니다.");
+            } catch(e) { alert("연결 오류"); }
             toggleLoading(false);
         }
 
-        function adminLogout() {
-            localStorage.removeItem('gn_admin_session');
-            location.reload();
-        }
+        function adminLogout() { localStorage.removeItem('gn_admin_session'); location.reload(); }
 
         function showTab(id) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('tab-' + id).classList.add('active');
             document.getElementById('btn-' + id).classList.add('active');
-            if(id === 'scanner') startScanner(); else stopScanner();
             if(id === 'users') loadUsers();
         }
 
+        // 신청 승인 로직 (기능 복구)
         async function loadPendingActivities() {
             toggleLoading(true);
-            const res = await fetch(GAS_URL, {method:'POST', body:JSON.stringify({type:'adminGetAllPending'})}).then(r=>r.json());
-            const list = document.getElementById('pending-list');
-            if(res.result === 'success' && res.pending.length > 0) {
-                list.innerHTML = res.pending.map(p => `
-                    <div class="admin-card">
-                        <div class="small text-muted mb-2">${p.date} | ${p.email}</div>
-                        <div class="fw-bold fs-5">${p.title}</div>
-                        <div class="text-primary fw-bold">+${p.amount.toLocaleString()}P 대기</div>
-                        <div class="row g-2 mt-2">
-                            ${p.img1 ? `<div class="col-4"><img src="${p.img1}" class="pending-img"></div>` : ''}
-                            ${p.img2 ? `<div class="col-4"><img src="${p.img2}" class="pending-img"></div>` : ''}
-                        </div>
-                        <div class="d-flex gap-2 mt-3">
-                            <button class="btn-reject" onclick="handleActivity(${p.rowIdx}, 'reject')">반려</button>
-                            <button class="btn-approve" onclick="handleActivity(${p.rowIdx}, 'approve')">승인</button>
-                        </div>
-                    </div>`).join('');
-            } else list.innerHTML = '<div class="text-center p-5">대기 내역 없음</div>';
+            try {
+                const res = await fetch(GAS_URL, {method:'POST', body:JSON.stringify({type:'adminGetAllPending'})}).then(r=>r.json());
+                const list = document.getElementById('pending-list');
+                if(res.result === 'success' && res.pending.length > 0) {
+                    list.innerHTML = res.pending.map(p => `
+                        <div class="admin-card">
+                            <div class="small text-muted mb-2">${p.date} | ${p.email}</div>
+                            <div class="fw-bold fs-5">${p.title}</div>
+                            <div class="text-primary fw-bold">+${p.amount.toLocaleString()}P 대기</div>
+                            <div class="row g-2 mt-2">
+                                ${p.img1 ? `<div class="col-6"><img src="${p.img1}" class="pending-img"></div>` : ''}
+                                ${p.img2 ? `<div class="col-6"><img src="${p.img2}" class="pending-img"></div>` : ''}
+                            </div>
+                            <div class="d-flex gap-2 mt-3">
+                                <button class="btn btn-light flex-fill fw-bold rounded-3" onclick="handleActivity(${p.rowIdx}, 'reject')">반려</button>
+                                <button class="btn btn-primary flex-fill fw-bold rounded-3" onclick="handleActivity(${p.rowIdx}, 'approve')">승인</button>
+                            </div>
+                        </div>`).join('');
+                } else list.innerHTML = '<div class="text-center p-5">대기 내역이 없습니다.</div>';
+            } catch(e) {}
             toggleLoading(false);
         }
+
         async function handleActivity(rowIdx, action) {
-    // 현재 화면(Pending List)에서 해당 행의 데이터를 찾습니다.
-    const list = document.getElementById('pending-list');
-    const cards = list.querySelectorAll('.admin-card');
-    let targetData = null;
-
-    // 대기 내역 로드 시 저장된 rowIdx와 일치하는 카드의 정보를 추출
-    // (더 확실하게 하기 위해 서버에서 온 데이터를 임시 저장해두고 쓰는 게 좋지만, 
-    // 우선 현재 UI 구조에서 안전하게 데이터를 뽑아내도록 짰습니다.)
-    
-    if(!confirm(action === 'approve' ? "승인하시겠습니까?" : "반려하시겠습니까?")) return;
-
-    toggleLoading(true);
-    try {
-        // [수정] 서버로 보낼 때 rowIdx뿐만 아니라 
-        // 장부 기록에 필요한 email과 amount를 같이 실어 보냅니다.
-        const res = await fetch(GAS_URL, {
-            method: 'POST',
-            body: JSON.stringify({
-                type: 'adminHandleActivity',
-                rowIdx: rowIdx,
-                action: action
-                // 서버 로직 보강을 위해 필요한 경우 여기에 추가 데이터를 넣을 수 있습니다.
-            })
-        }).then(r => r.json());
-
-        if (res.result === 'success') {
-            alert(action === 'approve' ? "승인이 완료되었습니다." : "반려되었습니다.");
-            loadPendingActivities(); // 목록 새로고침
-        } else {
-            alert("처리 실패: " + res.message);
+            if(!confirm(action === 'approve' ? "승인하시겠습니까?" : "반려하시겠습니까?")) return;
+            toggleLoading(true);
+            try {
+                await fetch(GAS_URL, {method:'POST', body:JSON.stringify({type:'adminHandleActivity', rowIdx, action})});
+                loadPendingActivities();
+            } catch(e) {}
+            toggleLoading(false);
         }
-    } catch (e) {
-        console.error(e);
-        alert("서버 통신 에러");
-    }
-    toggleLoading(false);
-}
 
+        // 회원 관리 & 수정 로직 (기능 복구)
         async function loadUsers() {
             toggleLoading(true);
-            const res = await fetch(GAS_URL, {method:'POST', body:JSON.stringify({type:'adminGetUsers'})}).then(r=>r.json());
-            if(res.result === 'success') {
-                allUsers = res.users; // GAS에서 이미 reverse() 해서 보냄
-                renderUsers(allUsers);
-            }
+            try {
+                const res = await fetch(GAS_URL, {method:'POST', body:JSON.stringify({type:'adminGetUsers'})}).then(r=>r.json());
+                if(res.result === 'success') { allUsers = res.users; renderUsers(allUsers); }
+            } catch(e) {}
             toggleLoading(false);
         }
 
@@ -226,19 +223,19 @@
             selectedUserEmail = email;
             document.getElementById('edit-user-name').innerText = name + "님 정보 수정";
             document.getElementById('edit-points').value = points;
-            document.getElementById('edit-phone').value = phone;
-            document.getElementById('edit-org').value = org;
+            document.getElementById('edit-phone').value = phone.replace("'", "");
+            document.getElementById('edit-org').value = org || "";
             new bootstrap.Modal(document.getElementById('userEditModal')).show();
         }
 
         async function saveUserInfo() {
             toggleLoading(true);
-            const data = {
-                type: 'adminUpdateUserFull', // GAS에 이 타입 추가 필요
-                email: selectedUserEmail,
-                points: document.getElementById('edit-points').value,
-                phone: document.getElementById('edit-phone').value,
-                org: document.getElementById('edit-org').value
+            const data = { 
+                type: 'adminUpdateUserFull', 
+                email: selectedUserEmail, 
+                points: document.getElementById('edit-points').value, 
+                phone: document.getElementById('edit-phone').value, 
+                org: document.getElementById('edit-org').value 
             };
             const res = await fetch(GAS_URL, {method:'POST', body:JSON.stringify(data)}).then(r=>r.json());
             if(res.result === 'success') {
@@ -255,9 +252,51 @@
             renderUsers(filtered);
         }
 
+        // 스캐너 로직 (풀화면 팝업)
+        function openScanner() {
+            document.getElementById('scanner-modal').style.display = 'block';
+            html5QrCode = new Html5Qrcode("admin-reader");
+            html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, (text) => {
+                scannedUid = text;
+                closeScanner();
+                fetchUserInfoFromScan(text);
+            }).catch(err => { alert("카메라를 열 수 없습니다."); closeScanner(); });
+        }
+
+        function closeScanner() {
+            if(html5QrCode) html5QrCode.stop().then(() => html5QrCode.clear());
+            document.getElementById('scanner-modal').style.display = 'none';
+        }
+
+        async function fetchUserInfoFromScan(uid) {
+            toggleLoading(true);
+            try {
+                const res = await fetch(GAS_URL, {method:'POST', body:JSON.stringify({type:'adminScanUser', uid: uid})}).then(r=>r.json());
+                if(res.result === 'success') {
+                    document.getElementById('scan-res-name').innerText = res.user.name;
+                    document.getElementById('scan-res-uid').innerText = uid;
+                    document.getElementById('scan-res-points').innerText = res.user.points.toLocaleString();
+                    new bootstrap.Modal(document.getElementById('scanResultModal')).show();
+                } else alert("존재하지 않는 사용자입니다.");
+            } catch(e) {}
+            toggleLoading(false);
+        }
+
+        async function adjustPointsFromScan() {
+            const amt = document.getElementById('scan-adjust-amount').value;
+            if(!amt) return alert("금액을 입력하세요.");
+            toggleLoading(true);
+            const res = await fetch(GAS_URL, {method:'POST', body:JSON.stringify({type:'adminScanUser', mode:'adjust', uid: scannedUid, amount: amt})}).then(r=>r.json());
+            if(res.result === 'success') {
+                alert(res.name + "님 처리완료: " + res.newPoints + "P");
+                bootstrap.Modal.getInstance(document.getElementById('scanResultModal')).hide();
+                document.getElementById('scan-adjust-amount').value = "";
+                loadUsers();
+            }
+            toggleLoading(false);
+        }
+
         function toggleLoading(show) { document.getElementById('loading-overlay').style.display = show ? 'flex' : 'none'; }
-        function startScanner() { /* 기존 스캐너 로직 동일 */ }
-        function stopScanner() { if(html5QrCode) html5QrCode.stop().catch(()=>{}); }
     </script>
 </body>
 </html>
