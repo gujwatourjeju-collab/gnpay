@@ -4,18 +4,42 @@
     <base target="_top">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#e6f7f6"> <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>김녕페이 2.0</title>
     <link rel="icon" href="https://gnpay.my/log.png" type="image/png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
    <script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.1/dist/browser-image-compression.js"></script>
    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+   <link rel="apple-touch-icon" href="https://gnpay.my/log.png">
+   <meta name="apple-mobile-web-app-capable" content="yes">
+   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+   <link rel="shortcut icon" href="https://gnpay.my/log.png">
   <style>
     @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
     :root { --primary: #01b2ad; --primary-grad: linear-gradient(135deg, #01b2ad 0%, #00d2ff 100%); --bg-grad: linear-gradient(180deg, #e6f7f6 0%, #f8fcfc 40%, #ffffff 100%); }
     
-    body { font-family: 'Pretendard', sans-serif; background: var(--bg-grad); margin:0; padding: env(safe-area-inset-top, 10px) 0 100px 0; min-height: 100vh; color: #1a1a1a; overflow-x: hidden; position: relative; }
+    body { 
+    font-family: 'Pretendard', sans-serif; 
+    background: var(--bg-grad); 
+    margin:0; 
+    padding: env(safe-area-inset-top, 20px) 0 100px 0; /* 아이폰 노치만큼 알아서 띄움 */
+    min-height: 100vh; 
+    color: #1a1a1a; 
+    overflow-x: hidden; 
+}
     
-    .top-nav { display: flex; justify-content: space-between; align-items: flex-start; padding: 20px 20px 5px; } 
+    .top-nav { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: flex-start; 
+    padding: 15px 20px 5px 26px; 
+    position: sticky; /* 스크롤 해도 고정됨 */
+    top: 0; 
+    z-index: 1000; /* 모든 요소보다 위에 있게 함 */
+    background: rgba(230, 247, 246, 0.8); /* 배경이랑 똑같은 민트 투명색 */
+    backdrop-filter: blur(10px); /* 뒤에 글자가 스쳐 지나갈 때 은은하게 비침 (럭셔리 포인트) */
+    -webkit-backdrop-filter: blur(10px);
+}
     .auth-links { display: flex; gap: 5px; align-items: center; }
     .auth-link { font-size: 0.8rem; font-weight: 700; color: #888; text-decoration: none; cursor: pointer; padding: 5px; line-height: 1; }
     
@@ -305,10 +329,10 @@
 
     <div id="page-main" class="page active">
         <div class="top-nav">
-            <div>
-                <img src="https://gnpay.my/log.png" style="width: 85px; margin-bottom: 8px;">
-                <div style="color:var(--primary); font-weight:900; font-size:1.4rem; letter-spacing:-0.5px; margin-bottom: 5px; margin-left: 10px;">김녕페이 2.0</div>
-            </div>
+            <div onclick="showPage('page-main')" style="cursor: pointer;">
+    <img src="https://gnpay.my/log.png" style="width: 85px; margin-bottom: 8px;">
+    <div style="color:var(--primary); font-weight:900; font-size:1.4rem; letter-spacing:-0.5px; margin-bottom: 5px; margin-left: 10px;">김녕페이 2.0</div>
+</div>
             <div class="auth-links" id="auth-area"></div>
         </div>
         <div class="pb-4" style="padding-left: 35px; padding-right: 25px;">
@@ -418,33 +442,104 @@
 </div>
 
     <div id="page-login" class="page">
-        <div class="top-nav">
-            <div><img src="https://gnpay.my/log.png" style="width: 85px; margin-bottom: 8px;"><div style="color:var(--primary); font-weight:900; font-size:1.4rem;">김녕페이 2.0</div></div>
-            <div class="fs-2 text-secondary" style="cursor:pointer; padding: 10px;" onclick="showPage('page-main')"><i class="bi bi-x"></i></div>
-        </div>
-        <div class="mt-4" style="padding-left: 35px; padding-right: 25px;">
-            <h1 class="fw-bolder mb-5">반가워요!<br><strong>로그인 해주세요</strong></h1>
-            <input type="email" id="login-email" class="form-control custom-input" placeholder="이메일">
+    <div class="top-nav">
+        <div onclick="showPage('page-main')" style="cursor: pointer;">
+    <img src="https://gnpay.my/log.png" style="width: 85px; margin-bottom: 8px;">
+    <div style="color:var(--primary); font-weight:900; font-size:1.4rem; letter-spacing:-0.5px; margin-bottom: 5px; margin-left: 10px;">김녕페이 2.0</div>
+</div>
+        <div class="fs-2 text-secondary" style="cursor:pointer; padding: 10px;" onclick="showPage('page-main')"><i class="bi bi-x"></i></div>
+    </div>
+    <div class="mt-2" style="padding-left: 35px; padding-right: 25px;">
+        <h1 class="fw-bolder mb-4" style="line-height: 1.2;">반가워요!<br><strong>로그인 해주세요</strong></h1>
+        <div class="mt-5"> <input type="email" id="login-email" class="form-control custom-input" placeholder="이메일">
             <input type="password" id="login-pw" class="form-control custom-input" placeholder="비밀번호">
             <button class="btn-scan w-100" onclick="submitLogin()">로그인하기</button>
-            <div class="text-center mt-4"><span class="text-muted small">계정이 없으신가요?</span><span class="fw-bold ms-2" style="color:var(--primary); cursor:pointer;" onclick="showPage('page-signup')">회원가입</span></div>
         </div>
     </div>
+</div>
 
     <div id="page-signup" class="page">
-        <div class="top-nav">
-            <div><img src="https://gnpay.my/log.png" style="width: 85px; margin-bottom: 8px;"><div style="color:var(--primary); font-weight:900; font-size:1.4rem;">김녕페이 2.0</div></div>
-            <div class="fs-2 text-secondary" style="cursor:pointer; padding: 10px;" onclick="showPage('page-main')"><i class="bi bi-x"></i></div>
+    <div class="top-nav">
+        <div onclick="showPage('page-main')" style="cursor: pointer;">
+            <img src="https://gnpay.my/log.png" style="width: 85px; margin-bottom: 8px;">
+            <div style="color:var(--primary); font-weight:900; font-size:1.4rem; letter-spacing:-0.5px; margin-bottom: 5px; margin-left: 10px;">김녕페이 2.0</div>
         </div>
-        <div class="mt-4" style="padding-left: 35px; padding-right: 25px;">
-            <h1 class="fw-bolder mb-4">새로운 시작!<br><strong>정보를 입력하세요</strong></h1>
-            <input type="text" id="reg-name" class="form-control custom-input" placeholder="이름">
-            <input type="email" id="reg-email" class="form-control custom-input" placeholder="이메일">
-            <input type="password" id="reg-pw" class="form-control custom-input" placeholder="비밀번호">
-            <input type="tel" id="reg-phone" class="form-control custom-input" placeholder="전화번호">
-            <button class="btn-scan w-100 mt-2" onclick="submitSignup()">가입하기</button>
+        <div class="fs-2 text-secondary" style="cursor:pointer; padding: 10px;" onclick="showPage('page-main')"><i class="bi bi-x"></i></div>
+    </div>
+    
+    <div class="mt-2" style="padding-left: 35px; padding-right: 25px;">
+        <h1 class="fw-bolder mb-4" style="line-height: 1.2;">새로운 시작!<br><strong>정보를 입력하세요</strong></h1>
+        
+        <div class="mt-4">
+            <div class="d-flex gap-2 mb-3">
+                <div style="position: relative; flex: 2;">
+                    <i class="bi bi-person" style="position: absolute; left: 16px; top: 16px; color: #adb5bd;"></i>
+                    <input type="text" id="reg-name" class="form-control custom-input" placeholder="이름" style="padding-left: 45px; margin-bottom:0;">
+                </div>
+                <div style="flex: 1;">
+                    <select id="reg-gender" class="form-control custom-input" style="padding-left: 15px; margin-bottom:0; font-weight: 600; color: #666;">
+                        <option value="">성별</option>
+                        <option value="남">남성</option>
+                        <option value="여">여성</option>
+                    </select>
+                </div>
+            </div>
+
+            <div style="position: relative; margin-bottom: 12px;">
+                <i class="bi bi-envelope" style="position: absolute; left: 16px; top: 16px; color: #adb5bd;"></i>
+                <input type="email" id="reg-email" class="form-control custom-input" placeholder="이메일" style="padding-left: 45px;">
+            </div>
+            <div style="position: relative; margin-bottom: 12px;">
+                <i class="bi bi-lock" style="position: absolute; left: 16px; top: 16px; color: #adb5bd;"></i>
+                <input type="password" id="reg-pw" class="form-control custom-input" placeholder="비밀번호" style="padding-left: 45px;">
+            </div>
+            <div style="position: relative; margin-bottom: 12px;">
+                <i class="bi bi-phone" style="position: absolute; left: 16px; top: 16px; color: #adb5bd;"></i>
+                <input type="tel" id="reg-phone" class="form-control custom-input" placeholder="전화번호" style="padding-left: 45px;">
+            </div>
+
+            <div style="position: relative; margin-bottom: 20px;">
+                <i class="bi bi-geo-alt" style="position: absolute; left: 16px; top: 16px; color: #adb5bd;"></i>
+                <select id="reg-region" class="form-control custom-input" style="padding-left: 45px; font-weight: 600; color: #666;">
+                    <option value="">거주 지역 선택</option>
+                    <option value="제주">제주</option>
+                    <option value="서울">서울</option>
+                    <option value="경기">경기</option>
+                    <option value="인천">인천</option>
+                    <option value="강원">강원</option>
+                    <option value="대전">대전</option>
+                    <option value="전북">전북</option>
+                    <option value="전남">전남</option>
+                    <option value="광주">광주</option>
+                    <option value="충남">충남</option>
+                    <option value="충북">충북</option>
+                    <option value="경북">경북</option>
+                    <option value="경남">경남</option>
+                    <option value="부산">부산</option>
+                    <option value="대구">대구</option>
+                    <option value="기타">기타</option>
+                </select>
+            </div>
+
+            <div class="p-3 mb-4" style="background: rgba(1, 178, 173, 0.05); border-radius: 18px; border: 1px dashed rgba(1, 178, 173, 0.3);">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center">
+                        <input type="checkbox" id="reg-agree" style="width: 20px; height: 20px; accent-color: var(--primary);">
+                        <label for="reg-agree" class="ms-2 small fw-bold text-dark" style="cursor:pointer;">개인정보 수집 및 이용 동의 (필수)</label>
+                    </div>
+                    <span class="small text-muted" style="text-decoration: underline; cursor:pointer;" onclick="alert('김녕페이 서비스 제공을 위한 최소한의 정보를 수집합니다.')">보기</span>
+                </div>
+            </div>
+            
+            <button class="btn-scan w-100 mt-2" onclick="checkAndSignup()">가입하기</button>
+        </div>
+
+        <div class="text-center mt-4 pb-5">
+            <span class="text-muted small">이미 계정이 있으신가요?</span>
+            <span class="fw-bold ms-2" style="color:var(--primary); cursor:pointer;" onclick="showPage('page-login')">로그인</span>
         </div>
     </div>
+</div>
 
     <div id="page-edit-info" class="page">
         <div class="top-nav">
@@ -945,7 +1040,28 @@ function forceShowPage(pageId) {
         targetPage.classList.add('active');
         window.scrollTo(0, 0);
     }
-}    
+}  
+function checkAndSignup() {
+    const agree = document.getElementById('reg-agree').checked;
+    const gender = document.getElementById('reg-gender').value;
+    const region = document.getElementById('reg-region').value;
+
+    if (!gender) return alert("성별을 선택해주세요.");
+    if (!region) return alert("거주 지역을 선택해주세요.");
+    if (!agree) return alert("개인정보 제공에 동의해주세요.");
+    
+    // 모든 체크 통과 시 기존 가입 함수 실행
+    submitSignup(); 
+}
+document.addEventListener('keypress', function (e) {
+    if (e.key === 'Enter') {
+        const activePage = document.querySelector('.page.active');
+        if (activePage) {
+            if (activePage.id === 'page-login') submitLogin();
+            else if (activePage.id === 'page-signup') submitSignup();
+        }
+    }
+});  
 </script>
 </body>
 </html>
