@@ -486,42 +486,38 @@
     </div>
 </div>
 
-        <div class="mt-4" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-            <div class="menu-item" onclick="openEditInfo()" style="background: white; border: 1px solid #eee; padding: 18px
 
-        <div class="mt-4" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-            <div class="menu-item" onclick="openEditInfo()" style="background: #151515; border: 1px solid #222; padding: 22px 10px; border-radius: 25px; transition: 0.3s;">
-                <i class="bi bi-person-vcard-fill" style="font-size: 1.8rem; color: var(--primary); margin-bottom: 8px; display: block;"></i>
-                <div class="menu-title" style="color: #fff; font-weight: 600; font-size: 0.95rem;">내 정보 수정</div>
-            </div>
-            <div class="menu-item" onclick="loadActivityHistory()" style="background: #151515; border: 1px solid #222; padding: 22px 10px; border-radius: 25px; transition: 0.3s;">
-                <i class="bi bi-journal-check" style="font-size: 1.8rem; color: var(--primary); margin-bottom: 8px; display: block;"></i>
-                <div class="menu-title" style="color: #fff; font-weight: 600; font-size: 0.95rem;">활동 내역</div>
-            </div>
-        </div>
-
-        <div class="mt-5 mb-5 text-center">
-            <button class="btn" onclick="logout()" style="color: #ff5e5e; font-size: 0.9rem; font-weight: 700; background: rgba(255, 94, 94, 0.08); padding: 14px 35px; border-radius: 18px; border: 1px solid rgba(255, 94, 94, 0.2); width: 100%;">
-                <i class="bi bi-box-arrow-right me-2"></i> 안전하게 로그아웃
-            </button>
-            <div class="mt-4 opacity-20" style="letter-spacing: 2px; font-size: 0.65rem; color: #fff;">GIMNYEONG PAY VERSION 2.0</div>
-        </div>
-    </div>
-</div>
-
-    <div id="page-login" class="page">
+        
+  <div id="page-login" class="page">
     <div class="top-nav">
         <div onclick="showPage('page-main')" style="cursor: pointer;">
-    <img src="https://gnpay.my/log.png" style="width: 85px; margin-bottom: 8px;">
-    <div style="color:var(--primary); font-weight:900; font-size:1.4rem; letter-spacing:-0.5px; margin-bottom: 5px; margin-left: 10px;">김녕페이 2.0</div>
-</div>
+            <img src="https://gnpay.my/log.png" style="width: 85px; margin-bottom: 8px;">
+            <div style="color:var(--primary); font-weight:900; font-size:1.4rem; letter-spacing:-0.5px; margin-bottom: 5px; margin-left: 10px;">김녕페이 2.0</div>
+        </div>
         <div class="fs-2 text-secondary" style="cursor:pointer; padding: 10px;" onclick="showPage('page-main')"><i class="bi bi-x"></i></div>
     </div>
+
     <div class="mt-2" style="padding-left: 35px; padding-right: 25px;">
         <h1 class="fw-bolder mb-4" style="line-height: 1.2;">반가워요!<br><strong>로그인 해주세요</strong></h1>
-        <div class="mt-5"> <input type="email" id="login-email" class="form-control custom-input" placeholder="이메일">
+        
+        <div class="mt-5"> 
+            <input type="email" id="login-email" class="form-control custom-input" placeholder="이메일">
             <input type="password" id="login-pw" class="form-control custom-input" placeholder="비밀번호">
+            
+            <div class="d-flex justify-content-between align-items-center px-1 mb-4" style="margin-top: -5px;">
+                <div class="form-check d-flex align-items-center gap-2">
+                    <input class="form-check-input" type="checkbox" id="remember-me" style="width: 17px; height: 17px; cursor: pointer;">
+                    <label class="form-check-label small text-muted" for="remember-me" style="cursor: pointer; padding-top: 2px;">아이디 기억</label>
+                </div>
+                <div class="small text-muted" onclick="alert('관리자에게 문의해주세요!\n010-XXXX-XXXX')" style="cursor: pointer;">비밀번호를 잊으셨나요?</div>
+            </div>
+
             <button class="btn-scan w-100" onclick="submitLogin()">로그인하기</button>
+
+            <div class="text-center mt-4">
+                <span class="text-muted small">아직 회원이 아니신가요?</span>
+                <span class="fw-bold small ms-2" style="color:var(--primary); cursor:pointer;" onclick="showPage('page-signup')">회원가입</span>
+            </div>
         </div>
     </div>
 </div>
@@ -557,13 +553,15 @@
                 <i class="bi bi-envelope" style="position: absolute; left: 16px; top: 16px; color: #adb5bd;"></i>
                 <input type="email" id="reg-email" class="form-control custom-input" placeholder="이메일" style="padding-left: 45px;">
             </div>
-            <div style="position: relative; margin-bottom: 12px;">
-                <i class="bi bi-lock" style="position: absolute; left: 16px; top: 16px; color: #adb5bd;"></i>
-                <input type="password" id="reg-pw" class="form-control custom-input" placeholder="비밀번호" style="padding-left: 45px;">
+            <div style="position: relative; margin-bottom: 5px;">
+            <i class="bi bi-lock" style="position: absolute; left: 16px; top: 16px; color: #adb5bd;"></i>
+            <input type="password" id="reg-pw" class="form-control custom-input" 
+             placeholder="비밀번호 (영문+숫자 혼합)" 
+             style="padding-left: 45px;">
             </div>
-            <div style="position: relative; margin-bottom: 12px;">
+               <div style="position: relative; margin-bottom: 12px;">
                 <i class="bi bi-phone" style="position: absolute; left: 16px; top: 16px; color: #adb5bd;"></i>
-                <input type="tel" id="reg-phone" class="form-control custom-input" placeholder="전화번호" style="padding-left: 45px;">
+                <input type="tel" id="reg-phone" class="form-control custom-input" placeholder="전화번호 (숫자만 연속해서 입력)" style="padding-left: 45px;">
             </div>
 
             <div style="position: relative; margin-bottom: 20px;">
@@ -786,7 +784,7 @@
 </body>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script>
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbx3n_w3jRXlNE1ht7zsg5WYv358AnGnFg61_AltbfPUnvlm7u3KjPtSRmDkAXrDPA/exec";
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbzCGRhehKnPasS6Zz-WZycvlU3GAGngvukVIx6xU_mzJf2mpv5xfoH5qGNWE8LHK7Dd/exec";
 function updateTab(element) {
     document.querySelectorAll('.tab-item').forEach(tab => tab.classList.remove('active'));
     element.classList.add('active');
@@ -986,23 +984,41 @@ function goToMyPage() {
     document.getElementById('my-qr-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${userData.uid}`;
 
 
-        async function submitLogin() {
-            const email = document.getElementById('login-email').value;
-            const pw = document.getElementById('login-pw').value;
-            if(!email || !pw) return alert("입력해주세요.");
-            loading.style.display='flex';
-            try {
-                const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ type: 'login', email, password: pw }) }).then(r => r.json());
-                if (res.result === 'success') {
-                    userData = { isLoggedIn: true, ...res.user, password: pw };
-                    localStorage.setItem('gnpay_user', JSON.stringify(userData));
-                    updateUI();
-                    showPage('page-main');
-                } else { alert(res.message); }
-            } catch (e) { alert("로그인 오류"); }
-            loading.style.display='none';
-        }
+       async function submitLogin() {
+    // [칼각 유지] 형님이 쓰시는 ID 그대로 가져옵니다
+    const email = document.getElementById('login-email').value;
+    const pw = document.getElementById('login-pw').value;
+    
+    if(!email || !pw) return alert("입력해주세요.");
+    loading.style.display='flex';
+    
+    try {
+        const res = await fetch(GAS_URL, { 
+            method: 'POST', 
+            body: JSON.stringify({ type: 'login', email, password: pw }) 
+        }).then(r => r.json());
 
+        if (res.result === 'success') {
+            // [지훈이의 엔진 추가] 아이디 기억하기 체크 여부 확인
+            const rememberMe = document.getElementById('remember-me').checked;
+            if (rememberMe) {
+                localStorage.setItem('gnpay_remember_email', email);
+            } else {
+                localStorage.removeItem('gnpay_remember_email');
+            }
+
+            userData = { isLoggedIn: true, ...res.user, password: pw };
+            localStorage.setItem('gnpay_user', JSON.stringify(userData));
+            updateUI();
+            showPage('page-main');
+        } else { 
+            alert(res.message); 
+        }
+    } catch (e) { 
+        alert("로그인 오류"); 
+    }
+    loading.style.display='none';
+}
         async function submitSignup() {
             const data = { type: 'signup', name: document.getElementById('reg-name').value, email: document.getElementById('reg-email').value, password: document.getElementById('reg-pw').value, phone: document.getElementById('reg-phone').value };
             loading.style.display='flex';
@@ -1086,17 +1102,15 @@ async function previewImages() {
    // [최종] 내역 조회 함수: 서버에서 장부와 신청내역을 동시에 가져옴
 async function loadActivityHistory() {
     showPage('page-history');
-    switchHistoryTab('point'); // 기본은 포인트 탭
+    switchHistoryTab('point'); 
 
     const pointList = document.getElementById('point-history-list');
     const activityList = document.getElementById('activity-history-list');
     
-    // 로딩 표시
-    pointList.innerHTML = '<div class="text-center p-4 small text-muted">포인트 내역 동기화 중...</div>';
-    activityList.innerHTML = '<div class="text-center p-4 small text-muted">활동 내역 동기화 중...</div>';
+    pointList.innerHTML = '<div class="text-center p-4 small text-muted">데이터 동기화 중...</div>';
+    activityList.innerHTML = '<div class="text-center p-4 small text-muted">데이터 동기화 중...</div>';
 
     try {
-        // [핵심] 서버의 'login' 타입을 재활용해 최신 내역(pointLogs, applications)을 통째로 가져옴
         const response = await fetch(GAS_URL, { 
             method: 'POST', 
             body: JSON.stringify({ 
@@ -1108,14 +1122,13 @@ async function loadActivityHistory() {
         const res = await response.json();
 
         if (res.result === 'success') {
-            // 서버에서 보낸 두 보따리 (PointLogs 시트와 Applications 시트 데이터)
-            const pLogs = res.user.history || [];       // 서버 코드의 pointLogs 매칭
-            const aLogs = res.user.applications || [];  // 서버 코드의 applications 매칭
+            const pLogs = res.user.history || [];       // PointLogs 데이터
+            const aLogs = res.user.applications || [];  // Applications 데이터
 
             let pHtml = '';
             let aHtml = '';
 
-            // 1. 포인트 내역 빌드 (PointLogs 시트 구조 대응)
+            // 1. 포인트 내역 빌드 (장부 데이터)
             if (pLogs.length > 0) {
                 pLogs.forEach(log => {
                     const isPlus = Number(log.amount) > 0;
@@ -1132,28 +1145,61 @@ async function loadActivityHistory() {
                 });
             }
 
-            // 2. 활동 현황 빌드 (Applications 시트 구조 대응)
-            if (aLogs.length > 0) {
-                aLogs.forEach(app => {
-                    const s = app.status || '대기';
-                    const sColor = s === '승인' ? 'var(--primary)' : (s === '반려' ? '#ff4d4d' : '#ffcc00');
-                    aHtml += `
-                        <div class="dashboard-card mb-3" style="padding:18px; animation:none; border-left:5px solid ${sColor}; width:100%; margin:0 0 12px 0;">
-                            <div style="flex:1;">
-                                <div class="fw-bold" style="font-size:1rem;">${app.title}</div>
-                                <div class="small text-muted">${app.date}</div>
+            // 2. 활동 현황 빌드 (사진 펼치기 기능 탑재)
+if (aLogs.length > 0) {
+    aLogs.forEach((app, idx) => {
+        const s = app.status || '대기';
+        // 승인이면 초록(var(--primary)), 반려면 빨강(#ff4d4d), 대기면 노랑(#ffcc00)
+        const sColor = s === '승인' ? 'var(--primary)' : (s === '반려' ? '#ff4d4d' : '#ffcc00');
+        
+        // 사진 데이터 확보
+        const pic1 = app.img1 || app.사진1 || app.photo1;
+        const pic2 = app.img2 || app.사진2 || app.photo2;
+        const pic3 = app.img3 || app.사진3 || app.photo3;
+
+        aHtml += `
+            <div class="dashboard-card mb-3" style="padding:18px; border-left:5px solid ${sColor}; flex-direction:column; align-items:flex-start; cursor:pointer;" 
+                 onclick="const d = document.getElementById('detail-${idx}'); d.style.display = (d.style.display === 'none' ? 'block' : 'none')">
+                
+                <div class="d-flex justify-content-between w-100 align-items-center">
+                    <div style="flex:1;">
+                        <div class="fw-bold" style="font-size:1rem; color:#333;">${app.title}</div>
+                        <div class="small text-muted">${app.date}</div>
+                    </div>
+                    <div class="text-end">
+                        <div class="badge mb-1" style="background:${sColor}; color:white; border-radius:8px; font-size:0.7rem; padding:4px 10px;">${s}</div>
+                        ${s === '승인' ? `<div class="fw-bold" style="color:var(--primary); font-size:0.9rem;">+${Number(app.points).toLocaleString()} P</div>` : ''}
+                    </div>
+                </div>
+
+                <div id="detail-${idx}" style="display:none; width:100%; margin-top:15px; border-top:1px dashed #eee; padding-top:15px;">
+                    <div class="row g-2 mb-3">
+                        ${pic1 ? `<div class="col-4"><img src="${pic1}" class="img-fluid rounded-3 shadow-sm" style="aspect-ratio:1; object-fit:cover;"></div>` : ''}
+                        ${pic2 ? `<div class="col-4"><img src="${pic2}" class="img-fluid rounded-3 shadow-sm" style="aspect-ratio:1; object-fit:cover;"></div>` : ''}
+                        ${pic3 ? `<div class="col-4"><img src="${pic3}" class="img-fluid rounded-3 shadow-sm" style="aspect-ratio:1; object-fit:cover;"></div>` : ''}
+                    </div>
+
+                    ${s === '반려' ? `
+                        <div style="background:#fff5f5; padding:12px; border-radius:12px; border:1px solid #ffe3e3;">
+                            <div class="d-flex justify-content-between align-items:center;">
+                                <span class="small text-muted">포인트 획득 실패</span>
+                                <span class="fw-bold" style="color:#ff4d4d; text-decoration:line-through;">+${Number(app.points).toLocaleString()} P</span>
                             </div>
-                            <div class="badge" style="background:${sColor}; color:white; border-radius:8px; font-size:0.75rem; padding:6px 12px; font-weight:700;">
-                                ${s} | +${Number(app.points).toLocaleString()}P
-                            </div>
-                        </div>`;
-                });
-            }
+                            ${app.message ? `<div class="mt-2 small" style="color:#e03131;"><strong>사유:</strong> ${app.message}</div>` : ''}
+                        </div>
+                    ` : `
+                        <div class="small text-muted text-center py-2" style="background:#f8f9fa; border-radius:10px;">
+                            ${s === '승인' ? '정상 승인된 활동입니다.' : '관리자가 확인 중입니다.'}
+                        </div>
+                    `}
+                </div>
+            </div>`;
+    });
+}
 
             pointList.innerHTML = pHtml || '<div class="text-center text-muted mt-5 small">포인트 기록이 없습니다.</div>';
             activityList.innerHTML = aHtml || '<div class="text-center text-muted mt-5 small">활동 신청 기록이 없습니다.</div>';
             
-            // 로컬 데이터 업데이트 및 상단 포인트 UI 갱신
             userData.points = res.user.points;
             localStorage.setItem('gnpay_user', JSON.stringify(userData));
             updateUI();
@@ -1163,7 +1209,6 @@ async function loadActivityHistory() {
         pointList.innerHTML = '<div class="text-center text-muted mt-5 small">서버 연결에 실패했습니다.</div>';
     }
 }
-
         function openEditInfo() {
             document.getElementById('edit-name').value = userData.name;
             document.getElementById('edit-email').value = userData.email;
@@ -1171,23 +1216,52 @@ async function loadActivityHistory() {
             showPage('page-edit-info');
         }
 
-        async function submitEditInfo() {
-            const newPw = document.getElementById('edit-pw').value;
-            const newPhone = document.getElementById('edit-phone').value;
-            if(!newPhone) return alert("전화번호를 입력해주세요.");
-            loading.style.display = 'flex';
-            try {
-                const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ type: 'updateUserInfo', email: userData.email, newPhone: newPhone, newPw: newPw }) }).then(r => r.json());
-                if(res.result === 'success') {
-                    alert("정보가 수정되었습니다.");
-                    userData.phone = newPhone;
-                    if(newPw) userData.password = newPw;
-                    localStorage.setItem('gnpay_user', JSON.stringify(userData));
-                    showPage('page-mypage');
-                } else { alert("수정 실패"); }
-            } catch(e) { alert("오류 발생"); }
-            loading.style.display = 'none';
+async function submitEditInfo() {
+    // 1. 화면에 있는 값들 싹 긁어모으기
+    const newPw = document.getElementById('edit-pw').value;
+    const newPhone = document.getElementById('edit-phone').value;
+    const newGender = document.getElementById('edit-gender').value; // 성별 추가
+    const newRegion = document.getElementById('edit-region').value; // 지역 추가
+
+    if(!newPhone) return alert("전화번호를 입력해주세요.");
+
+    loading.style.display = 'flex';
+    try {
+        // 2. 서버(GAS)에 성별, 지역까지 다 실어서 보냄
+        const res = await fetch(GAS_URL, { 
+            method: 'POST', 
+            body: JSON.stringify({ 
+                type: 'updateUserInfo', 
+                email: userData.email, 
+                newPhone: newPhone, 
+                newPw: newPw,
+                newGender: newGender, // 새로 추가된 항목
+                newRegion: newRegion  // 새로 추가된 항목
+            }) 
+        }).then(r => r.json());
+
+        if(res.result === 'success') {
+            alert("정보가 수정되었습니다.");
+            
+            // 3. [지훈이의 꼼수] 우리 앱 메모리(userData)도 서버랑 똑같이 업데이트!
+            userData.phone = newPhone;
+            userData.gender = newGender; // 메모리에 저장
+            userData.region = newRegion; // 메모리에 저장
+            if(newPw) userData.password = newPw;
+
+            // 4. 로컬스토리지(금고)에 싹 저장해서 새로고침해도 안 날아가게 함
+            localStorage.setItem('gnpay_user', JSON.stringify(userData));
+            
+            // 5. 마이페이지로 이동 (이동하면 바뀐 이름/정보가 뙇!)
+            showPage('page-mypage');
+        } else { 
+            alert("수정 실패: " + (res.message || "알 수 없는 오류")); 
         }
+    } catch(e) { 
+        alert("서버 통신 오류가 발생했습니다."); 
+    }
+    loading.style.display = 'none';
+}
 
         async function handleScan() {
             if (!userData.isLoggedIn) return showPage('page-login');
@@ -1274,7 +1348,20 @@ function animateValue(id, start, end, duration) {
     };
     window.requestAnimationFrame(step);
 }
-        window.onload = updateUI;
+      window.onload = function() {
+    // 1. 기존 UI 업데이트 엔진 가동
+    updateUI();
+
+    // 2. [지훈이의 엔진 추가] 저장된 아이디가 있으면 불러오기
+    const savedEmail = localStorage.getItem('gnpay_remember_email');
+    const emailInput = document.getElementById('login-email');
+    const rememberCheckbox = document.getElementById('remember-me');
+
+    if (savedEmail && emailInput) {
+        emailInput.value = savedEmail;
+        if (rememberCheckbox) rememberCheckbox.checked = true;
+    }
+};
 function forceShowPage(pageId) {
     // 1. 모든 페이지를 싹 다 숨깁니다.
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -1414,6 +1501,7 @@ function refreshUserData() {
     const saved = localStorage.getItem('gnpay_user');
     if (saved) userData = JSON.parse(saved);
 }
+
 </script>
 </body>
 </html>
