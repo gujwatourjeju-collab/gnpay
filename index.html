@@ -442,6 +442,15 @@ button[style*="background: #f8f9fa"]:active {
     transform: scale(0.9);
     opacity: 0.6;
 }
+/* 트렌디한 페이지 전환 액션 */
+.page {
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+}
+
+/* 들어오는 페이지 효과 */
+.page-enter-right { transform: translateX(100%); opacity: 0; }
+.page-enter-left { transform: translateX(-100%); opacity: 0; }
+.page-active { transform: translateX(0); opacity: 1; }
 </style>
 </head>
 <body>
@@ -460,6 +469,7 @@ button[style*="background: #f8f9fa"]:active {
                 </div>
                 <img id="qr-img-large" src="" style="width: 100%; max-width: 250px; border-radius: 12px; display: block;">
             </div>
+            
             <div class="mt-4">
                 <div class="amount-text user-points-display" id="focus-points" style="font-size: 2.7rem; font-weight: 900; color: var(--primary);">0</div>
                 <div class="small text-muted fw-bold" style="opacity: 0.6; letter-spacing: 1px;">나의 에코 포인트</div>
@@ -987,18 +997,23 @@ function updateTab(element) {
     const tabName = element.querySelector('span')?.innerText;
     
     if (tabName === '내정보') {
-        refreshUserData(); // 데이터 최신화
-        
+        // [수정 핵심] 데이터를 새로고침하고, 즉시 전역 변수에 다시 담습니다.
+        refreshUserData(); 
+        const saved = localStorage.getItem('gnpay_user');
+        if (saved) userData = JSON.parse(saved);
+
         if (userData && userData.isLoggedIn) {
-            showPage('page-mypage'); // 페이지 전환 먼저
+            showPage('page-mypage'); 
 
-            // [수정] 0.1초 뒤에 데이터 주입 (DOM이 확실히 그려진 후)
+            // DOM이 확실히 렌더링된 후 데이터를 직접 박아넣습니다.
             setTimeout(() => {
-                // 1. 이름 강제 주입
+                // 1. 이름 주입
                 const nameDisplay = document.getElementById('mypage-user-name');
-                if (nameDisplay) nameDisplay.innerText = userData.name || "사용자";
+                if (nameDisplay) {
+                    nameDisplay.innerText = userData.name || "사용자";
+                }
 
-                // 2. 포인트 촤르르 복구
+                // 2. 포인트 촤르르 애니메이션
                 const myPointEl = document.getElementById('my-u-points');
                 if (myPointEl) {
                     const targetPoints = Number(userData.points || 0);
@@ -1010,7 +1025,7 @@ function updateTab(element) {
                 if (qrImg && userData.uid) {
                     qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${userData.uid}`;
                 }
-            }, 100);
+            }, 50); // 0.1초보다 더 빠른 0.05초로 반응성 향상
         } else {
             showPage('page-login');
         }
@@ -1026,6 +1041,7 @@ function showPage(pageId) {
     const saved = localStorage.getItem('gnpay_user');
     if (saved) userData = JSON.parse(saved);
 
+    // 로그인 체크 로직 (기존 유지)
     if (!userData.isLoggedIn && 
         pageId !== 'page-main' && 
         pageId !== 'page-partners' && 
@@ -1036,24 +1052,44 @@ function showPage(pageId) {
         pageId = 'page-login'; 
     }
 
-document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     const target = document.getElementById(pageId);
     if(target) target.classList.add('active');
     window.scrollTo(0, 0);
 
-    // [버그 수정 핵심] 메인으로 복귀할 때 멈춘 숨쉬기 엔진을 다시 깨움
+    // [핵심 추가] 마이페이지 진입 시 데이터 강제 주입 엔진
+    if (pageId === 'page-mypage' && userData.isLoggedIn) {
+        setTimeout(() => {
+            // 1. 이름 박기
+            const nameEl = document.getElementById('mypage-user-name');
+            if (nameEl) nameEl.innerText = userData.name || "사용자";
+
+            // 2. 포인트 촤르르 가동
+            const pointEl = document.getElementById('my-u-points');
+            if (pointEl) {
+                const targetPoints = Number(userData.points || 0);
+                animateValue('my-u-points', 0, targetPoints, 1000);
+            }
+
+            // 3. QR 이미지 로드
+            const qrImg = document.getElementById('my-qr-img');
+            if (qrImg && userData.uid) {
+                qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${userData.uid}`;
+            }
+            
+            // 4. 타이머가 있다면 여기서 같이 시동 (나중에 타이머 넣으실 때 쓰세요)
+            if (typeof startQRTimer === 'function') startQRTimer();
+        }, 50);
+    }
+
+    // 메인화면 숨쉬기 로직 (기존 유지)
     if (pageId === 'page-main') {
         const qrTrigger = document.getElementById('qr-trigger');
         if (qrTrigger) {
-            // 1. 애니메이션을 초기화해서 브라우저가 다시 인식하게 만듭니다.
             qrTrigger.style.animation = 'none';
-            qrTrigger.offsetHeight; // 브라우저에게 강제로 새로고침 명령 (재점화 마법)
-            
-            // 2. 로그인 상태에 맞는 애니메이션을 다시 주입합니다.
+            qrTrigger.offsetHeight;
             if (userData.isLoggedIn) {
                 qrTrigger.style.animation = "breathe 2s infinite ease-in-out";
-                
-                // 3. 촤르르 숫자 액션도 여기서 확실하게 재가동
                 const mainPointEl = document.getElementById('main-u-points');
                 if (mainPointEl) {
                     mainPointEl.innerText = "0";
@@ -1827,6 +1863,60 @@ if (guideSlider) {
         });
     });
 }
+// --- 스와이프 화면 전환 엔진 시작 ---
+let touchstartX = 0;
+let touchendX = 0;
+const tabOrder = ['page-main', 'page-history', 'page-guide', 'page-mypage'];
+
+function handleGesture() {
+    const swipeThreshold = 70;
+    const activePage = document.querySelector('.page.active');
+    if (!activePage) return;
+
+    let currentIndex = tabOrder.indexOf(activePage.id);
+    if (currentIndex === -1) return;
+
+    let nextIndex;
+
+    // 1. 왼쪽으로 스와이프 (다음 페이지로)
+    if (touchstartX - touchendX > swipeThreshold) {
+        // [무한 루프] 마지막이면 처음(0)으로, 아니면 다음(+1)으로
+        nextIndex = (currentIndex === tabOrder.length - 1) ? 0 : currentIndex + 1;
+        executePageTransition(nextIndex);
+    }
+
+    // 2. 오른쪽으로 스와이프 (이전 페이지로)
+    if (touchendX - touchstartX > swipeThreshold) {
+        // [무한 루프] 처음이면 마지막으로, 아니면 이전(-1)으로
+        nextIndex = (currentIndex === 0) ? tabOrder.length - 1 : currentIndex - 1;
+        executePageTransition(nextIndex);
+    }
+}
+
+// 부드러운 전환 실행 함수
+function executePageTransition(index) {
+    const nextPageId = tabOrder[index];
+    
+    // 탭바 아이콘 불 켜기 연동
+    const tabs = document.querySelectorAll('.tab-item');
+    if (tabs[index]) {
+        // 내역 탭은 데이터 로딩이 필요하므로 기존 함수 활용
+        if (nextPageId === 'page-history') loadActivityHistory();
+        else showPage(nextPageId);
+        
+        // 탭바 아이콘 불 켜기
+        updateTab(tabs[index]);
+    }
+}
+
+document.addEventListener('touchstart', e => {
+    touchstartX = e.changedTouches[0].screenX;
+}, {passive: true});
+
+document.addEventListener('touchend', e => {
+    touchendX = e.changedTouches[0].screenX;
+    handleGesture();
+}, {passive: true});
 </script>
 </body>
 </html>
