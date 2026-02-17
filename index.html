@@ -383,7 +383,10 @@ button[style*="background: #f8f9fa"]:active {
     padding: 0 45px;
     gap: 20px;
 }
-
+.guide-slider::after {
+    content: '';
+    flex: 0 0 45px; /* 좌측 패딩과 동일한 너비 부여 */
+}
 /* 살아있는 카드 본체 */
 .guide-card {
     flex: 0 0 calc(100vw - 100px);
@@ -428,6 +431,16 @@ button[style*="background: #f8f9fa"]:active {
     z-index: 10;
     box-shadow: 0 5px 15px rgba(0,0,0,0.2);
     letter-spacing: 1px;
+}
+.nav-close-btn {
+    cursor: pointer;
+    padding: 10px;
+    color: #adb5bd;
+    transition: all 0.2s;
+}
+.nav-close-btn:active {
+    transform: scale(0.9);
+    opacity: 0.6;
 }
 </style>
 </head>
@@ -497,8 +510,8 @@ button[style*="background: #f8f9fa"]:active {
             <img src="https://gnpay.my/log.png" style="width: 85px;">
             <div style="color:var(--primary); font-weight:900; font-size:1.4rem; letter-spacing:-0.5px; margin-left: 10px;">앱 이용 안내</div>
         </div>
-        <div class="fs-2 text-secondary" style="cursor:pointer;" onclick="showPage('page-main')">
-            <i class="bi bi-x-circle-fill" style="opacity: 0.2;"></i>
+        <div class="fs-2 text-secondary" style="cursor:pointer; padding: 10px;" onclick="showPage('page-main')">
+            <i class="bi bi-x-lg" style="font-size: 1.5rem; opacity: 0.6;"></i>
         </div>
     </div>
 
@@ -508,7 +521,6 @@ button[style*="background: #f8f9fa"]:active {
 
     <div class="guide-slider-container" id="guide-slider-scroll">
         <div class="guide-slider">
-            
             <div class="guide-card active-focus">
                 <div class="guide-step-badge">STEP 01</div>
                 <div class="guide-icon-circle" style="width:75px; height:75px; border-radius:22px; background:#e6f7f6; color:var(--primary); display:flex; align-items:center; justify-content:center; font-size:2rem; margin-bottom:20px;">
@@ -547,17 +559,25 @@ button[style*="background: #f8f9fa"]:active {
                     누구보다 빠르게 해결하세요.
                 </div>
             </div>
+        </div>
+    </div>
 
+    <div class="text-center mt-2">
+        <div class="badge rounded-pill bg-light text-dark px-3 py-2" style="font-size: 0.75rem; opacity: 0.7; border: 1px solid #eee;">
+            <i class="bi bi-arrow-left-right me-1"></i> 옆으로 밀어서 가이드 확인
         </div>
     </div>
 </div>
-    <div id="page-mypage" class="page"> 
-    <div class="top-nav" style="padding-bottom: 5px;">
+<div id="page-mypage" class="page"> 
+    <div class="top-nav" style="display: flex; justify-content: space-between; align-items: flex-start; padding: 20px 20px 5px 26px;">
         <div onclick="showPage('page-main')" style="cursor: pointer;">
             <img src="https://gnpay.my/log.png" style="width: 85px;">
         </div>
-        <div class="fs-2 text-secondary" style="cursor:pointer; padding: 10px;" onclick="showPage('page-main')">
-            <i class="bi bi-x-lg" style="font-size: 1.5rem; opacity: 0.6;"></i>
+        
+        <div class="auth-links">
+            <span class="auth-link" onclick="openEditInfo()" style="color:var(--primary); font-weight:800; font-size: 0.8rem; padding: 5px; line-height: 1;">정보수정</span>
+            <span style="color:#eee; font-size:0.7rem; line-height: 1;">|</span>
+            <span class="auth-link" onclick="logout()" style="font-size: 0.8rem; font-weight: 700; color: #888; padding: 5px; line-height: 1;">로그아웃</span>
         </div>
     </div>
     
@@ -592,23 +612,7 @@ button[style*="background: #f8f9fa"]:active {
             </div>
         </div>
 
-        <div class="mt-3" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-            <div class="menu-item" onclick="openEditInfo()" style="background: white; border: 1px solid #eee; padding: 18px 10px; border-radius: 24px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.02);">
-                <i class="bi bi-person-gear" style="font-size: 1.5rem; color: var(--primary); margin-bottom: 4px;"></i>
-                <div class="menu-title" style="color: #444; font-weight: 800; font-size: 0.85rem;">정보 수정</div>
-            </div>
-            <div class="menu-item" onclick="loadActivityHistory()" style="background: white; border: 1px solid #eee; padding: 18px 10px; border-radius: 24px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.02);">
-                <i class="bi bi-clock-history" style="font-size: 1.5rem; color: var(--primary); margin-bottom: 4px;"></i>
-                <div class="menu-title" style="color: #444; font-weight: 800; font-size: 0.85rem;">활동 내역</div>
-            </div>
-        </div>
-
-        <div class="mt-4 mb-5 text-center" style="padding-bottom: 40px;">
-            <button class="btn" onclick="logout()" style="color: #aaa; font-size: 0.8rem; font-weight: 600; text-decoration: underline; background: none; border: none;">
-                로그아웃
-            </button>
-            <div class="mt-2 opacity-30" style="letter-spacing: 2px; font-size: 0.6rem; color: #000; font-weight: 700;">GIMNYEONG PAY 2.0</div>
-        </div>
+   
     </div>
 </div>
 
@@ -1007,11 +1011,9 @@ function updateTab(element) {
         let html5QrCode;
 
 function showPage(pageId) {
-    // 1. [순서 변경] 데이터부터 최신으로 읽어옵니다 (이름 누락 방지 핵심)
     const saved = localStorage.getItem('gnpay_user');
     if (saved) userData = JSON.parse(saved);
 
-    // 2. [원본 유지] 로그인 검문 로직
     if (!userData.isLoggedIn && 
         pageId !== 'page-main' && 
         pageId !== 'page-partners' && 
@@ -1022,33 +1024,40 @@ function showPage(pageId) {
         pageId = 'page-login'; 
     }
 
-    // 3. [핵심 추가] 마이페이지 진입 시 이름 강제 주입
-    if (pageId === 'page-mypage') {
-        setTimeout(() => {
-            const nameEl = document.getElementById('mypage-user-name');
-            if (nameEl && userData.name) {
-                nameEl.innerText = userData.name; // '사용자'가 나올 틈을 안 줌
-            }
-        }, 10);
-    }
-
-    // 4. [원본 유지] 페이지 전환 및 스크롤 상단 이동
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     const target = document.getElementById(pageId);
     if(target) target.classList.add('active');
     window.scrollTo(0, 0);
 
-    // 5. [추가] 하단바 아이콘 동기화 (불 켜기)
+    // [촤르르 복구 핵심] 페이지 진입 시 숫자 초기화 후 애니메이션 재가동
+    if (userData.isLoggedIn) {
+        if (pageId === 'page-main') {
+            const mainPointEl = document.getElementById('main-u-points');
+            if (mainPointEl) {
+                mainPointEl.innerText = "0"; // 초기화
+                setTimeout(() => {
+                    animateValue('main-u-points', 0, Number(userData.points || 0), 1000);
+                }, 100);
+            }
+        }
+        if (pageId === 'page-mypage') {
+            const myPointEl = document.getElementById('my-u-points');
+            if (myPointEl) {
+                myPointEl.innerText = "0"; // 초기화
+                setTimeout(() => {
+                    const nameEl = document.getElementById('mypage-user-name');
+                    if (nameEl) nameEl.innerText = userData.name;
+                    animateValue('my-u-points', 0, Number(userData.points || 0), 1000);
+                }, 100);
+            }
+        }
+    }
+
     if (typeof syncTabBar === 'function') syncTabBar(pageId);
 
-    // 6. [원본 유지] 하단바 표시/숨김 제어
     const tabBar = document.querySelector('.floating-tab-bar');
     if (tabBar) {
-        if (pageId === 'page-login' || pageId === 'page-signup') {
-            tabBar.style.display = 'none';
-        } else {
-            tabBar.style.display = 'flex';
-        }
+        tabBar.style.display = (pageId === 'page-login' || pageId === 'page-signup') ? 'none' : 'flex';
     }
 }
 function updateUI() {
