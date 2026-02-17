@@ -106,24 +106,28 @@
     .history-img { width: 100%; max-height: 180px; object-fit: cover; border-radius: 12px; margin-top: 8px; border: 1px solid #eee; display: block; }
     .history-content { font-size: 0.8rem; color: #555; background: #f8f9fa; padding: 10px; border-radius: 10px; margin-top: 8px; }
 
-  .page { 
-    display: none; 
-    width: 100%; 
-    min-height: 100vh; 
-    position: absolute; 
-    top: 0; 
-    left: 0; 
-    background: var(--bg-grad); 
-    z-index: 1;
-    /* [핵심] 하단바 높이(60px) + 여유공간(40px)을 더해서 바닥 여백을 넉넉히 줍니다 */
-    padding-bottom: 120px !important; 
+.page {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    opacity: 0;
+    pointer-events: none; /* 안 보일 땐 클릭 안 되게 */
+    transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.4s ease;
 }
 
-.page.active { 
-    display: block !important; 
-    z-index: 100; 
+.page.active {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+    pointer-events: auto;
+    z-index: 100;
 }
-
+.page-next {
+    transform: scale(0.9) translateX(100%);
+    opacity: 0;
+}
+.from-left { transform: translateX(-100%); }
+.from-right { transform: translateX(100%); }
 /* 탭바가 가리는 현상 방지용 바닥 여백 */
 #page-main, #page-mypage, #page-history, #page-activities, #page-guide, #page-partners {
     padding-bottom: 150px !important; 
@@ -1041,74 +1045,50 @@ function showPage(pageId) {
     const saved = localStorage.getItem('gnpay_user');
     if (saved) userData = JSON.parse(saved);
 
-    // 로그인 체크 로직 (기존 유지)
-    if (!userData.isLoggedIn && 
-        pageId !== 'page-main' && 
-        pageId !== 'page-partners' && 
-        pageId !== 'page-guide' && 
-        pageId !== 'page-login' && 
-        pageId !== 'page-signup'
-    ) {
-        pageId = 'page-login'; 
-    }
+    const allPages = document.querySelectorAll('.page');
+    const currentPage = document.querySelector('.page.active');
+    const targetPage = document.getElementById(pageId);
 
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    const target = document.getElementById(pageId);
-    if(target) target.classList.add('active');
+    if (!targetPage || currentPage === targetPage) return;
+
+    // 1. 방향 결정 (스와이프 시 시각적 일치감을 위해)
+    const order = ['page-main', 'page-history', 'page-guide', 'page-mypage'];
+    const curIdx = order.indexOf(currentPage?.id || "");
+    const nextIdx = order.indexOf(pageId);
+
+    // 들어올 방향 설정
+    allPages.forEach(p => {
+        p.classList.remove('from-left', 'from-right');
+        if (p !== targetPage) {
+            if (nextIdx > curIdx) p.classList.add('from-right');
+            else p.classList.add('from-left');
+        }
+    });
+
+    // 2. 페이지 교체 액션
+    if (currentPage) currentPage.classList.remove('active');
+    
+    // 약간의 시간차를 줘서 애니메이션이 씹히지 않게 함
+    setTimeout(() => {
+        targetPage.classList.add('active');
+    }, 10);
+
     window.scrollTo(0, 0);
 
-    // [핵심 추가] 마이페이지 진입 시 데이터 강제 주입 엔진
+    // [데이터 주입 로직 유지]
     if (pageId === 'page-mypage' && userData.isLoggedIn) {
         setTimeout(() => {
-            // 1. 이름 박기
             const nameEl = document.getElementById('mypage-user-name');
             if (nameEl) nameEl.innerText = userData.name || "사용자";
-
-            // 2. 포인트 촤르르 가동
-            const pointEl = document.getElementById('my-u-points');
-            if (pointEl) {
-                const targetPoints = Number(userData.points || 0);
-                animateValue('my-u-points', 0, targetPoints, 1000);
-            }
-
-            // 3. QR 이미지 로드
+            animateValue('my-u-points', 0, Number(userData.points || 0), 1000);
             const qrImg = document.getElementById('my-qr-img');
-            if (qrImg && userData.uid) {
-                qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${userData.uid}`;
-            }
-            
-            // 4. 타이머가 있다면 여기서 같이 시동 (나중에 타이머 넣으실 때 쓰세요)
-            if (typeof startQRTimer === 'function') startQRTimer();
-        }, 50);
+            if (qrImg && userData.uid) qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${userData.uid}`;
+        }, 100);
     }
 
-    // 메인화면 숨쉬기 로직 (기존 유지)
-    if (pageId === 'page-main') {
-        const qrTrigger = document.getElementById('qr-trigger');
-        if (qrTrigger) {
-            qrTrigger.style.animation = 'none';
-            qrTrigger.offsetHeight;
-            if (userData.isLoggedIn) {
-                qrTrigger.style.animation = "breathe 2s infinite ease-in-out";
-                const mainPointEl = document.getElementById('main-u-points');
-                if (mainPointEl) {
-                    mainPointEl.innerText = "0";
-                    setTimeout(() => {
-                        animateValue('main-u-points', 0, Number(userData.points || 0), 1000);
-                    }, 50);
-                }
-            } else {
-                qrTrigger.style.animation = "login-glow 2s infinite ease-in-out";
-            }
-        }
-    }
-
-    if (typeof syncTabBar === 'function') syncTabBar(pageId);
-
+    // 하단바 보임/숨김 제어
     const tabBar = document.querySelector('.floating-tab-bar');
-    if (tabBar) {
-        tabBar.style.display = (pageId === 'page-login' || pageId === 'page-signup') ? 'none' : 'flex';
-    }
+    if (tabBar) tabBar.style.display = (pageId === 'page-login' || pageId === 'page-signup') ? 'none' : 'flex';
 }
 function updateUI() {
     const authArea = document.getElementById('auth-area');
