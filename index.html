@@ -106,29 +106,32 @@
     .history-img { width: 100%; max-height: 180px; object-fit: cover; border-radius: 12px; margin-top: 8px; border: 1px solid #eee; display: block; }
     .history-content { font-size: 0.8rem; color: #555; background: #f8f9fa; padding: 10px; border-radius: 10px; margin-top: 8px; }
 
-/* [교체] 페이지 기본 위치 설정 */
 .page {
-    position: absolute; /* 모든 페이지를 한 자리에 겹쳐둠 */
+    position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     opacity: 0;
-    pointer-events: none; /* 안 보일 땐 터치 무시 */
-    transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.5s ease;
-    display: block !important; /* display: none을 쓰면 애니메이션이 안 먹히므로 상시 노출 */
+    pointer-events: none; /* 안 보일 땐 클릭 안 되게 */
+    transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.4s ease;
 }
 
-/* [교체] 활성화된 페이지: 정중앙 */
 .page.active {
     opacity: 1;
     transform: translateX(0) scale(1);
     pointer-events: auto;
     z-index: 100;
 }
-
-/* [추가] 대기실 방향 설정 */
+.page-next {
+    transform: scale(0.9) translateX(100%);
+    opacity: 0;
+}
 .from-left { transform: translateX(-100%); }
 .from-right { transform: translateX(100%); }
+/* 탭바가 가리는 현상 방지용 바닥 여백 */
+#page-main, #page-mypage, #page-history, #page-activities, #page-guide, #page-partners {
+    padding-bottom: 150px !important; 
+}
     .active { display: block !important; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -347,36 +350,19 @@ button[style*="background: #f8f9fa"]:active {
     background-color: #e9ecef !important;
 }
 /* 모든 페이지 기본 상태: 살짝 아래에 있고 투명함 */
-/* --- [교체] 페이지 전환 스타일 정예 멤버 --- */
-/* --- [수정] 페이지 전환 엔진 단일화 --- */
 .page {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
+    display: none;
     opacity: 0;
-    pointer-events: none;
-    /* transition 시간을 0.6s로 늘리고 cubic-bezier를 줘서 '쫀득함'을 만듭니다 */
-    transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.5s ease;
-    will-change: transform, opacity;
-    display: block !important; /* display: none을 쓰면 애니메이션이 씹힙니다 */
+    transform: translateY(15px); /* 살짝 아래에서 대기 */
+    transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-/* 활성화된 페이지: 정중앙 */
+/* 활성화된 페이지: 제자리로 오면서 선명해짐 */
 .page.active {
-    opacity: 1 !important;
-    transform: translateX(0) scale(1) !important;
-    pointer-events: auto;
-    z-index: 100;
-}
-
-/* 대기실: 옆에서 대기 중인 상태 */
-.from-left { transform: translateX(-100%); opacity: 0; }
-.from-right { transform: translateX(100%); opacity: 0; }
-
-/* 탭바 여백 (유지) */
-#page-main, #page-mypage, #page-history, #page-activities, #page-guide, #page-partners {
-    padding-bottom: 150px !important; 
+    display: block !important;
+    opacity: 1;
+    transform: translateY(0);
+    animation: pageIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 @keyframes pageIn {
@@ -385,35 +371,34 @@ button[style*="background: #f8f9fa"]:active {
 }
 /* 안내 페이지 카드 슬라이더 스타일 */
 /* 컨테이너: 배지가 튀어나올 공간을 위해 padding-top을 충분히(40px) 줍니다 */
-/* [교체] 수직형 가이드 엔진 */
 .guide-slider-container {
     width: 100%;
-    height: 450px; /* 고정 높이 부여 */
-    overflow-y: auto; /* 세로 스크롤로 변경 */
-    scroll-snap-type: y mandatory; /* 세로 방향 자석 효과 */
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
-    padding: 20px 0;
+    padding: 40px 0 60px; /* 위아래 여백을 줘서 배지 안 잘리게 함 */
     scrollbar-width: none;
-    display: block; /* 플렉스 해제 */
+    display: flex;
 }
 .guide-slider-container::-webkit-scrollbar { display: none; }
 
 .guide-slider {
     display: flex;
-    flex-direction: column; /* 세로 정렬 */
-    align-items: center;
-    gap: 30px; /* 카드 간격 */
-    padding: 0 20px 100px; /* 아래쪽 여유 공간 */
+    padding: 0 45px;
+    gap: 20px;
 }
-
-/* 살아있는 수직 카드 */
+.guide-slider::after {
+    content: '';
+    flex: 0 0 45px; /* 좌측 패딩과 동일한 너비 부여 */
+}
+/* 살아있는 카드 본체 */
 .guide-card {
-    flex: 0 0 350px; /* 카드의 세로 높이 고정 */
-    width: 90%; /* 가로 너비 */
+    flex: 0 0 calc(100vw - 100px);
     scroll-snap-align: center;
     background: white;
     border-radius: 40px;
-    padding: 40px 25px;
+    padding: 50px 25px 35px;
+    /* 카드가 살아있는 것처럼 보이게 하는 깊은 그림자 */
     box-shadow: 0 10px 30px rgba(0,0,0,0.05);
     border: 1px solid rgba(1, 178, 173, 0.1);
     display: flex;
@@ -421,28 +406,35 @@ button[style*="background: #f8f9fa"]:active {
     align-items: center;
     text-align: center;
     position: relative;
+    /* 쫀득한 움직임 설정 */
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    transform: scale(0.9);
-    opacity: 0.5;
+    transform: scale(0.9); /* 평소에는 살짝 작게 */
+    opacity: 0.5; /* 평소에는 흐릿하게 */
 }
 
-/* 중앙(포커스)에 왔을 때 효과 */
+/* 중앙에 왔을 때 살아나는 효과 */
 .guide-card.active-focus {
-    transform: scale(1.02);
+    transform: scale(1.05); /* 중앙에서 쫀득하게 커짐 */
     opacity: 1;
     box-shadow: 0 20px 40px rgba(1, 178, 173, 0.15);
     border: 1px solid rgba(1, 178, 173, 0.3);
 }
 
+/* 스텝 배지: 카드 경계선에 반쯤 걸치게 (절대 안 잘림) */
 .guide-step-badge {
     position: absolute;
-    top: -15px;
+    top: -18px; /* 카드 밖으로 18px 튀어나감 */
+    left: 50%;
+    transform: translateX(-50%);
     background: #1a1a1a;
     color: #fff;
-    padding: 5px 20px;
-    border-radius: 50px;
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     font-weight: 900;
+    padding: 7px 20px;
+    border-radius: 50px;
+    z-index: 10;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    letter-spacing: 1px;
 }
 .nav-close-btn {
     cursor: pointer;
@@ -584,11 +576,10 @@ button[style*="background: #f8f9fa"]:active {
         </div>
     </div>
 
-<div class="text-center mt-2">
-    <div class="badge rounded-pill bg-light text-dark px-3 py-2" style="font-size: 0.75rem; opacity: 0.7; border: 1px solid #eee;">
-        <i class="bi bi-arrow-up-down me-1"></i> 위아래로 밀어서 다음 단계 확인
-    </div>
-</div>
+    <div class="text-center mt-2">
+        <div class="badge rounded-pill bg-light text-dark px-3 py-2" style="font-size: 0.75rem; opacity: 0.7; border: 1px solid #eee;">
+            <i class="bi bi-arrow-left-right me-1"></i> 옆으로 밀어서 가이드 확인
+        </div>
     </div>
 </div>
 <div id="page-mypage" class="page"> 
@@ -654,8 +645,8 @@ button[style*="background: #f8f9fa"]:active {
         <h1 class="fw-bolder mb-4" style="line-height: 1.2;">반가워요!<br><strong>로그인 해주세요</strong></h1>
         
         <div class="mt-5"> 
-            <input type="email" id="login-email" class="form-control custom-input" placeholder="이메일">
-            <input type="password" id="login-pw" class="form-control custom-input" placeholder="비밀번호">
+<input type="email" id="login-email" class="form-control custom-input" placeholder="이메일" disabled>
+<input type="password" id="login-pw" class="form-control custom-input" placeholder="비밀번호" disabled>
             
             <div class="d-flex justify-content-between align-items-center px-1 mb-4" style="margin-top: -5px;">
                 <div class="form-check d-flex align-items-center gap-2">
@@ -1052,38 +1043,44 @@ function updateTab(element) {
 
 function showPage(pageId) {
     const allPages = document.querySelectorAll('.page');
-    const currentPage = document.querySelector('.page.active');
     const targetPage = document.getElementById(pageId);
+    const currentPage = document.querySelector('.page.active');
 
     if (!targetPage || currentPage === targetPage) return;
 
-    // 1. 순서 계산 (홈-내역-안내-내정보)
+    // 1. [페이스아이디 방지] 모든 input 일단 잠그기
+    document.querySelectorAll('input, select, textarea').forEach(el => el.disabled = true);
+
+    // 2. 방향 계산
     const order = ['page-main', 'page-history', 'page-guide', 'page-mypage'];
     const curIdx = order.indexOf(currentPage?.id || "");
     const nextIdx = order.indexOf(pageId);
 
-    // 2. 들어올 방향 미리 세팅
-    targetPage.classList.remove('active', 'from-left', 'from-right');
-    if (nextIdx > curIdx) {
-        targetPage.classList.add('from-right'); // 오른쪽에서 대기
-    } else {
-        targetPage.classList.add('from-left');  // 왼쪽에서 대기
+    // 3. 페이지 전환 실행
+    if (currentPage) {
+        currentPage.classList.remove('active');
+        // 가야할 방향 반대쪽으로 밀어내기
+        currentPage.style.transform = nextIdx > curIdx ? 'translateX(-100%)' : 'translateX(100%)';
+        currentPage.style.opacity = '0';
     }
 
-    // 3. 애니메이션 실행 (브라우저가 위치를 인지할 시간을 줌)
+    // 4. 타겟 페이지 등장
+    targetPage.style.transition = 'none'; // 등장할 땐 애니메이션 없이 위치 먼저 잡기
+    targetPage.style.transform = nextIdx > curIdx ? 'translateX(100%)' : 'translateX(-100%)';
+    
     requestAnimationFrame(() => {
-        if (currentPage) {
-            // 현재 페이지는 반대 방향으로 밀어냄
-            currentPage.classList.remove('active');
-            currentPage.classList.add(nextIdx > curIdx ? 'from-left' : 'from-right');
-        }
-        targetPage.classList.remove('from-left', 'from-right');
-        targetPage.classList.add('active'); // 중앙으로 입성
+        targetPage.style.transition = 'transform 0.5s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.4s ease';
+        targetPage.classList.add('active');
+        targetPage.style.transform = 'translateX(0)';
+        targetPage.style.opacity = '1';
+
+        // 5. [중요] 현재 페이지의 input들만 잠금 해제 (이러면 페이스아이디 안 뜸)
+        targetPage.querySelectorAll('input, select, textarea').forEach(el => el.disabled = false);
     });
 
     window.scrollTo(0, 0);
     
-    // 하단바 제어
+    // 탭바/배지 업데이트 등 기존 로직...
     const tabBar = document.querySelector('.floating-tab-bar');
     if (tabBar) tabBar.style.display = (pageId === 'page-login' || pageId === 'page-signup') ? 'none' : 'flex';
 }
@@ -1823,16 +1820,16 @@ if (guideSlider) {
     guideSlider.addEventListener('scroll', () => {
         const cards = guideSlider.querySelectorAll('.guide-card');
         const containerRect = guideSlider.getBoundingClientRect();
-        // 기준점을 세로 중앙으로 변경
-        const containerCenter = containerRect.top + containerRect.height / 2;
+        const containerCenter = containerRect.left + containerRect.width / 2;
 
         cards.forEach((card) => {
             const cardRect = card.getBoundingClientRect();
-            const cardCenter = cardRect.top + cardRect.height / 2;
+            const cardCenter = cardRect.left + cardRect.width / 2;
             
+            // 카드의 중심이 컨테이너의 중심과 가까워지면(오차범위 내) 활성화
             const distance = Math.abs(containerCenter - cardCenter);
             
-            if (distance < 150) { // 중앙 기준 150px 이내면 활성화
+            if (distance < 100) { // 중앙 기준 100px 이내로 들어오면
                 card.classList.add('active-focus');
             } else {
                 card.classList.remove('active-focus');
@@ -1848,24 +1845,22 @@ const tabOrder = ['page-main', 'page-history', 'page-guide', 'page-mypage'];
 function handleGesture() {
     const swipeThreshold = 70;
     const activePage = document.querySelector('.page.active');
-    if (!activePage) return;
+    
+    // 팝업 열려있으면 중단
+    if (document.getElementById('qr-focus-layer').style.display === 'flex' || 
+        document.getElementById('scanner-modal').style.display === 'block') return;
 
-    let currentIndex = tabOrder.indexOf(activePage.id);
+    let currentIndex = tabOrder.indexOf(activePage?.id);
     if (currentIndex === -1) return;
 
-    let nextIndex;
-
-    // 1. 왼쪽으로 스와이프 (다음 페이지로)
+    // 왼쪽 스와이프 (다음)
     if (touchstartX - touchendX > swipeThreshold) {
-        // [무한 루프] 마지막이면 처음(0)으로, 아니면 다음(+1)으로
-        nextIndex = (currentIndex === tabOrder.length - 1) ? 0 : currentIndex + 1;
+        let nextIndex = (currentIndex + 1) % tabOrder.length;
         executePageTransition(nextIndex);
     }
-
-    // 2. 오른쪽으로 스와이프 (이전 페이지로)
-    if (touchendX - touchstartX > swipeThreshold) {
-        // [무한 루프] 처음이면 마지막으로, 아니면 이전(-1)으로
-        nextIndex = (currentIndex === 0) ? tabOrder.length - 1 : currentIndex - 1;
+    // 오른쪽 스와이프 (이전)
+    else if (touchendX - touchstartX > swipeThreshold) {
+        let nextIndex = (currentIndex - 1 + tabOrder.length) % tabOrder.length;
         executePageTransition(nextIndex);
     }
 }
