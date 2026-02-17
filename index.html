@@ -10,12 +10,11 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
    <script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.1/dist/browser-image-compression.js"></script>
    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-   <link rel="apple-touch-icon" href="https://gnpay.my/log.png">
-   <meta name="apple-mobile-web-app-capable" content="yes">
-   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-   <meta name="theme-color" content="#e6f7f6"> 
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-   <link rel="shortcut icon" href="https://gnpay.my/log.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<link rel="apple-touch-icon" href="https://gnpay.my/log.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"> <meta name="theme-color" content="#e6f7f6"> 
+<link rel="shortcut icon" href="https://gnpay.my/log.png">
   <style>
     @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
     :root { --primary: #01b2ad; --primary-grad: linear-gradient(135deg, #01b2ad 0%, #00d2ff 100%); --bg-grad: linear-gradient(180deg, #e6f7f6 0%, #f8fcfc 40%, #ffffff 100%); }
@@ -151,10 +150,10 @@
     cursor: pointer;
 }
 
-.btn-scan:active {
-    transform: scale(0.95);
+.btn-scan:active, .btn-scan-popup:active {
+    transform: scale(0.92) !important;
     filter: brightness(1.1);
-    box-shadow: 0 5px 10px rgba(1, 178, 173, 0.3);
+    transition: transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
     .form-label { font-size: 0.8rem; font-weight: 700; color: #666; margin-left: 5px; margin-bottom: 5px; }
 .activity-badge {
@@ -178,21 +177,25 @@
 }
 /* 팝업 배경 - 아이폰 스타일 유리창 효과 */
 .qr-glass-effect {
-    background: rgba(255, 255, 255, 0.4) !important; /* 투명한 흰색 */
-    backdrop-filter: blur(15px) saturate(180%); /* 배경 흐리게 */
-    -webkit-backdrop-filter: blur(15px) saturate(180%);
+    background: rgba(255, 255, 255, 0.4) !important; 
+    backdrop-filter: blur(15px) saturate(180%) !important; /* 뒷배경 흐림 효과 */
+    -webkit-backdrop-filter: blur(15px) saturate(180%) !important;
+    transition: all 0.3s ease;
 }
 
 /* 팝업 카드 - 아래에서 위로 스르륵 */
 .qr-slide-up {
-    animation: qrSlideUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    animation: luxurySlideUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 
 @keyframes qrSlideUp {
     from { transform: translateY(100px); opacity: 0; }
     to { transform: translateY(0); opacity: 1; }
 }
-
+@keyframes luxurySlideUp {
+    from { transform: translateY(100px) scale(0.9); opacity: 0; }
+    to { transform: translateY(0) scale(1); opacity: 1; }
+}
 /* 숫자 밑에 은은한 그림자 */
 #focus-points {
     text-shadow: 0 10px 20px rgba(1, 178, 173, 0.2);
@@ -221,6 +224,7 @@
     z-index: 9999 !important;
     border: 1px solid rgba(255, 255, 255, 0.4);
     padding: 0 10px;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* 이 줄을 추가! */
 }
 
 /* 2. 아이콘 스타일: 텍스트는 빼고 아이콘만 강조 (미니멀리즘) */
@@ -321,6 +325,110 @@
     background: #f0f5f5;
     color: #888;
 }
+.bottom-nav {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* 슥 내려가는 효과 */
+    /* 기존 스타일들... */
+}
+/* 1. 모든 버튼 및 클릭 요소에 쫀득함 부여 */
+button, .btn, .menu-item, .dashboard-card, .tab-item, .auth-link {
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.2s ease !important;
+}
+
+/* 2. 누르는 순간(active) 반응 정의 */
+button:active, .btn:active, .menu-item:active, .dashboard-card:active, .tab-item:active, .auth-link:active {
+    transform: scale(0.94) !important; /* 6% 정도 슥 눌리는 맛 */
+    filter: brightness(1.1) !important; /* 살짝 반짝하는 효과 */
+}
+
+/* 3. 취소 버튼 같은 회색 버튼 전용 (조금 더 깊게 눌리는 느낌) */
+button[style*="background: #f8f9fa"]:active {
+    transform: scale(0.92) !important;
+    background-color: #e9ecef !important;
+}
+/* 모든 페이지 기본 상태: 살짝 아래에 있고 투명함 */
+.page {
+    display: none;
+    opacity: 0;
+    transform: translateY(15px); /* 살짝 아래에서 대기 */
+    transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* 활성화된 페이지: 제자리로 오면서 선명해짐 */
+.page.active {
+    display: block !important;
+    opacity: 1;
+    transform: translateY(0);
+    animation: pageIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes pageIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+/* 안내 페이지 카드 슬라이더 스타일 */
+/* 컨테이너: 배지가 튀어나올 공간을 위해 padding-top을 충분히(40px) 줍니다 */
+.guide-slider-container {
+    width: 100%;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    padding: 40px 0 60px; /* 위아래 여백을 줘서 배지 안 잘리게 함 */
+    scrollbar-width: none;
+    display: flex;
+}
+.guide-slider-container::-webkit-scrollbar { display: none; }
+
+.guide-slider {
+    display: flex;
+    padding: 0 45px;
+    gap: 20px;
+}
+
+/* 살아있는 카드 본체 */
+.guide-card {
+    flex: 0 0 calc(100vw - 100px);
+    scroll-snap-align: center;
+    background: white;
+    border-radius: 40px;
+    padding: 50px 25px 35px;
+    /* 카드가 살아있는 것처럼 보이게 하는 깊은 그림자 */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    border: 1px solid rgba(1, 178, 173, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    /* 쫀득한 움직임 설정 */
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform: scale(0.9); /* 평소에는 살짝 작게 */
+    opacity: 0.5; /* 평소에는 흐릿하게 */
+}
+
+/* 중앙에 왔을 때 살아나는 효과 */
+.guide-card.active-focus {
+    transform: scale(1.05); /* 중앙에서 쫀득하게 커짐 */
+    opacity: 1;
+    box-shadow: 0 20px 40px rgba(1, 178, 173, 0.15);
+    border: 1px solid rgba(1, 178, 173, 0.3);
+}
+
+/* 스텝 배지: 카드 경계선에 반쯤 걸치게 (절대 안 잘림) */
+.guide-step-badge {
+    position: absolute;
+    top: -18px; /* 카드 밖으로 18px 튀어나감 */
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1a1a1a;
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 900;
+    padding: 7px 20px;
+    border-radius: 50px;
+    z-index: 10;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    letter-spacing: 1px;
+}
 </style>
 </head>
 <body>
@@ -343,7 +451,7 @@
                 <div class="amount-text user-points-display" id="focus-points" style="font-size: 2.7rem; font-weight: 900; color: var(--primary);">0</div>
                 <div class="small text-muted fw-bold" style="opacity: 0.6; letter-spacing: 1px;">나의 에코 포인트</div>
             </div>
-            <button class="btn mt-4 w-100 rounded-pill fw-bold" style="background: #f1f3f5; color: #666; padding: 12px;" onclick="document.getElementById('qr-focus-layer').style.display='none'">닫기</button>
+            <button class="btn mt-4 w-100 rounded-pill fw-bold" style="background: #f1f3f5; color: #666; padding: 12px;" onclick="closeQR()">닫기</button>
         </div>
     </div>
 
@@ -381,50 +489,68 @@
                 <div class="menu-title">앱사용 안내</div>
             </div>
         </div>
-    </div> <div id="page-guide" class="page">
+    </div> 
+    
+    <div id="page-guide" class="page">
     <div class="top-nav">
         <div onclick="showPage('page-main')" style="cursor: pointer;">
-            <img src="https://gnpay.my/log.png" style="width: 85px; margin-bottom: 8px;">
-            <div style="color:var(--primary); font-weight:900; font-size:1.4rem; letter-spacing:-0.5px; margin-bottom: 5px; margin-left: 10px;">앱 사용 안내</div>
+            <img src="https://gnpay.my/log.png" style="width: 85px;">
+            <div style="color:var(--primary); font-weight:900; font-size:1.4rem; letter-spacing:-0.5px; margin-left: 10px;">앱 이용 안내</div>
         </div>
-        <div class="fs-2 text-secondary" style="cursor:pointer; padding: 10px;" onclick="showPage('page-main')">
-            <i class="bi bi-x-lg" style="font-size: 1.5rem; opacity: 0.6;"></i>
-        </div>
-    </div>
-
-    <div class="pb-4" style="padding-left: 35px; padding-right: 25px;">
-        <h1 class="fw-bolder mt-2" style="font-size: calc(1.375rem + 1.5vw); line-height: 1.2;">쉽고 빠르게<br><strong>이용 가이드를 확인하세요</strong></h1>
-    </div>
-
-  <div style="padding-left: 20px; padding-right: 20px;">
-    <div class="dashboard-card mb-3" style="padding: 22px; flex-direction: column; align-items: flex-start; animation: none; border-left: 5px solid var(--primary); margin: 0 0 15px 0; width: 100%;">
-        <div class="fw-bold" style="font-size: 1.1rem; color: var(--primary);">🌱 지구를 구하고 포인트를 쌓으세요</div>
-        <div class="small text-muted mt-2" style="line-height: 1.6;">
-            <strong>1. 활동 선택:</strong> 메인 화면의 '정화 활동' 메뉴에서 현재 참여 가능한 플로깅이나 환경 정화 미션을 확인하세요.<br>
-            <strong>2. 현장 인증:</strong> 활동 중인 모습이나 수거한 쓰레기 사진을 <strong>최대 3장</strong>까지 촬영하여 업로드합니다.<br>
-            <strong>3. 포인트 지급:</strong> 관리자가 정성스러운 활동을 확인하면 즉시 포인트가 적립됩니다. (신청 내역에서 상태 확인 가능)
-        </div>
-    </div>
-    
-    <div class="dashboard-card mb-3" style="padding: 22px; flex-direction: column; align-items: flex-start; animation: none; border-left: 5px solid #ffcc00; margin: 0 0 15px 0; width: 100%;">
-        <div class="fw-bold" style="font-size: 1.1rem; color: #d4a017;">🛍️ 김녕 어디서든 현금처럼 쓰세요</div>
-        <div class="small text-muted mt-2" style="line-height: 1.6;">
-            <strong>1. 가맹점 찾기:</strong> '포인트 사용처' 메뉴에서 김녕의 카페, 식당, 체험 센터를 미리 확인하세요.<br>
-            <strong>2. QR 결제:</strong> 하단 탭바 중앙의 <strong>[QR 스캔]</strong> 버튼을 누르고 매장에 비치된 코드를 촬영하세요.<br>
-            <strong>3. 결제 완료:</strong> 별도의 현금이나 카드 없이 보유하신 에코 포인트로 즉시 결제가 진행됩니다.
+        <div class="fs-2 text-secondary" style="cursor:pointer;" onclick="showPage('page-main')">
+            <i class="bi bi-x-circle-fill" style="opacity: 0.2;"></i>
         </div>
     </div>
 
-    <div class="dashboard-card mb-3" style="padding: 22px; flex-direction: column; align-items: flex-start; animation: none; border-left: 5px solid #00d2ff; margin: 0 0 15px 0; width: 100%;">
-        <div class="fw-bold" style="font-size: 1.1rem; color: #0099cc;">📱 나만의 스마트한 에코 라이프</div>
-        <div class="small text-muted mt-2" style="line-height: 1.6;">
-            <strong>- QR 체크인:</strong> 마이페이지의 '나의 QR'을 제시하면 가맹점 입장이 더욱 빨라집니다.<br>
-            <strong>- 실시간 동기화:</strong> 내 포인트는 5초마다 실시간으로 업데이트되어 안전하게 보호됩니다.<br>
-            <strong>- 정보 수정:</strong> 전화번호가 바뀌거나 비밀번호 변경이 필요할 땐 '내 정보 수정'을 이용하세요.
+    <div class="pb-2" style="padding-left: 35px; padding-right: 25px;">
+        <h1 class="fw-bolder mt-2" style="font-size: 1.8rem; line-height: 1.2; letter-spacing: -1.5px;">김녕페이<br><strong>사용 가이드</strong></h1>
+    </div>
+
+    <div class="guide-slider-container" id="guide-slider-scroll">
+        <div class="guide-slider">
+            
+            <div class="guide-card active-focus">
+                <div class="guide-step-badge">STEP 01</div>
+                <div class="guide-icon-circle" style="width:75px; height:75px; border-radius:22px; background:#e6f7f6; color:var(--primary); display:flex; align-items:center; justify-content:center; font-size:2rem; margin-bottom:20px;">
+                    <i class="bi bi-tree-fill"></i>
+                </div>
+                <h4 style="font-weight:900; letter-spacing:-1px; margin-bottom:12px;">에코 포인트 적립</h4>
+                <div class="step-desc" style="color:#666; font-size:0.95rem; line-height:1.7;">
+                    김녕 성세기 해변 정화 후<br>
+                    <strong>활동 사진</strong>을 인증하면<br>
+                    에코 포인트가 즉시 지급됩니다.
+                </div>
+            </div>
+
+            <div class="guide-card">
+                <div class="guide-step-badge">STEP 02</div>
+                <div class="guide-icon-circle" style="width:75px; height:75px; border-radius:22px; background:#fff9e6; color:#d4a017; display:flex; align-items:center; justify-content:center; font-size:2rem; margin-bottom:20px;">
+                    <i class="bi bi-bag-heart-fill"></i>
+                </div>
+                <h4 style="font-weight:900; letter-spacing:-1px; margin-bottom:12px;">마을 가맹점 사용</h4>
+                <div class="step-desc" style="color:#666; font-size:0.95rem; line-height:1.7;">
+                    적립된 포인트는 김녕 마을의<br>
+                    <strong>카페, 식당, 체험처</strong>에서<br>
+                    현금처럼 자유롭게 사용하세요.
+                </div>
+            </div>
+
+            <div class="guide-card">
+                <div class="guide-step-badge">STEP 03</div>
+                <div class="guide-icon-circle" style="width:75px; height:75px; border-radius:22px; background:#eefbff; color:#0099cc; display:flex; align-items:center; justify-content:center; font-size:2rem; margin-bottom:20px;">
+                    <i class="bi bi-qr-code-scan"></i>
+                </div>
+                <h4 style="font-weight:900; letter-spacing:-1px; margin-bottom:12px;">스마트 체크인</h4>
+                <div class="step-desc" style="color:#666; font-size:0.95rem; line-height:1.7;">
+                    마이페이지 <strong>나의 QR</strong>로<br>
+                    가맹점 입장과 본인 확인을<br>
+                    누구보다 빠르게 해결하세요.
+                </div>
+            </div>
+
         </div>
     </div>
-</div></div>
-
+</div>
     <div id="page-mypage" class="page"> 
     <div class="top-nav" style="padding-bottom: 5px;">
         <div onclick="showPage('page-main')" style="cursor: pointer;">
@@ -446,9 +572,9 @@
             </div>
 
             <div class="qr-integration-box" style="margin-bottom: 30px; display: inline-block;">
-                <div class="qr-top-logo" style="border: 3px solid #fff; width: 55px; height: 55px; background: var(--primary) !important; overflow: hidden; display: flex; align-items: center; justify-content: center;">
-                    <img src="https://gnpay.my/log2.png" style="width: 90%; height: 90%; object-fit: contain;">
-                </div>
+                <div class="qr-top-logo" style="border: 3px solid #fff; width: 40px; height: 40px; background: #01b2ad !important; overflow: hidden; display: flex; align-items: center; justify-content: center; 
+     border-radius: 12px !important;"> <img src="https://gnpay.my/log2.png" style="width: 100%; height: 100%; object-fit: contain;">
+</div>
                 <div class="qr-frame" style="background: #f8fcfc; padding: 12px; border-radius: 25px; display: inline-block; border: 1px solid #edf7f6; box-shadow: inset 0 2px 5px rgba(0,0,0,0.02);">
                     <img id="my-qr-img" src="" style="width: 170px; height: 170px; border-radius: 15px;">
                 </div>
@@ -509,7 +635,7 @@
                     <input class="form-check-input" type="checkbox" id="remember-me" style="width: 17px; height: 17px; cursor: pointer;">
                     <label class="form-check-label small text-muted" for="remember-me" style="cursor: pointer; padding-top: 2px;">아이디 기억</label>
                 </div>
-                <div class="small text-muted" onclick="alert('관리자에게 문의해주세요!\n010-XXXX-XXXX')" style="cursor: pointer;">비밀번호를 잊으셨나요?</div>
+                <div class="small text-muted" onclick="handleForgotPassword()" style="cursor: pointer;">비밀번호를 잊으셨나요?</div>
             </div>
 
             <button class="btn-scan w-100" onclick="submitLogin()">로그인하기</button>
@@ -521,6 +647,39 @@
         </div>
     </div>
 </div>
+<div id="pw-reset-layer" class="qr-glass-effect" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 10001; display: none; flex-direction: column; align-items: center; justify-content: center;">
+    <div class="bg-white p-4 rounded-5 shadow-lg qr-slide-up" style="width:85%; max-width:350px; position: relative; border: 1px solid rgba(255,255,255,0.3);">
+        
+        <div style="position: absolute; top: -20px; left: 20px; width: 55px; height: 55px; 
+            background: #01b2ad; /* 김녕페이 메인 로고색 */
+            border-radius: 18px; 
+            border: 4px solid #fff; 
+            box-shadow: 0 8px 15px rgba(1, 178, 173, 0.3); 
+            display: flex; align-items: center; justify-content: center; z-index: 10;">
+    
+    <img src="https://gnpay.my/log2.png" style="width: 80%; height: 80%; object-fit: contain;">
+</div>
+
+        <div class="text-center mt-3 mb-4">
+            <h5 class="fw-bold" style="color: #333; letter-spacing: -1px;">비밀번호 찾기</h5>
+            <p class="small text-muted" style="font-size: 0.75rem;">등록된 이메일과 전화번호를 입력하세요.</p>
+        </div>
+        
+        <div class="px-1">
+            <div class="form-label" style="font-size: 0.7rem; color: #01b2ad;">가입 이메일</div>
+            <input type="email" id="reset-email" class="form-control custom-input" placeholder="example@email.com" style="margin-bottom: 12px; font-size: 0.9rem;">
+            
+            <div class="form-label" style="font-size: 0.7rem; color: #01b2ad;">전화번호</div>
+            <input type="tel" id="reset-phone" class="form-control custom-input" placeholder="숫자만 입력" style="margin-bottom: 20px; font-size: 0.9rem;">
+        </div>
+        
+        <div class="d-flex gap-2">
+            <button class="btn w-50 rounded-pill fw-bold" style="background: #f8f9fa; color: #999; padding: 14px; border: none; font-size: 0.9rem;" onclick="document.getElementById('pw-reset-layer').style.display='none'">취소</button>
+            <button class="btn-scan w-50" style="padding: 14px; font-size: 1rem; background: #01b2ad; border: none; color: #fff; border-radius: 50px;" onclick="processPwReset()">확인</button>
+        </div>
+    </div>
+</div>
+
 
     <div id="page-signup" class="page">
     <div class="top-nav">
@@ -606,24 +765,44 @@
         </div>
     </div>
 </div>
-
-    <div id="page-edit-info" class="page">
-        <div class="top-nav">
-            <div class="fw-bold text-secondary" style="cursor:pointer; padding:10px;" onclick="showPage('page-mypage')"><i class="bi bi-chevron-left"></i> 취소</div>
-            <div class="fw-bold">정보 수정</div>
+<div id="profile-edit-layer" class="qr-glass-effect" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 10001; display: none; flex-direction: column; align-items: center; justify-content: center;">
+    <div class="bg-white p-4 rounded-5 shadow-lg qr-slide-up" style="width:85%; max-width:350px; position: relative; border: 1px solid rgba(255,255,255,0.3);">
+        
+        <div style="position: absolute; top: -20px; left: 20px; width: 55px; height: 55px; background: #01b2ad; border-radius: 18px; border: 4px solid #fff; box-shadow: 0 8px 15px rgba(1, 178, 173, 0.3); display: flex; align-items: center; justify-content: center; z-index: 10;">
+            <img src="https://gnpay.my/log2.png" style="width: 80%; height: 80%; object-fit: contain;">
         </div>
-        <div class="px-4 mt-3">
-            <div class="form-label">이름 (수정불가)</div>
-            <input type="text" id="edit-name" class="form-control custom-input" disabled>
-            <div class="form-label">이메일 (수정불가)</div>
-            <input type="email" id="edit-email" class="form-control custom-input" disabled>
-            <div class="form-label">새 비밀번호</div>
-            <input type="password" id="edit-pw" class="form-control custom-input" placeholder="변경할 경우에만 입력">
-            <div class="form-label">전화번호</div>
-            <input type="tel" id="edit-phone" class="form-control custom-input">
-            <button class="btn-scan w-100 mt-4" onclick="submitEditInfo()">수정 완료</button>
+
+        <div class="text-center mt-3 mb-4">
+            <h5 class="fw-bold" style="color: #333; letter-spacing: -1px;">
+                <span id="edit-user-name" style="color: #01b2ad;">사용자</span>님 정보 수정
+            </h5>
+            <p class="small text-muted" style="font-size: 0.75rem;">변경할 정보를 입력해 주세요.</p>
+        </div>
+        
+        <div class="px-1">
+            <div class="form-label" style="font-size: 0.7rem; color: #01b2ad;">거주 지역</div>
+            <select id="popup-edit-region" class="form-control custom-input" style="margin-bottom: 12px; font-size: 0.9rem; font-weight: 600;">
+                <option value="제주">제주</option><option value="서울">서울</option><option value="경기">경기</option>
+                <option value="인천">인천</option><option value="강원">강원</option><option value="대전">대전</option>
+                <option value="전북">전북</option><option value="전남">전남</option><option value="광주">광주</option>
+                <option value="충남">충남</option><option value="충북">충북</option><option value="경북">경북</option>
+                <option value="경남">경남</option><option value="부산">부산</option><option value="대구">대구</option>
+                <option value="기타">기타</option>
+            </select>
+
+            <div class="form-label" style="font-size: 0.7rem; color: #01b2ad;">전화번호</div>
+            <input type="tel" id="popup-edit-phone" class="form-control custom-input" placeholder="숫자만 입력" style="margin-bottom: 12px; font-size: 0.9rem;">
+            
+            <div class="form-label" style="font-size: 0.7rem; color: #01b2ad;">새 비밀번호 (선택)</div>
+            <input type="password" id="popup-edit-pw" class="form-control custom-input" placeholder="변경 시에만 입력" style="margin-bottom: 20px; font-size: 0.9rem;">
+        </div>
+        
+        <div class="d-flex gap-2">
+            <button class="btn w-50 rounded-pill fw-bold" style="background: #f8f9fa; color: #999; padding: 14px; border: none; font-size: 0.9rem;" onclick="document.getElementById('profile-edit-layer').style.display='none'">취소</button>
+            <button class="btn-scan w-50" style="padding: 14px; font-size: 1rem; background: #01b2ad; border: none; color: #fff; border-radius: 50px;" onclick="submitPopupEdit()">수정완료</button>
         </div>
     </div>
+</div>
 
     <div id="page-history" class="page">
     <div class="top-nav">
@@ -784,7 +963,7 @@
 </body>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script>
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbzCGRhehKnPasS6Zz-WZycvlU3GAGngvukVIx6xU_mzJf2mpv5xfoH5qGNWE8LHK7Dd/exec";
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbyqYJZwFATpO4fM47j2CZZZsAijbAQXB3XMP10_fEJmTRkXgLX3gEPdceixcbTmv5YQoA/exec";
 function updateTab(element) {
     document.querySelectorAll('.tab-item').forEach(tab => tab.classList.remove('active'));
     element.classList.add('active');
@@ -792,28 +971,30 @@ function updateTab(element) {
     const tabName = element.querySelector('span')?.innerText;
     
     if (tabName === '내정보') {
-        refreshUserData(); // [핵심] 클릭하는 순간 저장된 데이터를 다시 읽어옴
+        refreshUserData(); // 데이터 최신화
         
         if (userData && userData.isLoggedIn) {
-            // 1. 이름 강제 주입 (가장 중요한 부분!)
-            const nameDisplay = document.getElementById('mypage-user-name');
-            if (nameDisplay) {
-                // userData.name이 있으면 쓰고, 없으면 로컬스토리지 직접 뒤져서라도 넣음
-                nameDisplay.innerText = userData.name || JSON.parse(localStorage.getItem('gnpay_user')).name || "사용자";
-            }
+            showPage('page-mypage'); // 페이지 전환 먼저
 
-            // 2. 포인트 애니메이션
-            const myPointEl = document.getElementById('my-u-points');
-            if (myPointEl) {
-                myPointEl.innerText = "0";
-                animateValue('my-u-points', 0, Number(userData.points || 0), 1000);
-            }
+            // [수정] 0.1초 뒤에 데이터 주입 (DOM이 확실히 그려진 후)
+            setTimeout(() => {
+                // 1. 이름 강제 주입
+                const nameDisplay = document.getElementById('mypage-user-name');
+                if (nameDisplay) nameDisplay.innerText = userData.name || "사용자";
 
-            // 3. QR 코드 생성
-            const qrImg = document.getElementById('my-qr-img');
-            if (qrImg && userData.uid) {
-                qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${userData.uid}`;
-            }
+                // 2. 포인트 촤르르 복구
+                const myPointEl = document.getElementById('my-u-points');
+                if (myPointEl) {
+                    const targetPoints = Number(userData.points || 0);
+                    animateValue('my-u-points', 0, targetPoints, 1000);
+                }
+
+                // 3. QR 코드 생성
+                const qrImg = document.getElementById('my-qr-img');
+                if (qrImg && userData.uid) {
+                    qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${userData.uid}`;
+                }
+            }, 100);
         } else {
             showPage('page-login');
         }
@@ -877,46 +1058,34 @@ function updateUI() {
     const qrTrigger = document.getElementById('qr-trigger');
 
     if (userData.isLoggedIn) {
-        // --- 1. 로그인 상태 ---
-        authArea.innerHTML = `<span class="auth-link" style="color:var(--primary); font-weight:800;" onclick="goToMyPage()">${userData.name}님</span><span style="color:#eee; font-size:0.7rem;">|</span><span class="auth-link" onclick="logout()">로그아웃</span>`;
+        authArea.innerHTML = `<span class="auth-link" style="color:var(--primary); font-weight:800;" onclick="showPage('page-mypage')">${userData.name}님</span><span style="color:#eee; font-size:0.7rem;">|</span><span class="auth-link" onclick="logout()">로그아웃</span>`;
         welcome.innerHTML = `${userData.name}님, 오늘도<br><strong>푸른 김녕을 지켜요!</strong>`;
         
-        // 포인트 표시 및 기존 QR 팝업 기능 연결
-        pointDisplay.innerText = Number(userData.points || 0).toLocaleString();
+        // [촤르르 엔진 가동] 그냥 숫자를 넣지 않고 애니메이션을 돌립니다.
+        const targetPoints = Number(userData.points || 0);
+        animateValue('main-u-points', 0, targetPoints, 1000); // 1초 동안 촤르르
+
         qrTrigger.onclick = (e) => {
+            const tabBar = document.querySelector('.floating-tab-bar');
+            if (tabBar) tabBar.style.display = 'none';
             document.getElementById('qr-focus-layer').style.display = 'flex';
-            const targetVal = Number(userData.points || 0);
-            animateValue('focus-points', 0, targetVal, 1000);
+            animateValue('focus-points', 0, targetPoints, 1000);
             document.getElementById('qr-img-large').src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${userData.uid}`;
         };
         
-        qrTrigger.style.animation = "breathe 2s infinite ease-in-out"; // 일반 숨쉬기
-        updateActivityBadge(); // 하단 배지 업데이트
+        qrTrigger.style.animation = "breathe 2s infinite ease-in-out";
+        updateActivityBadge();
 
         if (!window.pointSyncInterval) {
             window.pointSyncInterval = setInterval(syncPointsRealtime, 5000);
         }
     } else {
-        // --- 2. 비로그인 상태 ---
+        // 비로그인 상태 로직 (현행 유지)
         authArea.innerHTML = `<span class="auth-link" onclick="showPage('page-signup')">회원가입</span><span style="color:#eee; font-size:0.7rem;">|</span><span class="auth-link text-dark" onclick="showPage('page-login')">로그인</span>`;
         welcome.innerHTML = `함께 만드는<br><strong>푸른 김녕 Wave</strong>`;
-        
-        // 쫀득한 유도 문구와 화살표
-        pointDisplay.innerHTML = `<span style="font-size: 0.95rem; font-weight: 800; color: var(--primary); letter-spacing: -0.5px;">로그인 후 이용하세요 <i class="bi bi-chevron-right" style="font-size: 0.8rem;"></i></span>`;
-        
-        // 칸 전체를 로그인 페이지 이동으로 변경
+        pointDisplay.innerHTML = `<span style="font-size: 0.95rem; font-weight: 800; color: var(--primary);">로그인 후 이용하세요 <i class="bi bi-chevron-right"></i></span>`;
         qrTrigger.onclick = () => showPage('page-login');
-        
-        // 비로그인 전용 반짝임 애니메이션
         qrTrigger.style.animation = "login-glow 2s infinite ease-in-out";
-
-        const badge = document.getElementById('activity-badge-count');
-        if(badge) badge.style.display = 'none';
-
-        if (window.pointSyncInterval) {
-            clearInterval(window.pointSyncInterval);
-            window.pointSyncInterval = null;
-        }
     }
 }
 // [추가] 배지 숫자를 실제로 계산하고 보여주는 함수
@@ -1037,6 +1206,43 @@ function goToMyPage() {
             showPage('page-submit-act');
         }
 
+        // [새로 추가하는 함수] 이메일 주소를 입력받아 서버(GAS)에 임시비번 요청을 보냅니다.
+// 1. 팝업 열기 (기존의 prompt 대신 이걸 실행)
+function handleForgotPassword() {
+    document.getElementById('pw-reset-layer').style.display = 'flex';
+    document.getElementById('reset-email').value = '';
+    document.getElementById('reset-phone').value = '';
+}
+
+// 2. 실제 서버 전송 (쫀득한 버튼 클릭 시 실행)
+async function processPwReset() {
+    const email = document.getElementById('reset-email').value;
+    const phone = document.getElementById('reset-phone').value;
+
+    if (!email || !phone) return alert("정보를 모두 입력해주세요!");
+
+    loading.style.display = 'flex';
+    try {
+        const res = await fetch(GAS_URL, {
+            method: 'POST',
+            body: JSON.stringify({ 
+                type: 'requestPwReset', 
+                email: email, 
+                phone: phone.replace(/[^0-9]/g, "") 
+            })
+        }).then(r => r.json());
+
+        if (res.result === 'success') {
+            alert("정보가 확인되었습니다!\n메일로 임시 비밀번호를 보냈습니다.");
+            document.getElementById('pw-reset-layer').style.display = 'none';
+        } else {
+            alert(res.message);
+        }
+    } catch (e) {
+        alert("서버 연결 실패");
+    }
+    loading.style.display = 'none';
+}
 async function previewImages() {
     const fileInput = document.getElementById('act-files');
     const previewContainer = document.getElementById('image-preview');
@@ -1209,25 +1415,79 @@ if (aLogs.length > 0) {
         pointList.innerHTML = '<div class="text-center text-muted mt-5 small">서버 연결에 실패했습니다.</div>';
     }
 }
-        function openEditInfo() {
-            document.getElementById('edit-name').value = userData.name;
-            document.getElementById('edit-email').value = userData.email;
-            document.getElementById('edit-phone').value = userData.phone;
-            showPage('page-edit-info');
-        }
+// 정보 수정 버튼 눌렀을 때 실행되는 함수
+function openEditInfo() {
+    const layer = document.getElementById('profile-edit-layer');
+    if (layer) {
+        layer.style.display = 'flex';
+        
+        if (userData) {
+            // 사장님 요청: 팝업 제목에 이름 넣기
+            const nameTarget = document.getElementById('edit-user-name');
+            if (nameTarget) nameTarget.innerText = userData.name || "사용자";
 
-async function submitEditInfo() {
-    // 1. 화면에 있는 값들 싹 긁어모으기
-    const newPw = document.getElementById('edit-pw').value;
-    const newPhone = document.getElementById('edit-phone').value;
-    const newGender = document.getElementById('edit-gender').value; // 성별 추가
-    const newRegion = document.getElementById('edit-region').value; // 지역 추가
+            // 기존 정보 채우기
+            document.getElementById('popup-edit-region').value = userData.region || "제주";
+            document.getElementById('popup-edit-phone').value = userData.phone || "";
+        }
+        document.getElementById('popup-edit-pw').value = "";
+    }
+}
+
+// 팝업 안에서 '수정완료' 눌렀을 때 실행되는 함수
+async function submitPopupEdit() {
+    const newRegion = document.getElementById('popup-edit-region').value;
+    const newPhone = document.getElementById('popup-edit-phone').value;
+    const newPw = document.getElementById('popup-edit-pw').value;
 
     if(!newPhone) return alert("전화번호를 입력해주세요.");
 
     loading.style.display = 'flex';
     try {
-        // 2. 서버(GAS)에 성별, 지역까지 다 실어서 보냄
+        const res = await fetch(GAS_URL, {
+            method: 'POST',
+            body: JSON.stringify({
+                type: 'updateUserInfo',
+                email: userData.email,
+                newPhone: newPhone,
+                newPw: newPw,
+                newRegion: newRegion,
+                newGender: userData.gender // 기존 정보 유지
+            })
+        }).then(r => r.json());
+
+        if(res.result === 'success') {
+            alert("정보가 수정되었습니다. 😊");
+            
+            // 내 폰의 로컬 데이터도 즉시 갱신
+            userData.phone = newPhone;
+            userData.region = newRegion;
+            if(newPw) userData.password = newPw;
+            
+            localStorage.setItem('gnpay_user', JSON.stringify(userData));
+            
+            // 팝업 닫기
+            document.getElementById('profile-edit-layer').style.display = 'none';
+        } else {
+            alert("수정 실패: " + res.message);
+        }
+    } catch(e) {
+        alert("서버 연결 실패. 다시 시도해 주세요!");
+    }
+    loading.style.display = 'none';
+}
+async function submitEditInfo() {
+    // 1. 화면에서 값 긁어오기
+    const newPhone = document.getElementById('edit-phone').value;
+    const newPw = document.getElementById('edit-pw').value;
+    const newGender = document.getElementById('edit-gender').value; 
+    const newRegion = document.getElementById('edit-region').value;
+
+    if(!newPhone) return alert("전화번호를 입력해주세요.");
+
+    loading.style.display = 'flex';
+    try {
+        // 2. 서버(GAS)에 모든 정보를 실어서 보냄
         const res = await fetch(GAS_URL, { 
             method: 'POST', 
             body: JSON.stringify({ 
@@ -1235,34 +1495,30 @@ async function submitEditInfo() {
                 email: userData.email, 
                 newPhone: newPhone, 
                 newPw: newPw,
-                newGender: newGender, // 새로 추가된 항목
-                newRegion: newRegion  // 새로 추가된 항목
+                newGender: newGender, 
+                newRegion: newRegion  
             }) 
         }).then(r => r.json());
 
         if(res.result === 'success') {
-            alert("정보가 수정되었습니다.");
+            alert("정보가 수정되었습니다. 😊");
             
-            // 3. [지훈이의 꼼수] 우리 앱 메모리(userData)도 서버랑 똑같이 업데이트!
+            // 3. 내 폰(메모리) 데이터도 즉시 갱신
             userData.phone = newPhone;
-            userData.gender = newGender; // 메모리에 저장
-            userData.region = newRegion; // 메모리에 저장
+            userData.gender = newGender;
+            userData.region = newRegion;
             if(newPw) userData.password = newPw;
 
-            // 4. 로컬스토리지(금고)에 싹 저장해서 새로고침해도 안 날아가게 함
             localStorage.setItem('gnpay_user', JSON.stringify(userData));
-            
-            // 5. 마이페이지로 이동 (이동하면 바뀐 이름/정보가 뙇!)
             showPage('page-mypage');
         } else { 
-            alert("수정 실패: " + (res.message || "알 수 없는 오류")); 
+            alert("수정 실패: " + res.message); 
         }
     } catch(e) { 
-        alert("서버 통신 오류가 발생했습니다."); 
+        alert("서버와 연결할 수 없습니다. 다시 시도해주세요!"); 
     }
     loading.style.display = 'none';
 }
-
         async function handleScan() {
             if (!userData.isLoggedIn) return showPage('page-login');
             document.getElementById('scanner-modal').style.display = 'block';
@@ -1313,25 +1569,36 @@ async function processAddPoints(amount, action) {
 
         function logout() { if(confirm('로그아웃 하시겠습니까?')) { localStorage.removeItem('gnpay_user'); location.reload(); } }
 
+// [전체 교체] 메인 카드 클릭 시
 document.getElementById('qr-trigger').onclick = (e) => {
     if (!userData.isLoggedIn) { showPage('page-login'); return; }
     
-    // 1. 팝업창의 포인트 칸(focus-points)을 0으로 초기화
-    const focusPointEl = document.getElementById('focus-points');
-    if (focusPointEl) {
-        focusPointEl.innerText = "0";
-        
-        // 2. 팝업을 먼저 띄웁니다 (보여야 올라가는 게 보임!)
-        document.getElementById('qr-focus-layer').style.display = 'flex';
-        
-        // 3. 0부터 실제 포인트까지 촤르르 엔진 가동!
-        const targetVal = Number(userData.points || 0);
-        animateValue('focus-points', 0, targetVal, 1000);
+    // 하단바 찾아서 확실하게 아래로 200px 던져버리기
+    const tabBar = document.querySelector('.floating-tab-bar');
+    if (tabBar) {
+        tabBar.style.setProperty('transform', 'translateX(-50%) translateY(200px)', 'important');
     }
-
-    // 4. QR 코드 생성
+    
+    // QR 팝업 띄우기
+    document.getElementById('qr-focus-layer').style.display = 'flex';
+    
+    const targetVal = Number(userData.points || 0);
+    animateValue('focus-points', 0, targetVal, 1000);
     document.getElementById('qr-img-large').src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${userData.uid}`;
 };
+
+// [전체 교체] 팝업 닫을 때 (닫기 버튼에 onclick="closeQR()" 꼭 넣어주세요!)
+// [확인 사살 버전] 딱 하나만 남기세요
+function closeQR() {
+    // 1. QR 팝업 끄기
+    document.getElementById('qr-focus-layer').style.display = 'none';
+    
+    // 2. 하단바 다시 무조건 살리기 (display 방식을 쓰면 절대 실패 안 합니다)
+    const tabBar = document.querySelector('.floating-tab-bar');
+    if (tabBar) {
+        tabBar.style.setProperty('display', 'flex', 'important');
+    }
+}
 function animateValue(id, start, end, duration) {
     const obj = document.getElementById(id);
     if (!obj) return;
@@ -1501,7 +1768,40 @@ function refreshUserData() {
     const saved = localStorage.getItem('gnpay_user');
     if (saved) userData = JSON.parse(saved);
 }
+function openMypage() {
+    document.querySelector('.bottom-nav').style.transform = 'translateY(100%)'; // 하단바 숨기기
+    showPage('page-mypage');
+}
 
+// 마이페이지 닫을 때 다시 보여주기
+function closeMypage() {
+    document.querySelector('.bottom-nav').style.transform = 'translateY(0)'; // 하단바 복구
+    showPage('page-main');
+}
+// 가이드 슬라이더 실시간 카드 활성화 엔진
+const guideSlider = document.getElementById('guide-slider-scroll');
+
+if (guideSlider) {
+    guideSlider.addEventListener('scroll', () => {
+        const cards = guideSlider.querySelectorAll('.guide-card');
+        const containerRect = guideSlider.getBoundingClientRect();
+        const containerCenter = containerRect.left + containerRect.width / 2;
+
+        cards.forEach((card) => {
+            const cardRect = card.getBoundingClientRect();
+            const cardCenter = cardRect.left + cardRect.width / 2;
+            
+            // 카드의 중심이 컨테이너의 중심과 가까워지면(오차범위 내) 활성화
+            const distance = Math.abs(containerCenter - cardCenter);
+            
+            if (distance < 100) { // 중앙 기준 100px 이내로 들어오면
+                card.classList.add('active-focus');
+            } else {
+                card.classList.remove('active-focus');
+            }
+        });
+    });
+}
 </script>
 </body>
 </html>
