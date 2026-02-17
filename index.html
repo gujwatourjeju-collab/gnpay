@@ -1024,31 +1024,33 @@ function showPage(pageId) {
         pageId = 'page-login'; 
     }
 
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     const target = document.getElementById(pageId);
     if(target) target.classList.add('active');
     window.scrollTo(0, 0);
 
-    // [촤르르 복구 핵심] 페이지 진입 시 숫자 초기화 후 애니메이션 재가동
-    if (userData.isLoggedIn) {
-        if (pageId === 'page-main') {
-            const mainPointEl = document.getElementById('main-u-points');
-            if (mainPointEl) {
-                mainPointEl.innerText = "0"; // 초기화
-                setTimeout(() => {
-                    animateValue('main-u-points', 0, Number(userData.points || 0), 1000);
-                }, 100);
-            }
-        }
-        if (pageId === 'page-mypage') {
-            const myPointEl = document.getElementById('my-u-points');
-            if (myPointEl) {
-                myPointEl.innerText = "0"; // 초기화
-                setTimeout(() => {
-                    const nameEl = document.getElementById('mypage-user-name');
-                    if (nameEl) nameEl.innerText = userData.name;
-                    animateValue('my-u-points', 0, Number(userData.points || 0), 1000);
-                }, 100);
+    // [버그 수정 핵심] 메인으로 복귀할 때 멈춘 숨쉬기 엔진을 다시 깨움
+    if (pageId === 'page-main') {
+        const qrTrigger = document.getElementById('qr-trigger');
+        if (qrTrigger) {
+            // 1. 애니메이션을 초기화해서 브라우저가 다시 인식하게 만듭니다.
+            qrTrigger.style.animation = 'none';
+            qrTrigger.offsetHeight; // 브라우저에게 강제로 새로고침 명령 (재점화 마법)
+            
+            // 2. 로그인 상태에 맞는 애니메이션을 다시 주입합니다.
+            if (userData.isLoggedIn) {
+                qrTrigger.style.animation = "breathe 2s infinite ease-in-out";
+                
+                // 3. 촤르르 숫자 액션도 여기서 확실하게 재가동
+                const mainPointEl = document.getElementById('main-u-points');
+                if (mainPointEl) {
+                    mainPointEl.innerText = "0";
+                    setTimeout(() => {
+                        animateValue('main-u-points', 0, Number(userData.points || 0), 1000);
+                    }, 50);
+                }
+            } else {
+                qrTrigger.style.animation = "login-glow 2s infinite ease-in-out";
             }
         }
     }
