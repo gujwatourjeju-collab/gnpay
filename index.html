@@ -861,13 +861,15 @@ button[style*="background: #f8f9fa"]:active {
             현재 참여 가능한 김녕 마을 정화 활동입니다.
         </div>
         
-        <div class="dashboard-card mb-3" onclick="openSubmit('김녕 성세기해변 플로깅', 2000, '김녕의 푸른 바다를 위해 플로깅 활동을 인증해주세요.')" style="padding: 22px; align-items: center; animation: none; border-left: 5px solid var(--primary); margin: 0 0 15px 0; width: 100%;">
-            <div style="flex: 1;">
-                <div class="fw-bold" style="font-size: 1.1rem;">김녕 성세기해변 플로깅</div>
-                <div class="text-success small fw-bold" style="margin-top: 4px;">+2,000 포인트 적립</div>
-            </div>
-            <i class="bi bi-chevron-right fs-4" style="color: #ccc;"></i>
-        </div>
+<div class="dashboard-card mb-3" onclick="openSubmit('김녕 성세기해변 플로깅', 2000, '...')" 
+     style="padding: 22px; align-items: center; border-left: 5px solid var(--primary); margin: 0 0 15px 0; width: 100%;
+            animation: breathe 2s infinite ease-in-out; /* 엔진 점화 */">
+    <div style="flex: 1;">
+        <div class="fw-bold" style="font-size: 1.1rem;">김녕 성세기해변 플로깅</div>
+        <div class="text-success small fw-bold" style="margin-top: 4px;">+2,000 포인트 적립</div>
+    </div>
+    <i class="bi bi-chevron-right fs-4" style="color: #ccc;"></i>
+</div>
 
         </div>
 </div>
@@ -925,15 +927,25 @@ button[style*="background: #f8f9fa"]:active {
             김녕페이 포인트를 현금처럼 사용할 수 있는 가맹점입니다.
         </div>
         
-        <div class="dashboard-card mb-3" style="padding: 22px; flex-direction: column; align-items: flex-start; animation: none; border-left: 5px solid var(--primary); margin: 0 0 15px 0; width: 100%;">
-            <div class="fw-bold" style="font-size: 1.1rem;">김녕수산문화복합센터</div>
-            <div class="small text-muted mt-1">📍 각종 체험 활동 · 2층 해녀삼춘커피</div>
-        </div>
-        
-        <div class="dashboard-card mb-3" style="padding: 22px; flex-direction: column; align-items: flex-start; animation: none; border-left: 5px solid var(--primary); margin: 0 0 15px 0; width: 100%;">
-            <div class="fw-bold" style="font-size: 1.1rem;">김녕어울림센터</div>
-            <div class="small text-muted mt-1">📍 각종 체험 활동 · 1층 삼춘카페 등</div>
-        </div>
+      <div class="dashboard-card mb-3" 
+     style="padding: 22px; flex-direction: column; align-items: flex-start; border-left: 5px solid var(--primary); margin: 0 0 15px 0; width: 100%;
+            animation: breathe 2s infinite ease-in-out; /* 엔진 점화 */">
+    <div class="fw-bold" style="font-size: 1.1rem;">김녕수산문화복합센터</div>
+    <div class="small text-muted mt-1">📍 각종 체험 활동 · 2층 해녀삼춘커피</div>
+</div>
+
+<div class="dashboard-card mb-3" 
+     style="padding: 22px; flex-direction: column; align-items: flex-start; border-left: 5px solid var(--primary); margin: 0 0 15px 0; width: 100%;
+            animation: breathe 2s infinite ease-in-out; /* 엔진 점화 */">
+    <div class="fw-bold" style="font-size: 1.1rem;">김녕어울림센터</div>
+    <div class="small text-muted mt-1">📍 각종 체험 활동 · 1층 삼춘카페 등</div>
+</div>
+<div class="dashboard-card mb-3" 
+     style="padding: 22px; flex-direction: column; align-items: flex-start; border-left: 5px solid var(--primary); margin: 0 0 15px 0; width: 100%;
+            animation: breathe 2s infinite ease-in-out;">
+    <div class="fw-bold" style="font-size: 1.1rem;">카페, 청굴물</div>
+    <div class="small text-muted mt-1">📍 각종 음료 및 디저트 · 각종 굿즈</div>
+</div>
     </div>
 </div>
 
@@ -1346,21 +1358,23 @@ async function loadActivityHistory() {
             let aHtml = '';
 
             // 1. 포인트 내역 빌드 (장부 데이터)
-            if (pLogs.length > 0) {
-                pLogs.forEach(log => {
-                    const isPlus = Number(log.amount) > 0;
-                    pHtml += `
-                        <div class="dashboard-card mb-3" style="padding:18px; animation:none; border-left:5px solid ${isPlus ? 'var(--primary)' : '#ff4d4d'}; width:100%; margin:0 0 12px 0;">
-                            <div style="flex:1;">
-                                <div class="fw-bold" style="font-size:1rem;">${log.title}</div>
-                                <div class="small text-muted">${log.date}</div>
-                            </div>
-                            <div class="fw-bold" style="color:${isPlus ? 'var(--primary)' : '#ff4d4d'}">
-                                ${isPlus ? '+' : ''}${Number(log.amount).toLocaleString()} P
-                            </div>
-                        </div>`;
-                });
-            }
+if (pLogs.length > 0) {
+    pLogs.forEach(log => {
+        const isPlus = Number(log.amount) > 0;
+        pHtml += `
+            <div class="dashboard-card mb-3" style="padding:18px; border-left:5px solid ${isPlus ? 'var(--primary)' : '#ff4d4d'}; width:100%; margin:0 0 12px 0; cursor:default;
+                animation: breathe 2s infinite ease-in-out; /* [핵심] 숨쉬기 애니메이션 강제 주입 */
+            ">
+                <div style="flex:1;">
+                    <div class="fw-bold" style="font-size:1rem;">${log.title}</div>
+                    <div class="small text-muted">${log.date}</div>
+                </div>
+                <div class="fw-bold" style="color:${isPlus ? 'var(--primary)' : '#ff4d4d'}">
+                    ${isPlus ? '+' : ''}${Number(log.amount).toLocaleString()} P
+                </div>
+            </div>`;
+    });
+}
 
             // 2. 활동 현황 빌드 (사진 펼치기 기능 탑재)
 if (aLogs.length > 0) {
