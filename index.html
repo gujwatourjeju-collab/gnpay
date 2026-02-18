@@ -1109,7 +1109,7 @@ function updateUI() {
 
     if (userData.isLoggedIn) {
         authArea.innerHTML = `<span class="auth-link" style="color:var(--primary); font-weight:800;" onclick="showPage('page-mypage')">${userData.name}님</span><span style="color:#eee; font-size:0.7rem;">|</span><span class="auth-link" onclick="logout()">로그아웃</span>`;
-        welcome.innerHTML = `${userData.name}님, 반갑습니다!<br><strong>탄소중립 실천 포인트를 손안에!</strong>`;
+        welcome.innerHTML = `${userData.name}님, 반갑습니다!<br><strong>김녕을 지켜주세요!</strong>`;
         
         const targetPoints = Number(userData.points || 0);
 
@@ -1922,3 +1922,4 @@ document.addEventListener('touchend', e => {
 </script>
 </body>
 </html>
+
