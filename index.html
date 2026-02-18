@@ -612,12 +612,17 @@ button[style*="background: #f8f9fa"]:active {
         <div class="mt-1" style="padding-left: 20px; padding-right: 20px;">
             <div class="premium-card text-center" style="margin: 0; background: white; border: 1px solid rgba(1, 178, 173, 0.15); box-shadow: 0 15px 35px rgba(0,0,0,0.08); border-radius: 35px; padding: 35px 20px;">
                 
-                <div style="margin-bottom: 25px;">
-                    <div style="color: var(--primary); font-size: 0.7rem; font-weight: 800; letter-spacing: 3px; margin-bottom: 5px; opacity: 0.8;">GIMNYEONG PAY</div>
-                    <div style="color: #1a1a1a; font-size: 1.6rem; font-weight: 900; letter-spacing: -1px;">
-                        <span id="mypage-user-name" style="color:var(--primary)"></span>님, 반가워요!
-                    </div>
-                </div>
+<div style="margin-bottom: 25px; text-align: center;">
+    
+    <div id="user-grade-badge" style="display: inline-flex; align-items: center; padding: 5px 14px; border-radius: 20px; font-size: 0.7rem; font-weight: 800; margin-bottom: 12px; border: 1px solid rgba(0,0,0,0.05); transition: all 0.3s ease;">
+        <span id="grade-icon" style="margin-right: 5px; font-size: 0.8rem;"></span> 
+        <span id="grade-name" style="letter-spacing: 0.5px;"></span>
+    </div>
+
+    <div style="color: #1a1a1a; font-size: 1.5rem; font-weight: 900; letter-spacing: -1px; white-space: nowrap;">
+        <span id="mypage-user-name" style="color:var(--primary)"></span>님, 반가워요!
+    </div>
+</div>
 
                 <div class="qr-integration-box" style="margin-bottom: 30px; display: inline-block;">
                     <div class="qr-top-logo" style="border: 3px solid #fff; width: 40px; height: 40px; background: #01b2ad !important; overflow: hidden; display: flex; align-items: center; justify-content: center; border-radius: 12px !important;"> 
@@ -1011,6 +1016,18 @@ button[style*="background: #f8f9fa"]:active {
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script>
         const GAS_URL = "https://script.google.com/macros/s/AKfycbyqYJZwFATpO4fM47j2CZZZsAijbAQXB3XMP10_fEJmTRkXgLX3gEPdceixcbTmv5YQoA/exec";
+    const GRADE_LEVELS = [
+    { name: "김녕 몽돌", min: 0, color: "#888", icon: "💎" },
+    { name: "김녕 파도", min: 1000, color: "#01b2ad", icon: "🌊" },
+    { name: "김녕 바람", min: 5000, color: "#ff9800", icon: "🌬️" },
+    { name: "김녕 수호신", min: 10000, color: "#e91e63", icon: "👑" }
+];
+
+// 현재 포인트로 등급을 찾아주는 지혜로운 함수
+function getGrade(points) {
+    // 뒤에서부터 검사해서 해당하는 가장 높은 등급을 반환
+    return [...GRADE_LEVELS].reverse().find(g => points >= g.min) || GRADE_LEVELS[0];
+}   
 function updateTab(element) {
     document.querySelectorAll('.tab-item').forEach(tab => tab.classList.remove('active'));
     element.classList.add('active');
@@ -1142,66 +1159,115 @@ function syncMypageState() {
     }
 }
 function updateUI() {
+    // 1. 핵심 요소 가져오기
     const authArea = document.getElementById('auth-area');
     const welcome = document.getElementById('welcome-message');
     const pointDisplay = document.getElementById('main-u-points');
     const qrTrigger = document.getElementById('qr-trigger');
 
-    // 🌟 추가: 마이페이지 내부 스위칭 함수 호출 (함수 상단에 배치)
-    syncMypageState(); 
+    // 🌟 [핵심 수리 1] 마이페이지의 '게스트/유저' 화면 상태를 강제로 동기화합니다.
+    // 이 함수가 있어야 비로그인 시 마이페이지 내용이 '로그인 유도창'으로 바뀝니다.
+    if (typeof syncMypageState === "function") {
+        syncMypageState(); 
+    }
 
     if (userData.isLoggedIn) {
-        // [로그인 상태] 사장님 기존 코드 유지
-        authArea.innerHTML = `<span class="auth-link" style="color:var(--primary); font-weight:800;" onclick="showPage('page-mypage')">${userData.name}님</span><span style="color:#eee; font-size:0.7rem;">|</span><span class="auth-link" onclick="logout()">로그아웃</span>`;
-        welcome.innerHTML = `${userData.name}님, 반갑습니다!<br><strong>김녕을 지켜주세요!</strong>`;
+        // ==========================================
+        // 🟢 [로그인 상태] 데이터 채워넣기
+        // ==========================================
+
+        // 1. 상단바 처리
+        if (authArea) {
+            authArea.innerHTML = `<span class="auth-link" style="color:var(--primary); font-weight:800;" onclick="showPage('page-mypage')">${userData.name}님</span><span style="color:#eee; font-size:0.7rem;">|</span><span class="auth-link" onclick="logout()">로그아웃</span>`;
+        }
+        if (welcome) {
+            welcome.innerHTML = `${userData.name}님, 반갑습니다!<br><strong>김녕을 지켜주세요!</strong>`;
+        }
         
         const targetPoints = Number(userData.points || 0);
 
+        // 2. 포인트 애니메이션 (메인 & 마이페이지)
         animateValue('main-u-points', 0, targetPoints, 1000);
-        animateValue('my-u-points', 0, targetPoints, 1000); 
-
-        // 마이페이지 이름 업데이트 (이것도 추가하세요)
-        const myName = document.getElementById('mypage-user-name');
-        if(myName) myName.innerText = userData.name;
-
-        // 마이페이지 QR 업데이트
-        const myQr = document.getElementById('my-qr-img');
-        if(myQr) myQr.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${userData.uid}`;
-
-        qrTrigger.onclick = (e) => {
-            const tabBar = document.querySelector('.floating-tab-bar');
-            if (tabBar) tabBar.style.display = 'none';
-            document.getElementById('qr-focus-layer').style.display = 'flex';
-            animateValue('focus-points', 0, targetPoints, 1000);
-            document.getElementById('qr-img-large').src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${userData.uid}`;
-        };
         
+        // [안전장치] 마이페이지 포인트 요소가 있을 때만 실행 (에러 방지)
+        if (document.getElementById('my-u-points')) {
+            animateValue('my-u-points', 0, targetPoints, 1000); 
+        }
+
+        // 3. 마이페이지 카드 정보 주입 (이름)
+        const myName = document.getElementById('mypage-user-name');
+        if (myName) myName.innerText = userData.name;
+
+        // 4. 마이페이지 QR 코드 생성
+        const myQr = document.getElementById('my-qr-img');
+        if (myQr && userData.uid) {
+            myQr.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${userData.uid}`;
+        }
+        
+        // 5. 등급(계급) 뱃지 업데이트 (아까 요청하신 기능)
+        // getGrade 함수가 있다면 실행
+        if (typeof getGrade === "function") {
+            const grade = getGrade(targetPoints);
+            const gradeBadge = document.getElementById('user-grade-badge');
+            const gradeName = document.getElementById('grade-name');
+            const gradeIcon = document.getElementById('grade-icon');
+            
+            if (gradeBadge && gradeName && gradeIcon) {
+                gradeBadge.style.backgroundColor = grade.color + '22';
+                gradeBadge.style.color = grade.color;
+                gradeName.innerText = grade.name;
+                gradeIcon.innerText = grade.icon;
+            }
+        }
+
+        // 6. 메인 QR 버튼 액션
         if (qrTrigger) {
+            qrTrigger.onclick = (e) => {
+                const tabBar = document.querySelector('.floating-tab-bar');
+                if (tabBar) tabBar.style.display = 'none'; // QR 확대 시 하단바 숨김
+                
+                const focusLayer = document.getElementById('qr-focus-layer');
+                if (focusLayer) {
+                    focusLayer.style.display = 'flex';
+                    animateValue('focus-points', 0, targetPoints, 1000);
+                    document.getElementById('qr-img-large').src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${userData.uid}`;
+                }
+            };
+            
+            // 애니메이션 리셋
             qrTrigger.style.animation = "none";
             void qrTrigger.offsetWidth;
             qrTrigger.style.animation = "breathe 2s infinite ease-in-out";
         }
         
+        // 7. 기타 동기화
         updateActivityBadge();
 
         if (!window.pointSyncInterval) {
             window.pointSyncInterval = setInterval(syncPointsRealtime, 5000);
         }
+
     } else {
-        // [비로그인 상태] 🌟 지혜로운 수리 구역
-        authArea.innerHTML = `<span class="auth-link" onclick="showPage('page-signup')">회원가입</span><span style="color:#eee; font-size:0.7rem;">|</span><span class="auth-link text-dark" onclick="showPage('page-login')">로그인</span>`;
-        welcome.innerHTML = `제주에서 함께 하는<br><strong>탄소중립 실천</strong>`;
+        // ==========================================
+        // 🔴 [비로그인 상태] 안내 멘트 처리
+        // ==========================================
         
-        if (pointDisplay) {
-            // 메인 화면 포인트를 누르면 로그인으로 가게 하되, 
-            // 하단바를 통한 마이페이지 이동은 막지 않습니다.
-            pointDisplay.innerHTML = `<span style="font-size: 0.95rem; font-weight: 800; color: var(--primary);" onclick="showPage('page-login')">로그인 후 이용하세요 <i class="bi bi-chevron-right"></i></span>`;
+        if (authArea) {
+            authArea.innerHTML = `<span class="auth-link" onclick="showPage('page-signup')">회원가입</span><span style="color:#eee; font-size:0.7rem;">|</span><span class="auth-link text-dark" onclick="showPage('page-login')">로그인</span>`;
+        }
+        if (welcome) {
+            welcome.innerHTML = `함께 만드는<br><strong>푸른 김녕 Wave</strong>`;
         }
         
-        // 메인 중앙 QR 버튼은 로그인이 필수이므로 유지
-        qrTrigger.onclick = () => showPage('page-login');
-
+        // 메인 화면 포인트판 클릭 시 로그인 유도
+        if (pointDisplay) {
+            pointDisplay.innerHTML = `<span style="font-size: 0.95rem; font-weight: 800; color: var(--primary); cursor: pointer;" onclick="showPage('page-login')">로그인 후 이용하세요 <i class="bi bi-chevron-right"></i></span>`;
+        }
+        
+        // 메인 QR 버튼 클릭 시 로그인 이동
         if (qrTrigger) {
+            qrTrigger.onclick = () => showPage('page-login');
+            
             qrTrigger.style.animation = "none";
             void qrTrigger.offsetWidth;
             qrTrigger.style.animation = "login-glow 2s infinite ease-in-out";
