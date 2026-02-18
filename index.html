@@ -612,22 +612,12 @@ button[style*="background: #f8f9fa"]:active {
         <div class="mt-1" style="padding-left: 20px; padding-right: 20px;">
             <div class="premium-card text-center" style="margin: 0; background: white; border: 1px solid rgba(1, 178, 173, 0.15); box-shadow: 0 15px 35px rgba(0,0,0,0.08); border-radius: 35px; padding: 35px 20px;">
                 
-<div style="margin-top: 35px; margin-bottom: 30px; text-align: center; font-family: 'Pretendard', sans-serif;">
-    
-    <div id="user-grade-badge" 
-         onclick="openGradeModal()" 
-         style="display: inline-flex; align-items: center; padding: 6px 16px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; margin-bottom: 14px; border: 1px solid rgba(0,0,0,0.05); transition: all 0.2s ease; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.03); background: #fff;">
-        <span id="grade-icon" style="margin-right: 6px; font-size: 0.9rem;"></span> 
-        <span id="grade-name" style="letter-spacing: 0.5px; line-height: 1;">등급 불러오는 중...</span>
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="margin-left: 4px; opacity: 0.3;">
-            <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-    </div>
-
-    <div style="color: #1a1a1a; font-size: 1.6rem; font-weight: 900; letter-spacing: -1.2px; line-height: 1.2;">
-        <span id="mypage-user-name" style="color: var(--primary); border-bottom: 3px solid rgba(1, 178, 173, 0.2);">사용자</span>님, 반가워요!
-    </div>
-</div>
+                <div style="margin-bottom: 25px;">
+                    <div style="color: var(--primary); font-size: 0.7rem; font-weight: 800; letter-spacing: 3px; margin-bottom: 5px; opacity: 0.8;">GIMNYEONG PAY</div>
+                    <div style="color: #1a1a1a; font-size: 1.6rem; font-weight: 900; letter-spacing: -1px;">
+                        <span id="mypage-user-name" style="color:var(--primary)"></span>님, 반가워요!
+                    </div>
+                </div>
 
                 <div class="qr-integration-box" style="margin-bottom: 30px; display: inline-block;">
                     <div class="qr-top-logo" style="border: 3px solid #fff; width: 40px; height: 40px; background: #01b2ad !important; overflow: hidden; display: flex; align-items: center; justify-content: center; border-radius: 12px !important;"> 
@@ -650,72 +640,16 @@ button[style*="background: #f8f9fa"]:active {
         포인트/활동 내역 보기 <i class="bi bi-chevron-right ms-1"></i>
     </button>
 </div>
-                    <div id="grade-progress-container" style="margin-top: 15px; border-top: 1px dashed rgba(1, 178, 173, 0.2); padding-top: 15px; text-align: left;">
-    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 8px;">
-        <div style="font-size: 0.75rem; font-weight: 800; color: #555;">
-            다음 등급까지 <span id="points-to-next" style="color: var(--primary);">0</span>P
-        </div>
-        <div id="next-grade-name" style="font-size: 0.65rem; font-weight: 700; color: #aaa; letter-spacing: -0.5px;">내일은 김녕 파도 🌊</div>
-    </div>
-    
-    <div style="width: 100%; height: 8px; background: #f0f5f5; border-radius: 10px; overflow: hidden; position: relative;">
-        <div id="grade-progress-bar" style="width: 0%; height: 100%; background: var(--primary-grad); border-radius: 10px; transition: width 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);"></div>
-    </div>
-</div>
+                    <div style="font-size: 0.85rem; color: #777; font-weight: 700; margin-top: 15px; border-top: 1px dashed rgba(1, 178, 173, 0.2); padding-top: 12px;">
+                        함께 하는 탄소중립 실천 🌱
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<div id="modal-grade-info" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(5px);">
-    
-    <div style="background: #fff; width: 88%; max-width: 380px; border-radius: 30px; padding: 30px 25px 25px 25px; position: relative; box-sizing: border-box; box-shadow: 0 20px 40px rgba(0,0,0,0.2);">
         
-        <div style="position: absolute; top: -25px; left: 20px; width: 60px; height: 60px; background: #01b2ad; border-radius: 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 15px rgba(1, 178, 173, 0.3); border: 4px solid #fff;">
-            <img src="https://gnpay.my/log2.png" style="width: 35px; height: 35px; object-fit: contain;">
-        </div>
-
-        <div onclick="closeGradeModal()" style="position: absolute; top: 20px; right: 20px; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; background: #f5f5f5; border-radius: 50%; color: #999; cursor: pointer; font-size: 1.2rem;">&times;</div>
-
-        <div style="margin-top: 15px; margin-bottom: 25px;">
-            <div style="color: var(--primary); font-size: 0.75rem; font-weight: 800; letter-spacing: 2px; margin-bottom: 4px;">GIMNYEONG RANK</div>
-            <div style="font-size: 1.4rem; font-weight: 900; color: #1a1a1a;">계급 체계 안내</div>
-            <div style="font-size: 0.8rem; color: #888; margin-top: 5px;">포인트를 모아 김녕의 수호신이 되어보세요!</div>
-        </div>
-
-        <div id="grade-list-container" style="display: flex; flex-direction: column; gap: 10px; max-height: 350px; overflow-y: auto; padding-right: 5px;">
-            </div>
-
-        <button onclick="closeGradeModal()" style="width: 100%; margin-top: 25px; padding: 16px; border-radius: 18px; border: none; background: #1a1a1a; color: #fff; font-size: 1rem; font-weight: 800; cursor: pointer; box-shadow: 0 10px 20px rgba(0,0,0,0.1);">닫기</button>
-    </div>
-</div>
-<div id="grade-info-layer" class="qr-glass-effect" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 10001; display: none; flex-direction: column; align-items: center; justify-content: center;">
-    <div class="bg-white p-4 rounded-5 shadow-lg qr-slide-up" style="width:85%; max-width:350px; position: relative; border: 1px solid rgba(255,255,255,0.3);">
-        
-        <div style="position: absolute; top: -25px; left: 20px; width: 60px; height: 60px; background: #1a1a1a; border-radius: 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 15px rgba(0,0,0,0.2); border: 4px solid #fff;">
-            <img src="https://gnpay.my/log2.png" style="width: 35px; height: 35px; object-fit: contain;">
-        </div>
-
-        <div onclick="document.getElementById('grade-info-layer').style.display='none'" style="position: absolute; top: 20px; right: 20px; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; background: #f5f5f5; border-radius: 50%; color: #999; cursor: pointer; font-size: 1.2rem;">&times;</div>
-
-        <div class="text-center mt-3 mb-4">
-            <div style="color: var(--primary); font-size: 0.75rem; font-weight: 800; letter-spacing: 2px; margin-bottom: 4px;">GIMNYEONG RANK</div>
-            <h5 class="fw-bold" style="color: #333; letter-spacing: -1px; font-size: 1.4rem;">계급 체계 안내</h5>
-            <p class="small text-muted" style="font-size: 0.8rem; margin-top: 5px;">포인트를 모아 김녕의 수호신이 되세요!</p>
-        </div>
-        
-        <div id="popup-grade-list" style="display: flex; flex-direction: column; gap: 10px; max-height: 300px; overflow-y: auto; padding-right: 5px;">
-            </div>
-        
-        <div class="mt-4">
-            <button class="btn w-100 rounded-pill fw-bold" style="background: #1a1a1a; color: #fff; padding: 16px; border: none; font-size: 1rem; box-shadow: 0 10px 20px rgba(0,0,0,0.1);" onclick="document.getElementById('grade-info-layer').style.display='none'">확인</button>
-        </div>
-    </div>
-</div>
-
-<div id="page-login" class="page">
-    ...
   <div id="page-login" class="page">
     <div class="top-nav">
         <div onclick="showPage('page-main')" style="cursor: pointer;">
@@ -1077,33 +1011,6 @@ button[style*="background: #f8f9fa"]:active {
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script>
         const GAS_URL = "https://script.google.com/macros/s/AKfycbyqYJZwFATpO4fM47j2CZZZsAijbAQXB3XMP10_fEJmTRkXgLX3gEPdceixcbTmv5YQoA/exec";
-    const GRADE_LEVELS = [
-    { name: "김녕 몽돌", min: 0, color: "#888", icon: "💎" },
-    { name: "김녕 파도", min: 1000, color: "#01b2ad", icon: "🌊" },
-    { name: "김녕 바람", min: 5000, color: "#ff9800", icon: "🌬️" },
-    { name: "김녕 수호신", min: 10000, color: "#e91e63", icon: "👑" }
-];
-
-// 현재 포인트로 등급을 찾아주는 지혜로운 함수
-function getGrade(points) {
-    // 뒤에서부터 검사해서 해당하는 가장 높은 등급을 반환
-    return [...GRADE_LEVELS].reverse().find(g => points >= g.min) || GRADE_LEVELS[0];
-}   
-function updateGradeUI(points) {
-    const grade = getGrade(points);
-    const gradeBadge = document.getElementById('user-grade-badge');
-    const gradeName = document.getElementById('grade-name');
-    const gradeIcon = document.getElementById('grade-icon');
-    
-    if (gradeBadge && gradeName && gradeIcon) {
-        // 투명도 22(약 13%)를 더해 연한 배경색 생성
-        gradeBadge.style.backgroundColor = grade.color + '22'; 
-        gradeBadge.style.color = grade.color;
-        gradeBadge.style.borderColor = grade.color + '44'; // 테두리도 살짝 색상 부여
-        gradeName.innerText = grade.name;
-        gradeIcon.innerText = grade.icon;
-    }
-}
 function updateTab(element) {
     document.querySelectorAll('.tab-item').forEach(tab => tab.classList.remove('active'));
     element.classList.add('active');
@@ -1142,43 +1049,7 @@ function updateTab(element) {
         let currentAct = { title: "", amount: 0 };
         const loading = document.getElementById('loading-overlay');
         let html5QrCode;
-// 팝업 열기 함수
-function openGradeModal() {
-    const container = document.getElementById('grade-list-container');
-    const modal = document.getElementById('modal-grade-info');
-    
-    // 리스트 초기화 후 생성
-    container.innerHTML = '';
-    
-    GRADE_LEVELS.forEach(grade => {
-        const item = document.createElement('div');
-        item.style.cssText = `
-            display: flex;
-            align-items: center;
-            padding: 15px;
-            background: #f8fcfc;
-            border-radius: 18px;
-            border: 1px solid #edf7f6;
-        `;
-        
-        item.innerHTML = `
-            <div style="font-size: 1.5rem; margin-right: 15px;">${grade.icon}</div>
-            <div style="flex: 1;">
-                <div style="font-size: 0.9rem; font-weight: 800; color: ${grade.color};">${grade.name}</div>
-                <div style="font-size: 0.75rem; color: #888;">${grade.min.toLocaleString()} P 이상</div>
-            </div>
-            <div style="font-size: 0.7rem; color: #aaa; font-weight: 600;">LEVEL</div>
-        `;
-        container.appendChild(item);
-    });
 
-    modal.style.display = 'flex';
-}
-
-// 팝업 닫기 함수
-function closeGradeModal() {
-    document.getElementById('modal-grade-info').style.display = 'none';
-}
 function showPage(pageId) {
     const targetPage = document.getElementById(pageId);
     const currentPage = document.querySelector('.page.active');
@@ -1271,140 +1142,78 @@ function syncMypageState() {
     }
 }
 function updateUI() {
-    // 1. 핵심 요소 가져오기
     const authArea = document.getElementById('auth-area');
     const welcome = document.getElementById('welcome-message');
     const pointDisplay = document.getElementById('main-u-points');
     const qrTrigger = document.getElementById('qr-trigger');
 
-    // 🌟 [핵심 수리 1] 마이페이지 상태 동기화
-    if (typeof syncMypageState === "function") {
-        syncMypageState(); 
-    }
+    // 🌟 추가: 마이페이지 내부 스위칭 함수 호출 (함수 상단에 배치)
+    syncMypageState(); 
 
     if (userData.isLoggedIn) {
-        // ==========================================
-        // 🟢 [로그인 상태] 데이터 채워넣기
-        // ==========================================
-
-        // 1. 상단바 및 웰컴 메시지
-        if (authArea) {
-            authArea.innerHTML = `<span class="auth-link" style="color:var(--primary); font-weight:800;" onclick="showPage('page-mypage')">${userData.name}님</span><span style="color:#eee; font-size:0.7rem;">|</span><span class="auth-link" onclick="logout()">로그아웃</span>`;
-        }
-        if (welcome) {
-            welcome.innerHTML = `${userData.name}님, 반갑습니다!<br><strong>김녕을 지켜주세요!</strong>`;
-        }
+        // [로그인 상태] 사장님 기존 코드 유지
+        authArea.innerHTML = `<span class="auth-link" style="color:var(--primary); font-weight:800;" onclick="showPage('page-mypage')">${userData.name}님</span><span style="color:#eee; font-size:0.7rem;">|</span><span class="auth-link" onclick="logout()">로그아웃</span>`;
+        welcome.innerHTML = `${userData.name}님, 반갑습니다!<br><strong>김녕을 지켜주세요!</strong>`;
         
         const targetPoints = Number(userData.points || 0);
 
-        // 2. 포인트 애니메이션 (메인 & 마이페이지)
         animateValue('main-u-points', 0, targetPoints, 1000);
-        if (document.getElementById('my-u-points')) {
-            animateValue('my-u-points', 0, targetPoints, 1000); 
-        }
+        animateValue('my-u-points', 0, targetPoints, 1000); 
 
-        // 3. 마이페이지 이름 및 QR 주입
+        // 마이페이지 이름 업데이트 (이것도 추가하세요)
         const myName = document.getElementById('mypage-user-name');
-        if (myName) myName.innerText = userData.name;
+        if(myName) myName.innerText = userData.name;
 
+        // 마이페이지 QR 업데이트
         const myQr = document.getElementById('my-qr-img');
-        if (myQr && userData.uid) {
-            myQr.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${userData.uid}`;
-        }
+        if(myQr) myQr.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${userData.uid}`;
+
+        qrTrigger.onclick = (e) => {
+            const tabBar = document.querySelector('.floating-tab-bar');
+            if (tabBar) tabBar.style.display = 'none';
+            document.getElementById('qr-focus-layer').style.display = 'flex';
+            animateValue('focus-points', 0, targetPoints, 1000);
+            document.getElementById('qr-img-large').src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${userData.uid}`;
+        };
         
-        // 4. 🔥 [집중 수리] 등급 뱃지 및 게이지 시스템
-        if (typeof getGrade === "function") {
-            const grade = getGrade(targetPoints);
-            const gradeBadge = document.getElementById('user-grade-badge');
-            const gradeName = document.getElementById('grade-name');
-            const gradeIcon = document.getElementById('grade-icon');
-            
-            // 뱃지 업데이트
-            if (gradeBadge && gradeName && gradeIcon) {
-                gradeBadge.style.backgroundColor = grade.color + '22';
-                gradeBadge.style.color = grade.color;
-                gradeName.innerText = grade.name;
-                gradeIcon.innerText = grade.icon;
-            }
-
-            // 게이지 및 MAX 로직
-            const pointsToNextEl = document.getElementById('points-to-next');
-            const nextGradeNameEl = document.getElementById('next-grade-name');
-            const progressBarEl = document.getElementById('grade-progress-bar');
-
-            if (pointsToNextEl && nextGradeNameEl && progressBarEl) {
-                // 현재 등급 인덱스 찾기
-                const currentGradeIdx = GRADE_LEVELS.slice().reverse().findIndex(g => targetPoints >= g.min);
-                const actualIdx = currentGradeIdx !== -1 ? (GRADE_LEVELS.length - 1 - currentGradeIdx) : 0;
-                const nextGrade = GRADE_LEVELS[actualIdx + 1];
-
-                if (nextGrade) {
-                    // 다음 등급이 있는 경우
-                    const currentMin = GRADE_LEVELS[actualIdx].min;
-                    const nextMin = nextGrade.min;
-                    const totalRange = nextMin - currentMin;
-                    const currentProgress = targetPoints - currentMin;
-                    const progressPercent = Math.min((currentProgress / totalRange) * 100, 100);
-                    const remainingPoints = nextMin - targetPoints;
-
-                    pointsToNextEl.innerText = remainingPoints.toLocaleString();
-                    nextGradeNameEl.innerText = `다음 목표: ${nextGrade.name} ${nextGrade.icon}`;
-                    progressBarEl.style.width = progressPercent + '%';
-                    progressBarEl.style.background = 'var(--primary-grad)'; 
-                } else {
-                    // 🔥 최고 계급 달성 (MAX)
-                    pointsToNextEl.innerHTML = '<span style="letter-spacing:1px;">MAX LEVEL</span>';
-                    nextGradeNameEl.innerText = `당신은 김녕의 수호신입니다 👑`;
-                    progressBarEl.style.width = '100%';
-                    progressBarEl.style.background = 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)'; 
-                }
-            }
-        }
-
-        // 5. 메인 QR 버튼 액션
         if (qrTrigger) {
-            qrTrigger.onclick = (e) => {
-                const tabBar = document.querySelector('.floating-tab-bar');
-                if (tabBar) tabBar.style.display = 'none';
-                
-                const focusLayer = document.getElementById('qr-focus-layer');
-                if (focusLayer) {
-                    focusLayer.style.display = 'flex';
-                    animateValue('focus-points', 0, targetPoints, 1000);
-                    document.getElementById('qr-img-large').src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${userData.uid}`;
-                }
-            };
             qrTrigger.style.animation = "none";
             void qrTrigger.offsetWidth;
             qrTrigger.style.animation = "breathe 2s infinite ease-in-out";
         }
         
         updateActivityBadge();
+
         if (!window.pointSyncInterval) {
             window.pointSyncInterval = setInterval(syncPointsRealtime, 5000);
         }
-
     } else {
-        // ==========================================
-        // 🔴 [비로그인 상태] 처리
-        // ==========================================
-        if (authArea) {
-            authArea.innerHTML = `<span class="auth-link" onclick="showPage('page-signup')">회원가입</span><span style="color:#eee; font-size:0.7rem;">|</span><span class="auth-link text-dark" onclick="showPage('page-login')">로그인</span>`;
-        }
-        if (welcome) {
-            welcome.innerHTML = `함께 만드는<br><strong>푸른 김녕 Wave</strong>`;
-        }
+        // [비로그인 상태] 🌟 지혜로운 수리 구역
+        authArea.innerHTML = `<span class="auth-link" onclick="showPage('page-signup')">회원가입</span><span style="color:#eee; font-size:0.7rem;">|</span><span class="auth-link text-dark" onclick="showPage('page-login')">로그인</span>`;
+        welcome.innerHTML = `제주에서 함께 하는<br><strong>탄소중립 실천</strong>`;
+        
         if (pointDisplay) {
-            pointDisplay.innerHTML = `<span style="font-size: 0.95rem; font-weight: 800; color: var(--primary); cursor: pointer;" onclick="showPage('page-login')">로그인 후 이용하세요 <i class="bi bi-chevron-right"></i></span>`;
+            // 메인 화면 포인트를 누르면 로그인으로 가게 하되, 
+            // 하단바를 통한 마이페이지 이동은 막지 않습니다.
+            pointDisplay.innerHTML = `<span style="font-size: 0.95rem; font-weight: 800; color: var(--primary);" onclick="showPage('page-login')">로그인 후 이용하세요 <i class="bi bi-chevron-right"></i></span>`;
         }
+        
+        // 메인 중앙 QR 버튼은 로그인이 필수이므로 유지
+        qrTrigger.onclick = () => showPage('page-login');
+
         if (qrTrigger) {
-            qrTrigger.onclick = () => showPage('page-login');
             qrTrigger.style.animation = "none";
             void qrTrigger.offsetWidth;
             qrTrigger.style.animation = "login-glow 2s infinite ease-in-out";
         }
     }
 }
+// 마이페이지 진입 시마다 상태 체크해서 화면 스위칭
+
+
+// showPage('page-mypage') 할 때 이 함수를 실행하게 걸어주면 끝!
+
+// [추가] 배지 숫자를 실제로 계산하고 보여주는 함수
 function updateActivityBadge() {
     // 1. 숫자를 표시할 빨간 동그라미 요소를 가져옵니다.
     const badge = document.getElementById('activity-badge-count');
