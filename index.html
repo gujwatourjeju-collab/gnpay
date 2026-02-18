@@ -109,15 +109,19 @@
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: white !important; /* 배경을 불투명하게 해서 뒷면 차단 */
+    width: 100vw; /* % 대신 vw 사용 */
+    height: 100vh; /* % 대신 vh 사용 */
+    background-color: white !important;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-    display: none; /* 일단 다 꺼둠 */
+    display: none;
     opacity: 0;
-    will-change: transform, opacity; /* 브라우저에게 나 움직일 거라고 미리 예고 */
-    backface-visibility: hidden; /* 뒤집혔을 때 안 보이게 (흔들림 방지) */
+    /* 아이폰 흔들림 방지 3대장 */
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+    will-change: transform, opacity;
     z-index: 10;
 }
 
@@ -1040,66 +1044,71 @@ function updateTab(element) {
         let html5QrCode;
 
 function showPage(pageId) {
-    const allPages = document.querySelectorAll('.page');
     const targetPage = document.getElementById(pageId);
     const currentPage = document.querySelector('.page.active');
 
+    // 1. 타겟이 없거나 이미 그 페이지면 즉시 중단
     if (!targetPage || currentPage === targetPage) return;
 
-    // 1. 모든 input 잠그기
-    document.querySelectorAll('input, select, textarea').forEach(el => el.disabled = true);
-
-    // 2. 방향 계산
-    const order = ['page-main', 'page-history', 'page-guide', 'page-mypage'];
-    const curIdx = order.indexOf(currentPage?.id || "");
+    // 2. 방향 계산 (currentPage가 없을 때를 대비해 기본값 0 설정)
+    const order = ['page-login', 'page-signup', 'page-main', 'page-history', 'page-guide', 'page-mypage'];
+    const curIdx = currentPage ? order.indexOf(currentPage.id) : -1;
     const nextIdx = order.indexOf(pageId);
 
-    // 3. 페이지 전환 실행 (물리적 제거 로직 포함)
+    // 3. 입력창 잠금
+    document.querySelectorAll('input, select, textarea').forEach(el => el.disabled = true);
+
+    // 4. [기존 페이지 처리] 
     if (currentPage) {
         currentPage.classList.remove('active');
+        // 아이폰 성능을 위해 transition 시간을 살짝 줄임 (0.35s)
+        currentPage.style.transition = 'transform 0.35s ease-out, opacity 0.35s ease-out';
         currentPage.style.transform = nextIdx > curIdx ? 'translateX(-100%)' : 'translateX(100%)';
         currentPage.style.opacity = '0';
         
-        // 🔥 [추가] 애니메이션(0.5초)이 끝나면 화면에서 완전히 숨김 (겹침 방지)
         const prevPage = currentPage;
         setTimeout(() => {
             if (!prevPage.classList.contains('active')) {
                 prevPage.style.display = 'none';
+                prevPage.style.transform = 'none';
             }
-        }, 500); 
+        }, 350);
     }
 
-    // 4. 타겟 페이지 등장 세팅
-    targetPage.style.display = 'block'; // 🔥 [추가] 나타날 페이지는 일단 보이게 설정
-    targetPage.style.transition = 'none'; 
-    targetPage.style.transform = nextIdx > curIdx ? 'translateX(100%)' : 'translateX(-100%)';
-    targetPage.style.opacity = '0'; // 등장 전엔 투명하게
+    // 5. [타겟 페이지 등장]
+    targetPage.style.display = 'block';
+    targetPage.style.transition = 'none'; // 위치 잡는 동안은 애니메이션 끔
     
+    // 시작 위치 잡기
+    const startX = nextIdx > curIdx ? '100%' : '-100%';
+    targetPage.style.transform = `translateX(${startX})`;
+    targetPage.style.opacity = '0';
+    
+    // 아이폰 틱장애 방지용 강제 리플로우
+    void targetPage.offsetWidth; 
+
+    // 등장 애니메이션
     requestAnimationFrame(() => {
-        // 브라우저 렌더링 타이밍을 맞추기 위한 이중 래핑
-        setTimeout(() => {
-            targetPage.style.transition = 'transform 0.5s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.4s ease';
-            targetPage.classList.add('active');
-            targetPage.style.transform = 'translateX(0)';
-            targetPage.style.opacity = '1';
-
-            // 5. 현재 페이지의 input들만 잠금 해제
-            targetPage.querySelectorAll('input, select, textarea').forEach(el => el.disabled = false);
-
-            if (pageId === 'page-main' || pageId === 'page-mypage') {
-                setTimeout(() => { updateUI(); }, 50); 
-            }
-        }, 10);
+        targetPage.style.transition = 'transform 0.4s cubic-bezier(0.1, 0.9, 0.2, 1), opacity 0.3s ease';
+        targetPage.classList.add('active');
+        targetPage.style.transform = 'translateX(0)';
+        targetPage.style.opacity = '1';
     });
 
-    window.scrollTo(0, 0);
-    
-    // 6. 하단바 제어
+    // 6. 마무리 (UI 업데이트 및 하단바)
+    setTimeout(() => {
+        targetPage.querySelectorAll('input, select, textarea').forEach(el => el.disabled = false);
+        if (pageId === 'page-main' || pageId === 'page-mypage') updateUI();
+    }, 400);
+
+    // 하단바 제어
     const tabBar = document.querySelector('.floating-tab-bar');
     if (tabBar) {
-        tabBar.style.display = (pageId === 'page-login' || pageId === 'page-signup') ? 'none' : 'flex';
+        tabBar.style.display = (['page-login', 'page-signup'].includes(pageId)) ? 'none' : 'flex';
         if (typeof syncTabBar === "function") syncTabBar(pageId);
     }
+    
+    window.scrollTo(0, 0);
 }
 function updateUI() {
     const authArea = document.getElementById('auth-area');
@@ -1922,4 +1931,5 @@ document.addEventListener('touchend', e => {
 </script>
 </body>
 </html>
+
 
