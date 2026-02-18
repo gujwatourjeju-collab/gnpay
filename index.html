@@ -105,22 +105,19 @@
   
     .history-img { width: 100%; max-height: 180px; object-fit: cover; border-radius: 12px; margin-top: 8px; border: 1px solid #eee; display: block; }
     .history-content { font-size: 0.8rem; color: #555; background: #f8f9fa; padding: 10px; border-radius: 10px; margin-top: 8px; }
-
 .page {
-    position: absolute;
+    display: none; /* 기본은 숨김 */
+    position: fixed; /* 페이지들이 같은 자리에 쌓이게 함 */
     top: 0;
     left: 0;
     width: 100%;
-    opacity: 0;
-    pointer-events: none; /* 안 보일 땐 클릭 안 되게 */
-    transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.4s ease;
+    height: 100%;
+    background: white; /* 배경색을 확실히 줘야 뒷페이지가 안 비침! */
+    z-index: 10;
 }
-
 .page.active {
-    opacity: 1;
-    transform: translateX(0) scale(1);
-    pointer-events: auto;
-    z-index: 100;
+    display: block;
+    z-index: 20; /* 활성화된 페이지만 위로 뙇! */
 }
 .page-next {
     transform: scale(0.9) translateX(100%);
@@ -1042,7 +1039,7 @@ function showPage(pageId) {
 
     if (!targetPage || currentPage === targetPage) return;
 
-    // 1. [페이스아이디 방지] 모든 input 일단 잠그기
+    // 1. 모든 input 잠그기
     document.querySelectorAll('input, select, textarea').forEach(el => el.disabled = true);
 
     // 2. 방향 계산
@@ -1050,33 +1047,42 @@ function showPage(pageId) {
     const curIdx = order.indexOf(currentPage?.id || "");
     const nextIdx = order.indexOf(pageId);
 
-    // 3. 페이지 전환 실행
+    // 3. 페이지 전환 실행 (물리적 제거 로직 포함)
     if (currentPage) {
         currentPage.classList.remove('active');
         currentPage.style.transform = nextIdx > curIdx ? 'translateX(-100%)' : 'translateX(100%)';
         currentPage.style.opacity = '0';
+        
+        // 🔥 [추가] 애니메이션(0.5초)이 끝나면 화면에서 완전히 숨김 (겹침 방지)
+        const prevPage = currentPage;
+        setTimeout(() => {
+            if (!prevPage.classList.contains('active')) {
+                prevPage.style.display = 'none';
+            }
+        }, 500); 
     }
 
     // 4. 타겟 페이지 등장 세팅
+    targetPage.style.display = 'block'; // 🔥 [추가] 나타날 페이지는 일단 보이게 설정
     targetPage.style.transition = 'none'; 
     targetPage.style.transform = nextIdx > curIdx ? 'translateX(100%)' : 'translateX(-100%)';
+    targetPage.style.opacity = '0'; // 등장 전엔 투명하게
     
     requestAnimationFrame(() => {
-        targetPage.style.transition = 'transform 0.5s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.4s ease';
-        targetPage.classList.add('active');
-        targetPage.style.transform = 'translateX(0)';
-        targetPage.style.opacity = '1';
+        // 브라우저 렌더링 타이밍을 맞추기 위한 이중 래핑
+        setTimeout(() => {
+            targetPage.style.transition = 'transform 0.5s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.4s ease';
+            targetPage.classList.add('active');
+            targetPage.style.transform = 'translateX(0)';
+            targetPage.style.opacity = '1';
 
-        // 5. [중요] 현재 페이지의 input들만 잠금 해제
-        targetPage.querySelectorAll('input, select, textarea').forEach(el => el.disabled = false);
+            // 5. 현재 페이지의 input들만 잠금 해제
+            targetPage.querySelectorAll('input, select, textarea').forEach(el => el.disabled = false);
 
-        // 🌟 [수정 완료] 메인 또는 마이페이지 진입 시 엔진 재가동
-        // 홈에서 이름 눌러 들어갈 때도 숫자가 촤르르 올라가도록 'page-mypage' 추가함
-        if (pageId === 'page-main' || pageId === 'page-mypage') {
-            setTimeout(() => {
-                updateUI();
-            }, 50); 
-        }
+            if (pageId === 'page-main' || pageId === 'page-mypage') {
+                setTimeout(() => { updateUI(); }, 50); 
+            }
+        }, 10);
     });
 
     window.scrollTo(0, 0);
