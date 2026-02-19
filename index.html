@@ -497,31 +497,27 @@ button[style*="background: #f8f9fa"]:active {
 /* 3. 아이콘 박스: 배경 없이 아이콘만 강조하거나 아주 연한 원형 */
 .icon-circle {
     position: relative;
-    width: 58px;
-    height: 58px;
-    border-radius: 18px;
+    width: 66px;       /* 기존 58px -> 66px로 확대 */
+    height: 66px;      /* 기존 58px -> 66px로 확대 */
+    border-radius: 20px; /* 덩치가 커졌으니 둥글기도 아이폰 비율에 맞게 20px로 조정 */
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.8rem;
+    font-size: 2.2rem;   /* 내부 그림(이모티콘)도 1.8rem -> 2.2rem으로 시원하게 확대! */
     background: #ffffff;
     box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     overflow: visible !important;
-    
-    /* [수정 포인트] 간격을 8px에서 12px~14px 정도로 넓힙니다 */
-    margin-bottom: 10px; 
+    margin-bottom: 8px;  /* 아이콘이 커졌으니 글자와의 간격은 살짝 좁혀서 안정감 부여 */
 }
 
     /* 4. 앱 이름 스타일 */
- .menu-title-iphone {
-    font-size: 0.72rem;
+.menu-title-iphone {
+    font-size: 0.78rem;  /* 기존 0.72rem -> 0.78rem으로 가독성 업! */
     font-weight: 700;
     color: #333;
     letter-spacing: -0.5px;
     text-align: center;
     white-space: nowrap;
-    
-    /* [추가 포인트] 혹시 모르니 줄간격을 줘서 답답함을 해소합니다 */
     line-height: 1.4; 
 }
     /* 빨간 배지: 아이콘 오른쪽 상단에 딱! */
@@ -698,6 +694,11 @@ button[style*="background: #f8f9fa"]:active {
         <i class="bi bi-lightning-charge-fill"></i>
     </div>
     <div class="menu-title-iphone">퀘스트</div>
+</div>
+<div class="menu-item-iphone" onclick="showPage('page-ranking'); loadRankingData('today');">
+    <div class="icon-circle" style="color: #ffc107;"> <i class="bi bi-trophy-fill"></i>
+    </div>
+    <div class="menu-title-iphone">수호자 랭킹</div>
 </div>
 
     <div class="menu-item-iphone" onclick="showPage('page-guide')">
@@ -1258,11 +1259,32 @@ button[style*="background: #f8f9fa"]:active {
         <div id="reader" style="width:100%; height:80vh;"></div>
         <button class="btn btn-light" style="position:absolute; bottom:50px; left:50%; transform:translateX(-50%);" onclick="closeScanner()">닫기</button>
     </div>
+<div id="page-ranking" class="page">
+    <div class="top-nav">
+        <div onclick="showPage('page-main')" style="cursor: pointer;">
+            <img src="https://gnpay.my/log.png" style="width: 85px; margin-bottom: 8px;">
+            <div style="color:var(--primary); font-weight:900; font-size:1.4rem; letter-spacing:-0.5px; margin-bottom: 5px; margin-left: 10px;">수호자 랭킹</div>
+        </div>
+        <div class="fs-2 text-secondary" style="cursor:pointer; padding: 10px;" onclick="showPage('page-main')">
+            <i class="bi bi-x-lg" style="font-size: 1.5rem; opacity: 0.6;"></i>
+        </div>
+    </div>
 
+    <div class="d-flex px-4 mt-2 mb-4" style="gap: 10px;">
+        <div id="tab-rank-today" class="flex-fill text-center py-2 active-tab" onclick="switchRankTab('today')" style="cursor:pointer; font-weight:800; border-radius:15px; font-size:0.9rem;">오늘의 랭킹</div>
+        <div id="tab-rank-total" class="flex-fill text-center py-2 inactive-tab" onclick="switchRankTab('total')" style="cursor:pointer; font-weight:800; border-radius:15px; font-size:0.9rem;">전체 랭킹</div>
+    </div>
+
+    <div style="padding-left: 20px; padding-right: 20px;">
+        <div id="ranking-list">
+            <div class="text-center text-muted mt-5 small">랭킹 정보를 불러오는 중...</div>
+        </div>
+    </div>
+</div>
 </body>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script>
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbyqYJZwFATpO4fM47j2CZZZsAijbAQXB3XMP10_fEJmTRkXgLX3gEPdceixcbTmv5YQoA/exec";
+        const GAS_URL = "https://script.google.com/macros/s/AKfycby6C0tEYO3LYB2LrTEQwW2W5kzA5JiTgs1UVserc_w8g7vsfcvGM-5Qlt7QPv9Zc5-oDg/exec";
 function updateTab(element) {
     document.querySelectorAll('.tab-item').forEach(tab => tab.classList.remove('active'));
     element.classList.add('active');
@@ -2533,6 +2555,86 @@ document.addEventListener('touchend', e => {
     touchendX = e.changedTouches[0].screenX;
     handleGesture();
 }, {passive: true});
+// 1. 탭 전환 (활동 기록 방식 계승)
+function switchRankTab(type) {
+    const todayTab = document.getElementById('tab-rank-today');
+    const totalTab = document.getElementById('tab-rank-total');
+
+    if (type === 'today') {
+        todayTab.className = 'flex-fill text-center py-2 active-tab';
+        totalTab.className = 'flex-fill text-center py-2 inactive-tab';
+        loadRankingData('today');
+    } else {
+        todayTab.className = 'flex-fill text-center py-2 inactive-tab';
+        totalTab.className = 'flex-fill text-center py-2 active-tab';
+        loadRankingData('total');
+    }
+}
+
+// 2. 랭킹 데이터 로드 (서버 연동용 프레임)
+async function loadRankingData(mode) {
+    const listContainer = document.getElementById('ranking-list');
+    listContainer.innerHTML = '<div class="text-center p-5 small text-muted">순위를 집계 중입니다...</div>';
+
+    try {
+        const res = await fetch(GAS_URL, {
+            method: 'POST',
+            body: JSON.stringify({ type: 'getRanking', mode: mode })
+        }).then(r => r.json());
+
+        if (res.result === 'success' && res.data && res.data.length > 0) {
+            renderRanking(res.data);
+        } else {
+            // 서버에 데이터가 없으면 샘플이라도 출력!
+            throw new Error("No Data");
+        }
+    } catch (e) {
+        console.log("랭킹 로드 실패, 샘플 데이터 가동");
+        const sampleData = [
+            { name: "해녀", points: 15000, rank: "해녀" },
+            { name: "돌고래", points: 8500, rank: "돌고래" },
+            { name: "당근", points: 5200, rank: "당근" },
+            { name: "감자", points: 3100, rank: "감자" },
+            { name: "보말", points: 1200, rank: "보말" }
+        ];
+        renderRanking(sampleData);
+    }
+}
+
+// 3. 랭킹 렌더링 (디자인 핵심)
+function renderRanking(data) {
+    const listContainer = document.getElementById('ranking-list');
+    const rankDataMap = {
+        '보말': '🐚', '감자': '🥔', '당근': '🥕', '돌고래': '🐬', '해녀': '👑'
+    };
+
+    let html = '';
+    data.forEach((user, idx) => {
+        const isTop3 = idx < 3;
+        const medal = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : (idx + 1);
+        
+        html += `
+            <div class="dashboard-card mb-3" style="padding:15px 20px; animation: breathe 2s infinite ease-in-out; border-left: 5px solid ${isTop3 ? 'var(--primary)' : '#eee'};">
+                <div class="d-flex align-items-center gap-3 w-100">
+                    <div class="fw-900" style="font-size: 1.1rem; min-width: 30px; color: ${isTop3 ? 'var(--primary)' : '#888'};">
+                        ${medal}
+                    </div>
+                    <div style="flex:1;">
+                        <div class="fw-bold" style="font-size:1rem; color:#333;">${user.name}</div>
+                        <div class="small text-muted" style="font-size:0.7rem;">${rankDataMap[user.rank] || '🐚'} ${user.rank} 등급</div>
+                    </div>
+                    <div class="text-end">
+                        <div class="fw-900" style="color:var(--primary); font-size:1.1rem;">
+                            ${user.points.toLocaleString()}<span style="font-size:0.75rem; margin-left:2px;">P</span>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+    });
+    listContainer.innerHTML = html;
+}
+
 </script>
+
 </body>
 </html>
