@@ -6,15 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#e6f7f6"> <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>김녕페이 2.0</title>
-    <link rel="icon" href="https://gnpay.my/log2.png" type="image/png">
+    <link rel="icon" href="https://gnpay.my/log.png" type="image/png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
    <script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.1/dist/browser-image-compression.js"></script>
    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<link rel="apple-touch-icon" href="https://gnpay.my/log2.png">
+<link rel="apple-touch-icon" href="https://gnpay.my/log.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"> <meta name="theme-color" content="#e6f7f6"> 
-<link rel="shortcut icon" href="https://gnpay.my/log2.png">
+<link rel="shortcut icon" href="https://gnpay.my/log.png">
   <style>
     @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
     :root { --primary: #01b2ad; --primary-grad: linear-gradient(135deg, #01b2ad 0%, #00d2ff 100%); --bg-grad: linear-gradient(180deg, #e6f7f6 0%, #f8fcfc 40%, #ffffff 100%); }
@@ -105,37 +105,25 @@
   
     .history-img { width: 100%; max-height: 180px; object-fit: cover; border-radius: 12px; margin-top: 8px; border: 1px solid #eee; display: block; }
     .history-content { font-size: 0.8rem; color: #555; background: #f8f9fa; padding: 10px; border-radius: 10px; margin-top: 8px; }
-.page {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw; /* % 대신 vw 사용 */
-    height: 100vh; /* % 대신 vh 사용 */
-    background-color: white !important;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    display: none;
-    opacity: 0;
-    /* 아이폰 흔들림 방지 3대장 */
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
-    -webkit-transform-style: preserve-3d;
-    transform-style: preserve-3d;
-    will-change: transform, opacity;
-    z-index: 10;
+
+  .page { 
+    display: none; 
+    width: 100%; 
+    min-height: 100vh; 
+    position: absolute; 
+    top: 0; 
+    left: 0; 
+    background: var(--bg-grad); 
+    z-index: 1;
+    /* [핵심] 하단바 높이(60px) + 여유공간(40px)을 더해서 바닥 여백을 넉넉히 줍니다 */
+    padding-bottom: 120px !important; 
 }
 
-.page.active {
-    display: block;
-    opacity: 1;
-    z-index: 20; /* 활성 페이지만 위로 뙇! */
+.page.active { 
+    display: block !important; 
+    z-index: 100; 
 }
-.page-next {
-    transform: scale(0.9) translateX(100%);
-    opacity: 0;
-}
-.from-left { transform: translateX(-100%); }
-.from-right { transform: translateX(100%); }
+
 /* 탭바가 가리는 현상 방지용 바닥 여백 */
 #page-main, #page-mypage, #page-history, #page-activities, #page-guide, #page-partners {
     padding-bottom: 150px !important; 
@@ -170,22 +158,22 @@
     .form-label { font-size: 0.8rem; font-weight: 700; color: #666; margin-left: 5px; margin-bottom: 5px; }
 .activity-badge {
     position: absolute;
-    top: 15px;      /* 위에서 15px */
-    right: 15px;    /* 오른쪽에서 15px */
-    background-color: #FF3B30; /* 아이폰 느낌 강렬한 레드 */
+    top: -5px;      /* 위쪽에서 -5px 만큼 */
+    right: -5px;     /* 오른쪽에서 -5px 만큼 */
+    background-color: #FF3B30; /* 아이폰 레드 */
     color: white;
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     font-weight: 900;
-    min-width: 18px;
-    height: 18px;
+    min-width: 20px;
+    height: 20px;
     border-radius: 10px;
-    display: flex;
+    display: flex; /* 숫자 중앙 정렬 */
     align-items: center;
     justify-content: center;
-    border: 2px solid white; /* 흰색 테두리가 있어야 고급스럽습니다 */
-    box-shadow: 0 2px 8px rgba(255, 59, 48, 0.3);
-    z-index: 10;
-    padding: 0 4px;
+    border: 2px solid white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    z-index: 100;
+    padding: 0 5px;
 }
 /* 팝업 배경 - 아이폰 스타일 유리창 효과 */
 .qr-glass-effect {
@@ -379,35 +367,34 @@ button[style*="background: #f8f9fa"]:active {
 }
 /* 안내 페이지 카드 슬라이더 스타일 */
 /* 컨테이너: 배지가 튀어나올 공간을 위해 padding-top을 충분히(40px) 줍니다 */
-/* [교체] 수직형 가이드 엔진 */
 .guide-slider-container {
     width: 100%;
-    height: 450px; /* 고정 높이 부여 */
-    overflow-y: auto; /* 세로 스크롤로 변경 */
-    scroll-snap-type: y mandatory; /* 세로 방향 자석 효과 */
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
-    padding: 20px 0;
+    padding: 40px 0 60px; /* 위아래 여백을 줘서 배지 안 잘리게 함 */
     scrollbar-width: none;
-    display: block; /* 플렉스 해제 */
+    display: flex;
 }
 .guide-slider-container::-webkit-scrollbar { display: none; }
 
 .guide-slider {
     display: flex;
-    flex-direction: column; /* 세로 정렬 */
-    align-items: center;
-    gap: 30px; /* 카드 간격 */
-    padding: 0 20px 100px; /* 아래쪽 여유 공간 */
+    padding: 0 45px;
+    gap: 20px;
 }
-
-/* 살아있는 수직 카드 */
+.guide-slider::after {
+    content: '';
+    flex: 0 0 45px; /* 좌측 패딩과 동일한 너비 부여 */
+}
+/* 살아있는 카드 본체 */
 .guide-card {
-    flex: 0 0 350px; /* 카드의 세로 높이 고정 */
-    width: 90%; /* 가로 너비 */
+    flex: 0 0 calc(100vw - 100px);
     scroll-snap-align: center;
     background: white;
     border-radius: 40px;
-    padding: 40px 25px;
+    padding: 50px 25px 35px;
+    /* 카드가 살아있는 것처럼 보이게 하는 깊은 그림자 */
     box-shadow: 0 10px 30px rgba(0,0,0,0.05);
     border: 1px solid rgba(1, 178, 173, 0.1);
     display: flex;
@@ -415,28 +402,39 @@ button[style*="background: #f8f9fa"]:active {
     align-items: center;
     text-align: center;
     position: relative;
+    /* 쫀득한 움직임 설정 */
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    transform: scale(0.9);
-    opacity: 0.5;
+    transform: scale(0.9); /* 평소에는 살짝 작게 */
+    opacity: 0.5; /* 평소에는 흐릿하게 */
 }
 
-/* 중앙(포커스)에 왔을 때 효과 */
+/* 중앙에 왔을 때 살아나는 효과 */
 .guide-card.active-focus {
-    transform: scale(1.02);
+    transform: scale(1.05); /* 중앙에서 쫀득하게 커짐 */
     opacity: 1;
     box-shadow: 0 20px 40px rgba(1, 178, 173, 0.15);
     border: 1px solid rgba(1, 178, 173, 0.3);
 }
 
+/* 스텝 배지: 카드    { id: '보말', name: '김녕 보말 🐚', pt: 0 },
+    { id: '감자', name: '김녕 감자 🥔', pt: 1000 },
+    { id: '당근', name: '김녕 당근 🥕', pt: 3000 },
+    { id: '돌고래', name: '김녕 돌고래 🐬', pt: 5000 },
+    { id: '해녀', name: '전설의 해녀 👑', pt: 10000 } 경계선에 반쯤 걸치게 (절대 안 잘림) */
 .guide-step-badge {
     position: absolute;
-    top: -15px;
+    top: -18px; /* 카드 밖으로 18px 튀어나감 */
+    left: 50%;
+    transform: translateX(-50%);
     background: #1a1a1a;
     color: #fff;
-    padding: 5px 20px;
-    border-radius: 50px;
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     font-weight: 900;
+    padding: 7px 20px;
+    border-radius: 50px;
+    z-index: 10;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    letter-spacing: 1px;
 }
 .nav-close-btn {
     cursor: pointer;
@@ -457,164 +455,6 @@ button[style*="background: #f8f9fa"]:active {
 .page-enter-right { transform: translateX(100%); opacity: 0; }
 .page-enter-left { transform: translateX(-100%); opacity: 0; }
 .page-active { transform: translateX(0); opacity: 1; }
-
-/* 핀테크 스타일 메뉴 아이템 */
-/* 1. 그리드 설정: 1줄에 4개(1fr 1fr 1fr 1fr) */
-    .menu-grid-iphone {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 10px;
-        padding: 10px 15px;
-        margin-top: 9px;
-        background: transparent; /* 배경 삭제 */
-    }
-
-    /* 2. 아이템 설정: 프레임 없이 투명하게 */
-.menu-item-iphone {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    cursor: pointer;
-    position: relative;
-    /* [핵심] 부드러운 복귀를 위한 트랜지션 */
-    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-.menu-item-iphone:active .icon-circle {
-    /* 기존에 하단바에 쓰던 jellyPop 엔진을 여기서 호출합니다 */
-    animation: jellyPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
- @keyframes jellyPopMain {
-    0% { transform: scale(1); }
-    30% { transform: scale(1.2); } /* 살짝 벌크업 */
-    50% { transform: scale(0.9); } /* 훅 줄어들었다가 */
-    100% { transform: scale(1); } /* 복귀 */
-}
-.menu-item-iphone:active .icon-circle {
-    animation: jellyPopMain 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-/* 3. 아이콘 박스: 배경 없이 아이콘만 강조하거나 아주 연한 원형 */
-.icon-circle {
-    position: relative;
-    width: 58px;
-    height: 58px;
-    border-radius: 18px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.8rem;
-    background: #ffffff;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    overflow: visible !important;
-    
-    /* [수정 포인트] 간격을 8px에서 12px~14px 정도로 넓힙니다 */
-    margin-bottom: 10px; 
-}
-
-    /* 4. 앱 이름 스타일 */
- .menu-title-iphone {
-    font-size: 0.72rem;
-    font-weight: 700;
-    color: #333;
-    letter-spacing: -0.5px;
-    text-align: center;
-    white-space: nowrap;
-    
-    /* [추가 포인트] 혹시 모르니 줄간격을 줘서 답답함을 해소합니다 */
-    line-height: 1.4; 
-}
-    /* 빨간 배지: 아이콘 오른쪽 상단에 딱! */
-.badge-iphone {
-    position: absolute;
-    /* [수정 포인트] 
-       마이너스 값을 주면 아이콘 박스 '바깥쪽'으로 밀려납니다. 
-       -5px 정도가 아이폰 앱 배지 위치와 가장 흡사합니다.
-    */
-    top: -5px; 
-    right: -5px; 
-    
-    background: #FF3B30;
-    color: white;
-    font-size: 0.7rem;
-    font-weight: 900;
-    min-width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 2px solid white; /* 배경과 대비되는 테두리 필수 */
-    z-index: 10;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    padding: 0 2px;
-}
-@keyframes harryFloat {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
-}
-.fw-900 { font-weight: 900 !important; }
-    #rank-table-list .fw-900 { letter-spacing: -0.8px; }
-    #rank-info-layer b { color: var(--primary); font-weight: 900; }
-    
-    @keyframes pulse {
-        0% { transform: scale(1); opacity: 1; }
-        50% { transform: scale(1.02); opacity: 0.9; }
-        100% { transform: scale(1); opacity: 1; }
-    }
-/* 1. 컨테이너: 박스 형태를 버리고 배경에 녹아들게 */
-.level-container {
-    margin: 10px 0;
-    padding: 12px 16px; /* 크기를 확 줄임 */
-    background: transparent; /* 배경색 제거 (부모 컨테이너에 맞춤) */
-}
-
-/* 2. 텍스트 레이아웃: 가독성 중심 */
-.level-info {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 8px;
-}
-
-.current-level {
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: #333;
-}
-
-.points-left {
-    font-size: 0.75rem;
-    color: #888;
-}
-
-.points-left strong {
-    color: var(--primary); /* 앱 메인 컬러 사용 */
-    font-weight: 800;
-}
-
-/* 3. 게이지 바: 슬림하고 세련되게 */
-.gauge-background {
-    width: 100%;
-    height: 8px; /* 얇게 변경 */
-    background: #e9ecef;
-    border-radius: 10px;
-    overflow: hidden;
-}
-
-.gauge-fill {
-    height: 100%;
-    background: var(--primary); /* 단색으로 깔끔하게 */
-    border-radius: 10px;
-    transition: width 0.6s ease-out;
-    /* 3D 뱃지와 통일감을 주기 위해 상단에만 아주 얇은 하이라이트 */
-    box-shadow: inset 0 1px 1px rgba(255,255,255,0.4);
-}
-
-/* 4. 아래 레이블은 굳이 필요 없다면 제거하거나 아주 작게 */
-.level-labels {
-    display: none; /* 일단 숨겨서 미니멀하게 유지 */
-}
 </style>
 </head>
 <body>
@@ -650,63 +490,32 @@ button[style*="background: #f8f9fa"]:active {
 </div>
             <div class="auth-links" id="auth-area"></div>
         </div>
-      <div class="pb-4" style="padding-left: 35px; padding-right: 25px; position: relative;">
-    <h1 class="fw-bolder mt-2" id="welcome-message">
-        제주에서 함께 하는<br><strong>탄소중립 실천</strong>
-    </h1>
-
-<div class="harry-float-container" style="position: absolute; right: 10px; bottom: 5px; width: 110px; height: 110px; z-index: 10;">
-    <div id="harry-motion-box" style="width: 100%; height: 100%; position: relative; animation: harryFloat 3s infinite ease-in-out;">
-        <div class="harry-float-container" onclick="openRankInfo()" style="position: absolute; right: 22px; bottom: 5px; width: 110px; height: 110px; z-index: 10; cursor: pointer;"></div>
-        <div id="harry-badge" style="
-            position: absolute; top: -20px; left: 5px; 
-            background: linear-gradient(145deg, #222, #000); 
-            color: #ffffff; padding: 5px 12px; border-radius: 20px; 
-            font-size: 0.7rem; font-weight: 800; white-space: nowrap; 
-            box-shadow: 3px 3px 8px rgba(0,0,0,0.3), inset 1px 1px 2px rgba(255,255,255,0.2);
-            border: 1px solid rgba(255,255,255,0.1); z-index: 11;">
-            반가워요! 🌊
+        <div class="pb-4" style="padding-left: 35px; padding-right: 25px;">
+            <h1 class="fw-bolder mt-2" id="welcome-message">함께 만드는<br><strong>푸른 김녕 Wave</strong></h1>
         </div>
-
-        <img id="harry-img" src="https://gnpay.my/harry_guest.png" 
-             style="width: 100%; height: 100%; object-fit: contain;"
-             onerror="this.src='https://gnpay.my/harry.png'">
-    </div>
-</div>
-</div>
         <div class="dashboard-card" id="qr-trigger">
             <div><div class="small fw-bold text-muted">MY POINTS</div><div class="amount-text user-points-display" id="main-u-points">0</div></div>
             <div style="background: var(--primary-grad); color:white; width:50px; height:50px; border-radius:18px; display:flex; align-items:center; justify-content:center; font-size:1.5rem;"><i class="bi bi-qr-code"></i></div>
         </div>
-       <div class="menu-grid-iphone">
-    <div class="menu-item-iphone" onclick="openSubmit('우리 마을 플로깅 (자유)', 2000, '...')">
-        <div class="icon-circle" style="color: #01b2ad;">
-            <i class="bi bi-tree-fill"></i>
+        <div class="menu-grid">
+            <div class="menu-item" onclick="openSubmit('우리 마을 플로깅 (자유)', 2000, '김녕마을 환경 정화에 동참해 주셔서 감사합니다.<br>활동 사진을 자유롭게 올려주세요.')">
+                <i class="bi bi-patch-check-fill"></i>
+                <div class="menu-title">정화 활동</div>
+            </div>
+            <div class="menu-item" onclick="showPage('page-partners')">
+                <i class="bi bi-bag-heart-fill"></i>
+                <div class="menu-title">가맹점</div>
+            </div>
+            <div class="menu-item" onclick="showPage('page-activities')" style="position: relative;">
+                <i class="bi bi-calendar-check-fill"></i>
+                <div class="menu-title">진행중 활동</div>
+                <div id="activity-badge-count" class="activity-badge" style="display: flex;">0</div> 
+            </div>
+            <div class="menu-item" onclick="showPage('page-guide')">
+                <i class="bi bi-info-circle-fill"></i>
+                <div class="menu-title">앱사용 안내</div>
+            </div>
         </div>
-        <div class="menu-title-iphone">자유활동</div>
-    </div>
-
-    <div class="menu-item-iphone" onclick="showPage('page-partners')">
-        <div class="icon-circle" style="color: #ff9800;">
-            <i class="bi bi-bag-heart-fill"></i>
-        </div>
-        <div class="menu-title-iphone">가맹점</div>
-    </div>
-<div class="menu-item-iphone" onclick="showPage('page-activities')">
-    <div class="icon-circle" style="color: #00d2ff;">
-        <div id="activity-badge-count" class="badge-iphone" style="display: none;">0</div>
-        <i class="bi bi-lightning-charge-fill"></i>
-    </div>
-    <div class="menu-title-iphone">퀘스트</div>
-</div>
-
-    <div class="menu-item-iphone" onclick="showPage('page-guide')">
-        <div class="icon-circle" style="color: #673ab7;">
-            <i class="bi bi-info-circle-fill"></i>
-        </div>
-        <div class="menu-title-iphone">이용안내</div>
-    </div>
-</div>
     </div> 
     
     <div id="page-guide" class="page">
@@ -767,11 +576,11 @@ button[style*="background: #f8f9fa"]:active {
         </div>
     </div>
 
-  <div class="text-center mt-2">
-    <div class="badge rounded-pill bg-light text-dark px-3 py-2" style="font-size: 0.75rem; opacity: 0.7; border: 1px solid #eee;">
-        <i class="bi bi-arrow-up-down me-1"></i> 위아래로 밀어서 다음 단계 확인
+    <div class="text-center mt-2">
+        <div class="badge rounded-pill bg-light text-dark px-3 py-2" style="font-size: 0.75rem; opacity: 0.7; border: 1px solid #eee;">
+            <i class="bi bi-arrow-left-right me-1"></i> 옆으로 밀어서 가이드 확인
+        </div>
     </div>
-</div>
 </div>
 <div id="page-mypage" class="page"> 
     <div class="top-nav" style="display: flex; justify-content: space-between; align-items: flex-start; padding: 20px 20px 5px 26px;">
@@ -779,82 +588,48 @@ button[style*="background: #f8f9fa"]:active {
             <img src="https://gnpay.my/log.png" style="width: 85px;">
         </div>
         
-        <div class="auth-links" id="mypage-auth-buttons" style="display: none;">
+        <div class="auth-links">
             <span class="auth-link" onclick="openEditInfo()" style="color:var(--primary); font-weight:800; font-size: 0.8rem; padding: 5px; line-height: 1;">정보수정</span>
             <span style="color:#eee; font-size:0.7rem; line-height: 1;">|</span>
             <span class="auth-link" onclick="logout()" style="font-size: 0.8rem; font-weight: 700; color: #888; padding: 5px; line-height: 1;">로그아웃</span>
         </div>
     </div>
-
-    <div id="mypage-guest-content" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 60vh; text-align: center; padding: 20px;">
-        <div style="background: #f0fafa; width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
-            <i class="bi bi-person-lock" style="font-size: 2.5rem; color: var(--primary); opacity: 0.5;"></i>
-        </div>
-        <h5 class="fw-900">로그인이 필요합니다</h5>
-        <p style="font-size: 0.85rem; color: #888; line-height: 1.5; margin-bottom: 25px;">
-            회원 정보와 포인트 내역을 확인하시려면<br>로그인을 먼저 진행해주세요.
-        </p>
-        <button class="btn-scan" onclick="showPage('page-login')" style="width: 180px; padding: 12px; font-weight: 800; border-radius: 15px;">로그인 하러가기</button>
-    </div>
-
-    <div id="mypage-user-content" style="display: none;">
+    
     <div class="mt-1" style="padding-left: 20px; padding-right: 20px;">
         <div class="premium-card text-center" style="margin: 0; background: white; border: 1px solid rgba(1, 178, 173, 0.15); box-shadow: 0 15px 35px rgba(0,0,0,0.08); border-radius: 35px; padding: 35px 20px;">
             
             <div style="margin-bottom: 25px;">
-                <div id="mypage-rank-label" style="color: var(--primary); font-size: 0.8rem; font-weight: 900; letter-spacing: 1px; margin-bottom: 5px; opacity: 1;">
-                    &nbsp;
-                </div>
-                
+                <div style="color: var(--primary); font-size: 0.7rem; font-weight: 800; letter-spacing: 3px; margin-bottom: 5px; opacity: 0.8;">GIMNYEONG PASS</div>
                 <div style="color: #1a1a1a; font-size: 1.6rem; font-weight: 900; letter-spacing: -1px;">
-                    <span id="mypage-user-name" style="color:var(--primary)"></span>님, 반가워요!
+                <span id="mypage-user-name" style="color:var(--primary)"></span>님, 반가워요!
                 </div>
-                </div>
+            </div>
 
-                <div class="qr-integration-box" style="margin-bottom: 30px; display: inline-block;">
-                    <div class="qr-top-logo" style="border: 3px solid #fff; width: 40px; height: 40px; background: #01b2ad !important; overflow: hidden; display: flex; align-items: center; justify-content: center; border-radius: 12px !important;"> 
-                        <img src="https://gnpay.my/log2.png" style="width: 100%; height: 100%; object-fit: contain;">
-                    </div>
-                    <div class="qr-frame" style="background: #f8fcfc; padding: 12px; border-radius: 25px; display: inline-block; border: 1px solid #edf7f6; box-shadow: inset 0 2px 5px rgba(0,0,0,0.02);">
-                        <img id="my-qr-img" src="" style="width: 170px; height: 170px; border-radius: 15px;">
-                    </div>
+            <div class="qr-integration-box" style="margin-bottom: 30px; display: inline-block;">
+                <div class="qr-top-logo" style="border: 3px solid #fff; width: 40px; height: 40px; background: #01b2ad !important; overflow: hidden; display: flex; align-items: center; justify-content: center; 
+     border-radius: 12px !important;"> <img src="https://gnpay.my/log2.png" style="width: 100%; height: 100%; object-fit: contain;">
+</div>
+                <div class="qr-frame" style="background: #f8fcfc; padding: 12px; border-radius: 25px; display: inline-block; border: 1px solid #edf7f6; box-shadow: inset 0 2px 5px rgba(0,0,0,0.02);">
+                    <img id="my-qr-img" src="" style="width: 170px; height: 170px; border-radius: 15px;">
                 </div>
+            </div>
 
-                <div style="background: #f8fcfc; padding: 22px 15px; border-radius: 28px; border: 1px solid rgba(1, 178, 173, 0.1);">
-                    <div style="color: #888; font-size: 0.75rem; font-weight: 700; letter-spacing: 1px; margin-bottom: 5px;">사용가능 포인트</div>
-                    <div style="display: flex; align-items: baseline; justify-content: center; gap: 4px;">
-                        <div class="user-points-display" id="my-u-points" style="font-size: 3rem; font-weight: 900; color: var(--primary); line-height: 1;">0</div>
-                        <div style="font-size: 1.3rem; font-weight: 800; color: #333;">P</div>
-                    </div>
-                    <div class="text-center mt-3">
-    <button onclick="loadActivityHistory()" 
-            style="background: rgba(1, 178, 173, 0.08); border: none; padding: 8px 18px; border-radius: 50px; color: var(--primary); font-size: 0.8rem; font-weight: 800;">
-        포인트/활동 내역 보기 <i class="bi bi-chevron-right ms-1"></i>
-    </button>
-</div>
-                 <div class="level-container" onclick="openRankInfo()" style="cursor: pointer; padding: 15px 5px;">
-  <div class="level-info" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-    <div style="display: flex; flex-direction: column; align-items: flex-start;">
-      <span style="font-size: 0.65rem; color: #aaa; font-weight: 800; letter-spacing: 0.5px; margin-bottom: 4px;">NEXT LEVEL</span>
-      <span id="pop-rank-badge-text" style="font-size: 0.95rem; font-weight: 900; color: #333; letter-spacing: -0.5px;">목표 확인 중</span>
-    </div>
-    <div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end;">
-      <span style="font-size: 0.65rem; color: #aaa; font-weight: 800; letter-spacing: 0.5px; margin-bottom: 4px;">REMAINING</span>
-      <div style="font-size: 1.1rem; font-weight: 900; color: var(--primary); line-height: 1;">
-        <span id="pop-next-info">0</span><span style="font-size: 0.8rem; margin-left: 2px;">P</span>
-      </div>
-    </div>
-  </div>
-  
-  <div class="gauge-background" style="width: 100%; height: 10px; background: rgba(0,0,0,0.05); border-radius: 10px; overflow: hidden;">
-    <div id="pop-gauge-bar" class="gauge-fill" style="width: 0%; height: 100%; background: var(--primary-grad); border-radius: 10px; transition: width 1.2s cubic-bezier(0.1, 0.9, 0.2, 1);"></div>
-  </div>
-</div>
+            <div style="background: #f8fcfc; padding: 22px 15px; border-radius: 28px; border: 1px solid rgba(1, 178, 173, 0.1);">
+                <div style="color: #888; font-size: 0.75rem; font-weight: 700; letter-spacing: 1px; margin-bottom: 5px;">CURRENT BALANCE</div>
+                <div style="display: flex; align-items: baseline; justify-content: center; gap: 4px;">
+                    <div class="user-points-display" id="my-u-points" style="font-size: 3rem; font-weight: 900; color: var(--primary); line-height: 1;">0</div>
+                    <div style="font-size: 1.3rem; font-weight: 800; color: #333;">P</div>
+                </div>
+                <div style="font-size: 0.85rem; color: #777; font-weight: 700; margin-top: 15px; border-top: 1px dashed rgba(1, 178, 173, 0.2); padding-top: 12px;">
+                    함께 만드는 푸른 김녕 Wave 🌱
                 </div>
             </div>
         </div>
+
+   
     </div>
 </div>
+
 
         
   <div id="page-login" class="page">
@@ -870,8 +645,8 @@ button[style*="background: #f8f9fa"]:active {
         <h1 class="fw-bolder mb-4" style="line-height: 1.2;">반가워요!<br><strong>로그인 해주세요</strong></h1>
         
         <div class="mt-5"> 
-<input type="email" id="login-email" class="form-control custom-input" placeholder="이메일" disabled>
-<input type="password" id="login-pw" class="form-control custom-input" placeholder="비밀번호" disabled>
+            <input type="email" id="login-email" class="form-control custom-input" placeholder="이메일">
+            <input type="password" id="login-pw" class="form-control custom-input" placeholder="비밀번호">
             
             <div class="d-flex justify-content-between align-items-center px-1 mb-4" style="margin-top: -5px;">
                 <div class="form-check d-flex align-items-center gap-2">
@@ -1047,51 +822,6 @@ button[style*="background: #f8f9fa"]:active {
     </div>
 </div>
 
-<div id="rank-info-layer" class="qr-glass-effect" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 10001; display: none; flex-direction: column; align-items: center; justify-content: center;" onclick="this.style.display='none'">
-    <div class="bg-white p-4 rounded-5 shadow-lg qr-slide-up" style="width:88%; max-width:360px; position: relative; border: 1px solid rgba(255,255,255,0.3);" onclick="event.stopPropagation()">
-        
-        <div style="position: absolute; top: -20px; left: 20px; width: 55px; height: 55px; background: var(--primary-grad); border-radius: 18px; border: 4px solid #fff; box-shadow: 0 8px 15px rgba(1, 178, 173, 0.3); display: flex; align-items: center; justify-content: center; z-index: 10;">
-            <i class="bi bi-stars" style="color: white; font-size: 1.5rem;"></i>
-        </div>
-
-        <div class="text-center mt-3 mb-4">
-    <h5 class="fw-900" style="color: #1a1a1a; letter-spacing: -1.5px; font-size: 1.4rem; line-height: 1.1;">
-        김녕 수호자 <span style="color: var(--primary);">리포트</span>
-    </h5>
-    <p style="font-size: 0.8rem; font-weight: 600; color: #888; margin-top: 5px; letter-spacing: -0.5px;">
-        실천할수록 김녕의 보물이 자라나요!
-    </p>
-</div>
-        
-        <div class="p-4 mb-4" style="background: #f0fafa; border-radius: 30px; border: 1px solid #e0f2f1; position: relative; overflow: hidden;">
-            <div class="d-flex align-items-center gap-3 mb-3">
-                <div style="background: white; padding: 10px; border-radius: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05);">
-                    <img id="pop-rank-img" src="" style="width: 65px; height: 65px; object-fit: contain;">
-                </div>
-                <div style="flex: 1;">
-                    <div id="pop-rank-badge" style="display:inline-block; padding:3px 10px; border-radius:12px; font-size:0.7rem; color:white; font-weight:800; margin-bottom:5px;"></div>
-                    <div class="fw-900" style="font-size: 1.2rem; color:#222;"><span id="pop-user-name"></span>님</div>
-                </div>
-            </div>
-
-            <div id="gauge-container">
-                <div class="d-flex justify-content-between small fw-bold mb-1" style="font-size: 0.65rem; color: #666;">
-                    <span>성장 에너지</span>
-                    <span id="pop-gauge-percent">0%</span>
-                </div>
-                <div style="width: 100%; height: 12px; background: #e0e0e0; border-radius: 10px; overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);">
-                    <div id="pop-gauge-bar" style="width: 0%; height: 100%; background: var(--primary-grad); transition: width 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);"></div>
-                </div>
-                <div id="pop-next-info" class="text-center mt-2 fw-800" style="font-size: 0.75rem; color: var(--primary);"></div>
-            </div>
-        </div>
-
-        <div id="rank-table-list" style="max-height: 220px; overflow-y: auto; padding-right: 5px;">
-            </div>
-        
-        <button class="btn-scan w-100 mt-3" style="padding: 15px; border-radius: 20px;" onclick="document.getElementById('rank-info-layer').style.display='none'">확인 완료</button>
-    </div>
-</div>
     <div id="page-history" class="page">
     <div class="top-nav">
         <div onclick="showPage('page-main')" style="cursor: pointer;">
@@ -1129,7 +859,7 @@ button[style*="background: #f8f9fa"]:active {
     <div class="top-nav">
         <div onclick="showPage('page-main')" style="cursor: pointer;">
             <img src="https://gnpay.my/log.png" style="width: 85px; margin-bottom: 8px;">
-            <div style="color:var(--primary); font-weight:900; font-size:1.4rem; letter-spacing:-0.5px; margin-bottom: 5px; margin-left: 10px;">진행중 퀘스트</div>
+            <div style="color:var(--primary); font-weight:900; font-size:1.4rem; letter-spacing:-0.5px; margin-bottom: 5px; margin-left: 10px;">진행중 활동</div>
         </div>
         <div class="fs-2 text-secondary" style="cursor:pointer; padding: 10px;" onclick="showPage('page-main')">
             <i class="bi bi-x-lg" style="font-size: 1.5rem; opacity: 0.6;"></i>
@@ -1142,7 +872,7 @@ button[style*="background: #f8f9fa"]:active {
 
     <div id="activity-list-container" style="padding-left: 20px; padding-right: 20px;">
         <div class="small text-muted mb-4" style="padding-left: 15px; opacity: 0.8; font-size: 0.85rem;">
-            현재 참여 가능한 김녕 마을 정화 퀘스트입니다.
+            현재 참여 가능한 김녕 마을 정화 활동입니다.
         </div>
         
 <div class="dashboard-card mb-3" onclick="openSubmit('김녕 성세기해변 플로깅', 2000, '...')" 
@@ -1150,7 +880,7 @@ button[style*="background: #f8f9fa"]:active {
             animation: breathe 2s infinite ease-in-out; /* 엔진 점화 */">
     <div style="flex: 1;">
         <div class="fw-bold" style="font-size: 1.1rem;">김녕 성세기해변 플로깅</div>
-        <div class="text-success small fw-bold" style="margin-top: 4px;">+3,000 포인트 적립</div>
+        <div class="text-success small fw-bold" style="margin-top: 4px;">+2,000 포인트 적립</div>
     </div>
     <i class="bi bi-chevron-right fs-4" style="color: #ccc;"></i>
 </div>
@@ -1238,9 +968,10 @@ button[style*="background: #f8f9fa"]:active {
             <i class="bi bi-house-door-fill"></i>
             <span>홈</span>
         </div>
-       <div class="tab-item" onclick="showPage('page-partners'); updateTab(this)">
-    <i class="bi bi-shop"></i> <span>가맹점</span>
-</div>
+        <div class="tab-item" onclick="loadActivityHistory(); updateTab(this)">
+            <i class="bi bi-journal-text"></i>
+            <span>내역</span>
+        </div>
         <div class="tab-scan-btn" onclick="handleScan()">
             <i class="bi bi-qr-code-scan"></i>
         </div>
@@ -1270,30 +1001,38 @@ function updateTab(element) {
     const tabName = element.querySelector('span')?.innerText;
     
     if (tabName === '내정보') {
+        // [수정 핵심] 데이터를 새로고침하고, 즉시 전역 변수에 다시 담습니다.
         refreshUserData(); 
-        showPage('page-mypage'); 
-        
+        const saved = localStorage.getItem('gnpay_user');
+        if (saved) userData = JSON.parse(saved);
+
         if (userData && userData.isLoggedIn) {
+            showPage('page-mypage'); 
+
+            // DOM이 확실히 렌더링된 후 데이터를 직접 박아넣습니다.
             setTimeout(() => {
-                /* ... (기존 마이페이지 데이터 채우기 코드는 그대로 유지) ... */
+                // 1. 이름 주입
                 const nameDisplay = document.getElementById('mypage-user-name');
-                if (nameDisplay) nameDisplay.innerText = userData.name || "사용자";
+                if (nameDisplay) {
+                    nameDisplay.innerText = userData.name || "사용자";
+                }
+
+                // 2. 포인트 촤르르 애니메이션
                 const myPointEl = document.getElementById('my-u-points');
-                if (myPointEl) animateValue('my-u-points', 0, Number(userData.points || 0), 1000);
+                if (myPointEl) {
+                    const targetPoints = Number(userData.points || 0);
+                    animateValue('my-u-points', 0, targetPoints, 1000);
+                }
+
+                // 3. QR 코드 생성
                 const qrImg = document.getElementById('my-qr-img');
-                if (qrImg && userData.uid) qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${userData.uid}`;
-            }, 50);
+                if (qrImg && userData.uid) {
+                    qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${userData.uid}`;
+                }
+            }, 50); // 0.1초보다 더 빠른 0.05초로 반응성 향상
+        } else {
+            showPage('page-login');
         }
-    }
-    // [▼ 여기를 수정했습니다!]
-    else if (tabName === '가맹점') {
-        showPage('page-partners');
-    }
-    else if (tabName === '홈') {
-        showPage('page-main');
-    }
-    else if (tabName === '안내') {
-        showPage('page-guide');
     }
 }
         let userData = JSON.parse(localStorage.getItem('gnpay_user')) || { isLoggedIn: false, points: 0 };
@@ -1303,94 +1042,76 @@ function updateTab(element) {
         let html5QrCode;
 
 function showPage(pageId) {
-    const targetPage = document.getElementById(pageId);
-    const currentPage = document.querySelector('.page.active');
+    const saved = localStorage.getItem('gnpay_user');
+    if (saved) userData = JSON.parse(saved);
 
-    // 1. 타겟이 없거나 이미 그 페이지면 즉시 중단
-    if (!targetPage || currentPage === targetPage) return;
-
-    // 🌟 [추가] 마이페이지 진입 시 로그인 상태에 따라 내부 화면 미리 세팅
-    if (pageId === 'page-mypage') {
-        syncMypageState(); 
+    // 로그인 체크 로직 (기존 유지)
+    if (!userData.isLoggedIn && 
+        pageId !== 'page-main' && 
+        pageId !== 'page-partners' && 
+        pageId !== 'page-guide' && 
+        pageId !== 'page-login' && 
+        pageId !== 'page-signup'
+    ) {
+        pageId = 'page-login'; 
     }
 
-    // 2. 방향 계산 (currentPage가 없을 때를 대비해 기본값 -1 설정)
-    const order = ['page-login', 'page-signup', 'page-main', 'page-history', 'page-guide', 'page-mypage'];
-    const curIdx = currentPage ? order.indexOf(currentPage.id) : -1;
-    const nextIdx = order.indexOf(pageId);
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    const target = document.getElementById(pageId);
+    if(target) target.classList.add('active');
+    window.scrollTo(0, 0);
 
-    // 3. 입력창 잠금
-    document.querySelectorAll('input, select, textarea').forEach(el => el.disabled = true);
-
-    // 4. [기존 페이지 처리] 
-    if (currentPage) {
-        currentPage.classList.remove('active');
-        currentPage.style.transition = 'transform 0.35s ease-out, opacity 0.35s ease-out';
-        currentPage.style.transform = nextIdx > curIdx ? 'translateX(-100%)' : 'translateX(100%)';
-        currentPage.style.opacity = '0';
-        
-        const prevPage = currentPage;
+    // [핵심 추가] 마이페이지 진입 시 데이터 강제 주입 엔진
+    if (pageId === 'page-mypage' && userData.isLoggedIn) {
         setTimeout(() => {
-            if (!prevPage.classList.contains('active')) {
-                prevPage.style.display = 'none';
-                prevPage.style.transform = 'none';
+            // 1. 이름 박기
+            const nameEl = document.getElementById('mypage-user-name');
+            if (nameEl) nameEl.innerText = userData.name || "사용자";
+
+            // 2. 포인트 촤르르 가동
+            const pointEl = document.getElementById('my-u-points');
+            if (pointEl) {
+                const targetPoints = Number(userData.points || 0);
+                animateValue('my-u-points', 0, targetPoints, 1000);
             }
-        }, 350);
+
+            // 3. QR 이미지 로드
+            const qrImg = document.getElementById('my-qr-img');
+            if (qrImg && userData.uid) {
+                qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${userData.uid}`;
+            }
+            
+            // 4. 타이머가 있다면 여기서 같이 시동 (나중에 타이머 넣으실 때 쓰세요)
+            if (typeof startQRTimer === 'function') startQRTimer();
+        }, 50);
     }
 
-    // 5. [타겟 페이지 등장]
-    targetPage.style.display = 'block';
-    targetPage.style.transition = 'none'; 
-    
-    const startX = nextIdx > curIdx ? '100%' : '-100%';
-    targetPage.style.transform = `translateX(${startX})`;
-    targetPage.style.opacity = '0';
-    
-    void targetPage.offsetWidth; 
+    // 메인화면 숨쉬기 로직 (기존 유지)
+    if (pageId === 'page-main') {
+        const qrTrigger = document.getElementById('qr-trigger');
+        if (qrTrigger) {
+            qrTrigger.style.animation = 'none';
+            qrTrigger.offsetHeight;
+            if (userData.isLoggedIn) {
+                qrTrigger.style.animation = "breathe 2s infinite ease-in-out";
+                const mainPointEl = document.getElementById('main-u-points');
+                if (mainPointEl) {
+                    mainPointEl.innerText = "0";
+                    setTimeout(() => {
+                        animateValue('main-u-points', 0, Number(userData.points || 0), 1000);
+                    }, 50);
+                }
+            } else {
+                qrTrigger.style.animation = "login-glow 2s infinite ease-in-out";
+            }
+        }
+    }
 
-    requestAnimationFrame(() => {
-        targetPage.style.transition = 'transform 0.4s cubic-bezier(0.1, 0.9, 0.2, 1), opacity 0.3s ease';
-        targetPage.classList.add('active');
-        targetPage.style.transform = 'translateX(0)';
-        targetPage.style.opacity = '1';
-    });
+    if (typeof syncTabBar === 'function') syncTabBar(pageId);
 
-    // 6. 마무리 (UI 업데이트 및 하단바)
-    setTimeout(() => {
-        targetPage.querySelectorAll('input, select, textarea').forEach(el => el.disabled = false);
-        // 🌟 updateUI 내부에 syncMypageState()를 포함시키면 더 완벽합니다.
-        if (pageId === 'page-main' || pageId === 'page-mypage') updateUI();
-    }, 400);
-
-    // 7. 하단바 제어 (지혜로운 방식: 마이페이지에선 무조건 노출)
     const tabBar = document.querySelector('.floating-tab-bar');
     if (tabBar) {
-        const isAuthPage = ['page-login', 'page-signup'].includes(pageId);
-        tabBar.style.display = isAuthPage ? 'none' : 'flex';
-        if (typeof syncTabBar === "function") syncTabBar(pageId);
-    }
-    
-    window.scrollTo(0, 0);
-}
-
-function syncMypageState() {
-    // [수정] localStorage의 엉뚱한 키 대신, 현재 로드된 userData 객체의 상태를 확인합니다.
-    const isLogined = userData && userData.isLoggedIn; 
-    
-    const guestContent = document.getElementById('mypage-guest-content');
-    const userContent = document.getElementById('mypage-user-content');
-    const authButtons = document.getElementById('mypage-auth-buttons');
-
-    if (!isLogined) {
-        // 비로그인: 게스트 화면 노출 (여기에 '로그인 하러가기' 버튼이 있음)
-        if(guestContent) guestContent.style.display = 'flex';
-        if(userContent) userContent.style.display = 'none';
-        if(authButtons) authButtons.style.display = 'none';
-    } else {
-        // 로그인: 회원 카드 노출
-        if(guestContent) guestContent.style.display = 'none';
-        if(userContent) userContent.style.display = 'block';
-        if(authButtons) authButtons.style.display = 'flex';
+        tabBar.style.display = (pageId === 'page-login' || pageId === 'page-signup') ? 'none' : 'flex';
     }
 }
 function updateUI() {
@@ -1398,106 +1119,14 @@ function updateUI() {
     const welcome = document.getElementById('welcome-message');
     const pointDisplay = document.getElementById('main-u-points');
     const qrTrigger = document.getElementById('qr-trigger');
-    
-    const rankLabel = document.getElementById('mypage-rank-label');
-
-    syncMypageState(); 
 
     if (userData.isLoggedIn) {
-        const currentRankKey = getRankByPoints(userData.points);
-        
-        // [🔥 절대 에러 안나는 색상 데이터 창고]
-        const rankData = {
-            'GUEST':  { text: 'GIMNYEONG PAY', color: 'linear-gradient(145deg, #ffffff, #e6e6e6)', textColor: '#333' },
-            '보말':   { text: '김녕 보말 🌱', color: 'linear-gradient(145deg, #ffdee9, #b5fffc)', textColor: '#333' },
-            '감자':   { text: '김녕 감자 🌊', color: 'linear-gradient(145deg, #e1b382, #c89666)', textColor: '#fff' },
-            '당근':   { text: '김녕 당근 💎', color: 'linear-gradient(145deg, #ff9a9e, #fecfef)', textColor: '#fff' },
-            '돌고래': { text: '김녕 돌고래 ✨', color: 'linear-gradient(145deg, #01b2ad, #00d2ff)', textColor: '#fff' },
-            '해녀':   { text: '전설의 해녀 👑', color: 'linear-gradient(145deg, #667eea, #764ba2)', textColor: '#fff' }
-        };
-
-        // 1. 현재 등급 뱃지 업데이트 (유저 이름 위)
-        if (rankLabel) {
-            const data = rankData[currentRankKey] || rankData['GUEST'];
-            rankLabel.innerText = data.text;
-            rankLabel.style.display = 'inline-block';
-            rankLabel.style.padding = '4px 14px';
-            rankLabel.style.borderRadius = '15px';
-            rankLabel.style.background = data.color;
-            rankLabel.style.color = data.textColor;
-            rankLabel.style.fontSize = '0.75rem';
-            rankLabel.style.fontWeight = '900';
-            rankLabel.style.boxShadow = '0 4px 10px rgba(0,0,0,0.08)';
-            rankLabel.style.marginBottom = '8px';
-        }
-
-        const points = Number(userData.points || 0);
-        const ranks = [
-    { id: '보말', name: '김녕 보말 🐚', pt: 0 },
-    { id: '감자', name: '김녕 감자 🥔', pt: 1000 },
-    { id: '당근', name: '김녕 당근 🥕', pt: 3000 },
-    { id: '돌고래', name: '김녕 돌고래 🐬', pt: 5000 },
-    { id: '해녀', name: '전설의 해녀 👑', pt: 10000 }
-];
-
-        const nextRank = ranks.find(r => r.pt > points);
-        const currentRankData = [...ranks].reverse().find(r => r.pt <= points);
-
-        const gaugeFill = document.querySelector('#page-mypage #pop-gauge-bar'); 
-        const nextInfoNum = document.querySelector('#page-mypage #pop-next-info');
-        const nextRankTitle = document.querySelector('#page-mypage #pop-rank-badge-text');
-
-        if (nextRank) {
-            const range = nextRank.pt - currentRankData.pt;
-            const progress = points - currentRankData.pt;
-            const percent = Math.min(Math.floor((progress / range) * 100), 100);
-            
-            if (gaugeFill) gaugeFill.style.width = percent + "%";
-            
-            // [🔥 수리 포인트] 다음 등급 텍스트에 고유 뱃지 색상 입히기
-            if (nextRankTitle) {
-                const nextData = rankData[nextRank.id] || rankData['GUEST'];
-                nextRankTitle.innerText = nextRank.name;
-                nextRankTitle.style.display = 'inline-block';
-                nextRankTitle.style.padding = '3px 12px';
-                nextRankTitle.style.borderRadius = '12px';
-                nextRankTitle.style.background = nextData.color; // 다음 등급 색상 주입
-                nextRankTitle.style.color = nextData.textColor;
-                nextRankTitle.style.fontSize = '0.8rem';
-                nextRankTitle.style.fontWeight = '900';
-                nextRankTitle.style.boxShadow = '0 2px 6px rgba(0,0,0,0.1)';
-            }
-
-            if (nextInfoNum) {
-                const diff = nextRank.pt - points;
-                animateValue('pop-next-info', 0, diff, 1000);
-            }
-        } else {
-            if (gaugeFill) gaugeFill.style.width = "100%";
-            if (nextRankTitle) {
-                nextRankTitle.innerText = "최고 등급 달성! 👑";
-                nextRankTitle.style.background = 'linear-gradient(145deg, #FFD700, #FFA500)';
-                nextRankTitle.style.color = '#fff';
-                nextRankTitle.style.padding = '3px 12px';
-                nextRankTitle.style.borderRadius = '12px';
-            }
-            if (nextInfoNum) nextInfoNum.innerText = "0";
-        }
-
-        updateHarryCharacter(currentRankKey);
-
         authArea.innerHTML = `<span class="auth-link" style="color:var(--primary); font-weight:800;" onclick="showPage('page-mypage')">${userData.name}님</span><span style="color:#eee; font-size:0.7rem;">|</span><span class="auth-link" onclick="logout()">로그아웃</span>`;
-        welcome.innerHTML = `${userData.name}님, 반갑습니다!<br><strong>김녕을 지켜주세요!</strong>`;
+        welcome.innerHTML = `${userData.name}님, 오늘도<br><strong>푸른 김녕을 지켜요!</strong>`;
         
+        // [촤르르 엔진 가동] 그냥 숫자를 넣지 않고 애니메이션을 돌립니다.
         const targetPoints = Number(userData.points || 0);
-        animateValue('main-u-points', 0, targetPoints, 1000);
-        animateValue('my-u-points', 0, targetPoints, 1000); 
-
-        const myName = document.getElementById('mypage-user-name');
-        if(myName) myName.innerText = userData.name;
-
-        const myQr = document.getElementById('my-qr-img');
-        if(myQr) myQr.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${userData.uid}`;
+        animateValue('main-u-points', 0, targetPoints, 1000); // 1초 동안 촤르르
 
         qrTrigger.onclick = (e) => {
             const tabBar = document.querySelector('.floating-tab-bar');
@@ -1507,39 +1136,21 @@ function updateUI() {
             document.getElementById('qr-img-large').src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${userData.uid}`;
         };
         
-        if (qrTrigger) {
-            qrTrigger.style.animation = "none";
-            void qrTrigger.offsetWidth;
-            qrTrigger.style.animation = "breathe 2s infinite ease-in-out";
-        }
-        
+        qrTrigger.style.animation = "breathe 2s infinite ease-in-out";
         updateActivityBadge();
 
         if (!window.pointSyncInterval) {
             window.pointSyncInterval = setInterval(syncPointsRealtime, 5000);
         }
     } else {
-        updateHarryCharacter('GUEST');
-        if (rankLabel) {
-            rankLabel.innerText = "GIMNYEONG PAY";
-            rankLabel.style.background = 'none';
-            rankLabel.style.padding = '0';
-            rankLabel.style.boxShadow = 'none';
-            rankLabel.style.color = 'var(--primary)';
-        }
+        // 비로그인 상태 로직 (현행 유지)
         authArea.innerHTML = `<span class="auth-link" onclick="showPage('page-signup')">회원가입</span><span style="color:#eee; font-size:0.7rem;">|</span><span class="auth-link text-dark" onclick="showPage('page-login')">로그인</span>`;
-        welcome.innerHTML = `제주에서 함께 하는<br><strong>탄소중립 실천</strong>`;
-        if (pointDisplay) {
-            pointDisplay.innerHTML = `<span style="font-size: 0.95rem; font-weight: 800; color: var(--primary);" onclick="showPage('page-login')">로그인 후 이용하세요 <i class="bi bi-chevron-right"></i></span>`;
-        }
+        welcome.innerHTML = `함께 만드는<br><strong>푸른 김녕 Wave</strong>`;
+        pointDisplay.innerHTML = `<span style="font-size: 0.95rem; font-weight: 800; color: var(--primary);">로그인 후 이용하세요 <i class="bi bi-chevron-right"></i></span>`;
         qrTrigger.onclick = () => showPage('page-login');
+        qrTrigger.style.animation = "login-glow 2s infinite ease-in-out";
     }
 }
-// 마이페이지 진입 시마다 상태 체크해서 화면 스위칭
-
-
-// showPage('page-mypage') 할 때 이 함수를 실행하게 걸어주면 끝!
-
 // [추가] 배지 숫자를 실제로 계산하고 보여주는 함수
 function updateActivityBadge() {
     // 1. 숫자를 표시할 빨간 동그라미 요소를 가져옵니다.
@@ -1560,31 +1171,24 @@ function updateActivityBadge() {
     }
 }
 
-async function syncPointsRealtime() {
-    if (!userData.isLoggedIn) return;
-    try {
-        const res = await fetch(GAS_URL, {
-            method: 'POST',
-            body: JSON.stringify({ type: 'login', email: userData.email, password: userData.password })
-        }).then(r => r.json());
+        async function syncPointsRealtime() {
+            if (!userData.isLoggedIn) return;
+            try {
+                const res = await fetch(GAS_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ type: 'login', email: userData.email, password: userData.password })
+                }).then(r => r.json());
 
-        if (res.result === 'success') {
-            userData.points = res.user.points;
-            localStorage.setItem('gnpay_user', JSON.stringify(userData));
-            
-            // 1. 화면의 숫자(포인트) 업데이트
-            document.querySelectorAll('.user-points-display').forEach(el => {
-                el.innerText = Number(res.user.points).toLocaleString();
-            });
-
-            // ---------------------------------------------------
-            // [지훈이의 엔진 추가] 백그라운드에서 포인트가 변하면 해리도 즉시 갱신!
-            const currentRank = getRankByPoints(res.user.points);
-            updateHarryCharacter(currentRank);
-            // ---------------------------------------------------
+                if (res.result === 'success') {
+                    userData.points = res.user.points;
+                    localStorage.setItem('gnpay_user', JSON.stringify(userData));
+                    document.querySelectorAll('.user-points-display').forEach(el => {
+                        el.innerText = Number(res.user.points).toLocaleString();
+                    });
+                }
+            } catch (e) { console.log("sync..."); }
         }
-    } catch (e) { console.log("sync..."); }
-}
+
 function goToMyPage() {
     // 1. 마이페이지로 화면 전환
     showPage('page-mypage');
@@ -1667,50 +1271,10 @@ function goToMyPage() {
 
         // [새로 추가하는 함수] 이메일 주소를 입력받아 서버(GAS)에 임시비번 요청을 보냅니다.
 // 1. 팝업 열기 (기존의 prompt 대신 이걸 실행)
-
-function updateMypageGauge() {
-    if (!userData.isLoggedIn) return;
-
-    const points = Number(userData.points || 0);
-    const ranks = [
-        { id: '몽돌', name: '김녕 보말 🌱', pt: 0 },
-        { id: '파도', name: '김녕 감자 🌊', pt: 1000 },
-        { id: '심해', name: '김녕 당근 💎', pt: 3000 },
-        { id: '수호신', name: '김녕 돌고래 ✨', pt: 5000 },
-        { id: '전설', name: '전설의 해녀 👑', pt: 10000 }
-    ];
-
-    const currentRankIdx = [...ranks].reverse().findIndex(r => r.pt <= points);
-    const nextRank = ranks.find(r => r.pt > points);
-
-    const gaugeBar = document.getElementById('pop-gauge-bar');
-    const badgeText = document.getElementById('pop-rank-badge-text'); // ID 수정됨
-    const nextInfo = document.getElementById('pop-next-info');
-
-    if (nextRank) {
-        const currentRankPt = ranks[ranks.length - 1 - currentRankIdx].pt;
-        const percent = Math.floor(((points - currentRankPt) / (nextRank.pt - currentRankPt)) * 100);
-        
-        if (gaugeBar) gaugeBar.style.width = percent + "%";
-        if (badgeText) badgeText.innerText = nextRank.name; // 다음 목표 등급 이름
-        if (nextInfo) animateValue('pop-next-info', 0, nextRank.pt - points, 1000);
-    } else {
-        if (gaugeBar) gaugeBar.style.width = "100%";
-        if (badgeText) badgeText.innerText = "최고 등급 달성! 👑";
-        if (nextInfo) nextInfo.innerText = "0";
-    }
-}
 function handleForgotPassword() {
-    const layer = document.getElementById('pw-reset-layer');
-    if(layer) {
-        layer.style.display = 'flex';
-        
-        // [수정 핵심] 여기도 팝업 열릴 때 잠금 해제 추가
-        layer.querySelectorAll('input').forEach(el => el.disabled = false);
-
-        document.getElementById('reset-email').value = '';
-        document.getElementById('reset-phone').value = '';
-    }
+    document.getElementById('pw-reset-layer').style.display = 'flex';
+    document.getElementById('reset-email').value = '';
+    document.getElementById('reset-phone').value = '';
 }
 
 // 2. 실제 서버 전송 (쫀득한 버튼 클릭 시 실행)
@@ -1917,14 +1481,10 @@ if (aLogs.length > 0) {
     }
 }
 // 정보 수정 버튼 눌렀을 때 실행되는 함수
-// 정보 수정 버튼 눌렀을 때 실행되는 함수
 function openEditInfo() {
     const layer = document.getElementById('profile-edit-layer');
     if (layer) {
         layer.style.display = 'flex';
-        
-        // [수정 핵심] 팝업이 열릴 때, 억지로 잠겨있던 입력창들을 깨워줍니다.
-        layer.querySelectorAll('input, select').forEach(el => el.disabled = false);
         
         if (userData) {
             // 사장님 요청: 팝업 제목에 이름 넣기
@@ -1932,17 +1492,13 @@ function openEditInfo() {
             if (nameTarget) nameTarget.innerText = userData.name || "사용자";
 
             // 기존 정보 채우기
-            const regionSelect = document.getElementById('popup-edit-region');
-            const phoneInput = document.getElementById('popup-edit-phone');
-
-            if(regionSelect) regionSelect.value = userData.region || "제주";
-            if(phoneInput) phoneInput.value = userData.phone || "";
+            document.getElementById('popup-edit-region').value = userData.region || "제주";
+            document.getElementById('popup-edit-phone').value = userData.phone || "";
         }
-        // 비밀번호 칸은 비워두기
-        const pwInput = document.getElementById('popup-edit-pw');
-        if(pwInput) pwInput.value = "";
+        document.getElementById('popup-edit-pw').value = "";
     }
 }
+
 // 팝업 안에서 '수정완료' 눌렀을 때 실행되는 함수
 async function submitPopupEdit() {
     const newRegion = document.getElementById('popup-edit-region').value;
@@ -2255,23 +1811,19 @@ function renderAppLogs() {
     }).join('');
 }
 function syncTabBar(pageId) {
+    // 1. 일단 모든 버튼의 불을 싹 끕니다 (초기화)
     document.querySelectorAll('.tab-item').forEach(tab => {
         tab.classList.remove('active');
     });
 
-    let targetIdx = -1;
-    if (pageId === 'page-main') targetIdx = 0;       // 홈
-    else if (pageId === 'page-partners') targetIdx = 1; // [수정] 내역 -> 가맹점
-    else if (pageId === 'page-guide') targetIdx = 2;    // 안내 (아이콘 순서에 따라 번호 조정 필요할 수 있음)
-    // 원래 안내가 3번째였다면 그대로 두시면 됩니다.
-    // (HTML 순서: 홈(0) - 가맹점(1) - 스캔버튼 - 안내(2) - 내정보(3))
-    
-    // 안내 페이지가 HTML상에서 4번째(인덱스 3)에 있다면 targetIdx = 3으로 잡아야 합니다.
-    // 현재 HTML 구조상: 홈, 가맹점, (스캔버튼), 안내, 내정보 순이므로
-    // 안내는 querySelectorAll('.tab-item') 했을 때 2번째 인덱스(0,1,2)가 맞습니다.
-    
+    // 2. 현재 페이지 ID를 보고 몇 번째 버튼을 켤지 결정합니다
+    let targetIdx = -1; // 기본값은 -1 (아무것도 안 켬)
+    if (pageId === 'page-main') targetIdx = 0;         // 홈
+    else if (pageId === 'page-history') targetIdx = 1;  // 내역
+    else if (pageId === 'page-guide') targetIdx = 2;    // 안내
     else if (pageId === 'page-mypage') targetIdx = 3;   // 내정보
 
+    // 3. 만약 하단바에 있는 페이지라면 해당 번호 아이콘만 불을 켭니다
     const tabItems = document.querySelectorAll('.tab-item');
     if (targetIdx !== -1 && tabItems[targetIdx]) {
         tabItems[targetIdx].classList.add('active');
@@ -2298,16 +1850,16 @@ if (guideSlider) {
     guideSlider.addEventListener('scroll', () => {
         const cards = guideSlider.querySelectorAll('.guide-card');
         const containerRect = guideSlider.getBoundingClientRect();
-        // 기준점을 세로 중앙으로 변경
-        const containerCenter = containerRect.top + containerRect.height / 2;
+        const containerCenter = containerRect.left + containerRect.width / 2;
 
         cards.forEach((card) => {
             const cardRect = card.getBoundingClientRect();
-            const cardCenter = cardRect.top + cardRect.height / 2;
+            const cardCenter = cardRect.left + cardRect.width / 2;
             
+            // 카드의 중심이 컨테이너의 중심과 가까워지면(오차범위 내) 활성화
             const distance = Math.abs(containerCenter - cardCenter);
             
-            if (distance < 150) { // 중앙 기준 150px 이내면 활성화
+            if (distance < 100) { // 중앙 기준 100px 이내로 들어오면
                 card.classList.add('active-focus');
             } else {
                 card.classList.remove('active-focus');
@@ -2323,22 +1875,24 @@ const tabOrder = ['page-main', 'page-history', 'page-guide', 'page-mypage'];
 function handleGesture() {
     const swipeThreshold = 70;
     const activePage = document.querySelector('.page.active');
-    
-    // 팝업 열려있으면 중단
-    if (document.getElementById('qr-focus-layer').style.display === 'flex' || 
-        document.getElementById('scanner-modal').style.display === 'block') return;
+    if (!activePage) return;
 
-    let currentIndex = tabOrder.indexOf(activePage?.id);
+    let currentIndex = tabOrder.indexOf(activePage.id);
     if (currentIndex === -1) return;
 
-    // 왼쪽 스와이프 (다음)
+    let nextIndex;
+
+    // 1. 왼쪽으로 스와이프 (다음 페이지로)
     if (touchstartX - touchendX > swipeThreshold) {
-        let nextIndex = (currentIndex + 1) % tabOrder.length;
+        // [무한 루프] 마지막이면 처음(0)으로, 아니면 다음(+1)으로
+        nextIndex = (currentIndex === tabOrder.length - 1) ? 0 : currentIndex + 1;
         executePageTransition(nextIndex);
     }
-    // 오른쪽 스와이프 (이전)
-    else if (touchendX - touchstartX > swipeThreshold) {
-        let nextIndex = (currentIndex - 1 + tabOrder.length) % tabOrder.length;
+
+    // 2. 오른쪽으로 스와이프 (이전 페이지로)
+    if (touchendX - touchstartX > swipeThreshold) {
+        // [무한 루프] 처음이면 마지막으로, 아니면 이전(-1)으로
+        nextIndex = (currentIndex === 0) ? tabOrder.length - 1 : currentIndex - 1;
         executePageTransition(nextIndex);
     }
 }
@@ -2358,173 +1912,7 @@ function executePageTransition(index) {
         updateTab(tabs[index]);
     }
 }
-function updateHarryCharacter(rank) {
-    const badge = document.getElementById('harry-badge');
-    const img = document.getElementById('harry-img');
-    if (!badge || !img) return;
 
-    const rankData = {
-        'GUEST': { img: '3dlog.png', color: 'linear-gradient(145deg, #ffffff, #e6e6e6)', text: '로그인 필요! 🔒', top: '-20px', left: '5px' },
-        '보말': { img: 'r.png', color: 'linear-gradient(145deg, #ffdee9, #b5fffc)', text: '김녕 보말 🐚', top: '-10px', left: '10px' },
-        '감자': { img: 'pote.png', color: 'linear-gradient(145deg, #e1b382, #c89666)', text: '김녕 감자 🥔', top: '-15px', left: '15px' },
-        '당근': { img: 'ca.png', color: 'linear-gradient(145deg, #ff9a9e, #fecfef)', text: '김녕 당근 🥕', top: '-28px', left: '9px' },
-        '돌고래': { img: 'dol.png', color: 'linear-gradient(145deg, #01b2ad, #00d2ff)', text: '김녕 돌고래 🐬', top: '-25px', left: '5px' },
-        '해녀': { img: 'harry.png', color: 'linear-gradient(145deg, #667eea, #764ba2)', text: '전설의 해녀 👑', top: '-25px', left: '5px' }
-    };
-
-    const data = rankData[rank];
-    if (data) {
-        img.src = `https://gnpay.my/${data.img}`;
-        badge.style.background = data.color;
-        badge.style.color = (rank === 'GUEST' || rank === '보말') ? '#333' : '#fff';
-        badge.innerText = data.text;
-        badge.style.top = data.top;
-        badge.style.left = data.left;
-    }
-}
-function getRankByPoints(points) {
-    // 로그인이 안 되어 있거나 포인트가 없으면 게스트
-    if (!userData.isLoggedIn || points === undefined || points === null) return 'GUEST'; 
-    
-    const p = Number(points);
-    if (p >= 10000) return '해녀';
-    if (p >= 5000)  return '돌고래';
-    if (p >= 3000)  return '당근';
-    if (p >= 1000)  return '감자';
-    return '보말'; // 0~999 포인트
-}
-function openRankInfo() {
-    const layer = document.getElementById('rank-info-layer');
-    if (!layer) return;
-
-    const points = Number(userData.points || 0);
-    const currentRankKey = getRankByPoints(points); 
-    const name = userData.isLoggedIn ? userData.name : "방문자";
-    
-    const ranks = [
-        { id: '보말', name: '김녕 보말 🌱', pt: 0, img: 'r.png', desc: '작고 소중한 김녕의 시작' },
-        { id: '감자', name: '김녕 감자 🌊', pt: 1000, img: 'pote.png', desc: '포슬포슬 잘 익은 실천의 맛' },
-        { id: '당근', name: '김녕 당근 💎', pt: 3000, img: 'ca.png', desc: '땅 속 깊이 뿌리내린 진심' },
-        { id: '돌고래', name: '김녕 돌고래 ✨', pt: 5000, img: 'dol.png', desc: '바다를 자유롭게 누비는 수호자' },
-        { id: '해녀', name: '전설의 해녀 👑', pt: 10000, img: 'harry.png', desc: '바다와 하나가 된 살아있는 전설' }
-    ];
-
-    // 1. 상단 데이터 세팅
-    const nameEl = document.querySelector('#rank-info-layer #pop-user-name');
-    if (nameEl) nameEl.innerText = name;
-    
-    // [🔥 수리 1] 흰 배경 박스 제거 및 캐릭터 벌크업
-    const rankImgDisplay = document.querySelector('#rank-info-layer #pop-rank-img');
-    if (rankImgDisplay) {
-        rankImgDisplay.src = document.getElementById('harry-img').src;
-        // 스타일 강제 주입: 배경 없애고 크기 키우고 그림자 쫀득하게
-        rankImgDisplay.style.width = '100px'; 
-        rankImgDisplay.style.height = '100px';
-        rankImgDisplay.style.objectFit = 'contain';
-        rankImgDisplay.style.filter = 'drop-shadow(0 10px 15px rgba(0,0,0,0.15))'; // 캐릭터가 떠있는 느낌
-        
-        // 부모 박스(흰색이었던 것) 스타일 무력화
-        const parentBox = rankImgDisplay.parentElement;
-        if (parentBox) {
-            parentBox.style.background = 'none';
-            parentBox.style.boxShadow = 'none';
-            parentBox.style.padding = '0';
-        }
-    }
-
-    // 2. 뱃지 색상 데이터
-    const rankDataMap = {
-    'GUEST':  { text: 'GIMNYEONG PAY', color: 'linear-gradient(145deg, #ffffff, #e6e6e6)', textColor: '#333' },
-    '보말':   { text: '김녕 보말 🐚', color: 'linear-gradient(145deg, #ffdee9, #b5fffc)', textColor: '#333' },
-    '감자':   { text: '김녕 감자 🥔', color: 'linear-gradient(145deg, #e1b382, #c89666)', textColor: '#fff' },
-    '당근':   { text: '김녕 당근 🥕', color: 'linear-gradient(145deg, #ff9a9e, #fecfef)', textColor: '#fff' },
-    '돌고래': { text: '김녕 돌고래 🐬', color: 'linear-gradient(145deg, #01b2ad, #00d2ff)', textColor: '#fff' },
-    '해녀':   { text: '전설의 해녀 👑', color: 'linear-gradient(145deg, #667eea, #764ba2)', textColor: '#fff' }
-};
-
-    const badge = document.querySelector('#rank-info-layer #pop-rank-badge');
-    if (badge) {
-        const data = rankDataMap[currentRankKey] || rankDataMap['GUEST'];
-        badge.innerText = data.text;
-        badge.style.background = data.color;
-        badge.style.color = data.textColor;
-        badge.style.display = 'inline-block';
-        badge.style.padding = '4px 14px';
-        badge.style.borderRadius = '15px';
-        badge.style.fontSize = '0.75rem';
-        badge.style.fontWeight = '900';
-    }
-
-    // 3. 게이지 및 NEXT LEVEL (형님 요청대로 칼각 정렬 유지)
-    const gaugeBar = document.querySelector('#rank-info-layer #pop-gauge-bar');
-    const gaugePercent = document.querySelector('#rank-info-layer #pop-gauge-percent');
-    const nextInfoArea = document.querySelector('#rank-info-layer #pop-next-info');
-
-    const nextRank = ranks.find(r => r.pt > points);
-    const currentRankData = [...ranks].reverse().find(r => r.pt <= points);
-
-    if (nextRank) {
-        const range = nextRank.pt - currentRankData.pt;
-        const progress = points - currentRankData.pt;
-        const percent = Math.min(Math.floor((progress / range) * 100), 100);
-        
-        if (gaugeBar) {
-            gaugeBar.style.width = '0%';
-            setTimeout(() => { gaugeBar.style.width = percent + "%"; }, 50);
-        }
-        if (gaugePercent) gaugePercent.innerText = percent + "%";
-
-        const nextData = rankDataMap[nextRank.id] || rankDataMap['GUEST'];
-
-        if (nextInfoArea) {
-            nextInfoArea.innerHTML = `
-                <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 15px;">
-                    <div style="text-align: left;">
-                        <div style="color: #aaa; font-size: 0.65rem; font-weight: 800; letter-spacing: 0.5px; margin-bottom: 5px;">NEXT LEVEL</div>
-                        <div style="display: inline-block; background: ${nextData.color}; color: ${nextData.textColor}; padding: 4px 14px; border-radius: 12px; font-size: 0.85rem; font-weight: 900; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
-                            ${nextRank.name}
-                        </div>
-                    </div>
-                    <div style="text-align: right;">
-                        <div style="color: #aaa; font-size: 0.65rem; font-weight: 800; letter-spacing: 0.5px; margin-bottom: 5px;">REMAINING</div>
-                        <div style="color: var(--primary); font-size: 1.2rem; font-weight: 900; line-height: 1;">
-                            ${(nextRank.pt - points).toLocaleString()}<span style="font-size: 0.8rem; margin-left: 2px;">P</span>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-    } else {
-        if (gaugeBar) gaugeBar.style.width = "100%";
-        if (gaugePercent) gaugePercent.innerText = "100%";
-        if (nextInfoArea) {
-            nextInfoArea.innerHTML = `<div style="margin-top: 15px; background: #1a1a1a; padding: 12px; border-radius: 18px; text-align: center; animation: pulse 1.5s infinite;"><span style="color: #FFD700; font-size: 1.1rem; font-weight: 900;">🏆 MAX LEVEL REACHED</span></div>`;
-        }
-    }
-
-    // 4. 하단 도감 리스트 렌더링
-    let tableHtml = "";
-    ranks.forEach(r => {
-        const isCurrent = currentRankKey.includes(r.id);
-        const isLocked = points < r.pt;
-        tableHtml += `
-            <div class="d-flex align-items-center gap-3 p-3 mb-2" style="border-radius:20px; background: ${isCurrent ? '#e6f7f6' : '#f8f9fa'}; border: 2px solid ${isCurrent ? 'var(--primary)' : 'transparent'}; opacity: ${isLocked ? '0.6' : '1'}">
-                <img src="https://gnpay.my/${r.img}" style="width: 40px; height: 40px; object-fit: contain; filter: ${isLocked ? 'grayscale(100%)' : 'none'}">
-                <div style="flex:1;">
-                    <div class="fw-900" style="font-size:0.85rem; color:${isCurrent ? 'var(--primary)' : '#333'}">${r.name}</div>
-                    <div class="text-muted" style="font-size:0.65rem;">${r.desc}</div>
-                </div>
-                <div class="text-end fw-bold" style="font-size:0.7rem; color:#888;">
-                    ${r.pt === 0 ? '기본' : r.pt.toLocaleString() + 'P'}
-                </div>
-            </div>`;
-    });
-    
-    const listEl = document.getElementById('rank-table-list');
-    if (listEl) listEl.innerHTML = tableHtml;
-
-    layer.style.display = 'flex';
-}
 document.addEventListener('touchstart', e => {
     touchstartX = e.changedTouches[0].screenX;
 }, {passive: true});
