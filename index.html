@@ -553,6 +553,68 @@ button[style*="background: #f8f9fa"]:active {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-10px); }
 }
+.fw-900 { font-weight: 900 !important; }
+    #rank-table-list .fw-900 { letter-spacing: -0.8px; }
+    #rank-info-layer b { color: var(--primary); font-weight: 900; }
+    
+    @keyframes pulse {
+        0% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.02); opacity: 0.9; }
+        100% { transform: scale(1); opacity: 1; }
+    }
+/* 1. 컨테이너: 박스 형태를 버리고 배경에 녹아들게 */
+.level-container {
+    margin: 10px 0;
+    padding: 12px 16px; /* 크기를 확 줄임 */
+    background: transparent; /* 배경색 제거 (부모 컨테이너에 맞춤) */
+}
+
+/* 2. 텍스트 레이아웃: 가독성 중심 */
+.level-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.current-level {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #333;
+}
+
+.points-left {
+    font-size: 0.75rem;
+    color: #888;
+}
+
+.points-left strong {
+    color: var(--primary); /* 앱 메인 컬러 사용 */
+    font-weight: 800;
+}
+
+/* 3. 게이지 바: 슬림하고 세련되게 */
+.gauge-background {
+    width: 100%;
+    height: 8px; /* 얇게 변경 */
+    background: #e9ecef;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.gauge-fill {
+    height: 100%;
+    background: var(--primary); /* 단색으로 깔끔하게 */
+    border-radius: 10px;
+    transition: width 0.6s ease-out;
+    /* 3D 뱃지와 통일감을 주기 위해 상단에만 아주 얇은 하이라이트 */
+    box-shadow: inset 0 1px 1px rgba(255,255,255,0.4);
+}
+
+/* 4. 아래 레이블은 굳이 필요 없다면 제거하거나 아주 작게 */
+.level-labels {
+    display: none; /* 일단 숨겨서 미니멀하게 유지 */
+}
 </style>
 </head>
 <body>
@@ -593,9 +655,9 @@ button[style*="background: #f8f9fa"]:active {
         제주에서 함께 하는<br><strong>탄소중립 실천</strong>
     </h1>
 
-<div class="harry-float-container" style="position: absolute; right: 22px; bottom: 5px; width: 110px; height: 110px; z-index: 10;">
+<div class="harry-float-container" style="position: absolute; right: 10px; bottom: 5px; width: 110px; height: 110px; z-index: 10;">
     <div id="harry-motion-box" style="width: 100%; height: 100%; position: relative; animation: harryFloat 3s infinite ease-in-out;">
-        
+        <div class="harry-float-container" onclick="openRankInfo()" style="position: absolute; right: 22px; bottom: 5px; width: 110px; height: 110px; z-index: 10; cursor: pointer;"></div>
         <div id="harry-badge" style="
             position: absolute; top: -20px; left: 5px; 
             background: linear-gradient(145deg, #222, #000); 
@@ -736,14 +798,17 @@ button[style*="background: #f8f9fa"]:active {
     </div>
 
     <div id="mypage-user-content" style="display: none;">
-        <div class="mt-1" style="padding-left: 20px; padding-right: 20px;">
-            <div class="premium-card text-center" style="margin: 0; background: white; border: 1px solid rgba(1, 178, 173, 0.15); box-shadow: 0 15px 35px rgba(0,0,0,0.08); border-radius: 35px; padding: 35px 20px;">
+    <div class="mt-1" style="padding-left: 20px; padding-right: 20px;">
+        <div class="premium-card text-center" style="margin: 0; background: white; border: 1px solid rgba(1, 178, 173, 0.15); box-shadow: 0 15px 35px rgba(0,0,0,0.08); border-radius: 35px; padding: 35px 20px;">
+            
+            <div style="margin-bottom: 25px;">
+                <div id="mypage-rank-label" style="color: var(--primary); font-size: 0.8rem; font-weight: 900; letter-spacing: 1px; margin-bottom: 5px; opacity: 1;">
+                    &nbsp;
+                </div>
                 
-                <div style="margin-bottom: 25px;">
-                    <div style="color: var(--primary); font-size: 0.7rem; font-weight: 800; letter-spacing: 3px; margin-bottom: 5px; opacity: 0.8;">GIMNYEONG PAY</div>
-                    <div style="color: #1a1a1a; font-size: 1.6rem; font-weight: 900; letter-spacing: -1px;">
-                        <span id="mypage-user-name" style="color:var(--primary)"></span>님, 반가워요!
-                    </div>
+                <div style="color: #1a1a1a; font-size: 1.6rem; font-weight: 900; letter-spacing: -1px;">
+                    <span id="mypage-user-name" style="color:var(--primary)"></span>님, 반가워요!
+                </div>
                 </div>
 
                 <div class="qr-integration-box" style="margin-bottom: 30px; display: inline-block;">
@@ -767,9 +832,24 @@ button[style*="background: #f8f9fa"]:active {
         포인트/활동 내역 보기 <i class="bi bi-chevron-right ms-1"></i>
     </button>
 </div>
-                    <div style="font-size: 0.85rem; color: #777; font-weight: 700; margin-top: 15px; border-top: 1px dashed rgba(1, 178, 173, 0.2); padding-top: 12px;">
-                        함께 하는 탄소중립 실천 🌱
-                    </div>
+                 <div class="level-container" onclick="openRankInfo()" style="cursor: pointer; padding: 15px 5px;">
+  <div class="level-info" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+    <div style="display: flex; flex-direction: column; align-items: flex-start;">
+      <span style="font-size: 0.65rem; color: #aaa; font-weight: 800; letter-spacing: 0.5px; margin-bottom: 4px;">NEXT LEVEL</span>
+      <span id="pop-rank-badge-text" style="font-size: 0.95rem; font-weight: 900; color: #333; letter-spacing: -0.5px;">목표 확인 중</span>
+    </div>
+    <div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end;">
+      <span style="font-size: 0.65rem; color: #aaa; font-weight: 800; letter-spacing: 0.5px; margin-bottom: 4px;">REMAINING</span>
+      <div style="font-size: 1.1rem; font-weight: 900; color: var(--primary); line-height: 1;">
+        <span id="pop-next-info">0</span><span style="font-size: 0.8rem; margin-left: 2px;">P</span>
+      </div>
+    </div>
+  </div>
+  
+  <div class="gauge-background" style="width: 100%; height: 10px; background: rgba(0,0,0,0.05); border-radius: 10px; overflow: hidden;">
+    <div id="pop-gauge-bar" class="gauge-fill" style="width: 0%; height: 100%; background: var(--primary-grad); border-radius: 10px; transition: width 1.2s cubic-bezier(0.1, 0.9, 0.2, 1);"></div>
+  </div>
+</div>
                 </div>
             </div>
         </div>
@@ -967,6 +1047,51 @@ button[style*="background: #f8f9fa"]:active {
     </div>
 </div>
 
+<div id="rank-info-layer" class="qr-glass-effect" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 10001; display: none; flex-direction: column; align-items: center; justify-content: center;" onclick="this.style.display='none'">
+    <div class="bg-white p-4 rounded-5 shadow-lg qr-slide-up" style="width:88%; max-width:360px; position: relative; border: 1px solid rgba(255,255,255,0.3);" onclick="event.stopPropagation()">
+        
+        <div style="position: absolute; top: -20px; left: 20px; width: 55px; height: 55px; background: var(--primary-grad); border-radius: 18px; border: 4px solid #fff; box-shadow: 0 8px 15px rgba(1, 178, 173, 0.3); display: flex; align-items: center; justify-content: center; z-index: 10;">
+            <i class="bi bi-stars" style="color: white; font-size: 1.5rem;"></i>
+        </div>
+
+        <div class="text-center mt-3 mb-4">
+    <h5 class="fw-900" style="color: #1a1a1a; letter-spacing: -1.5px; font-size: 1.4rem; line-height: 1.1;">
+        김녕 수호자 <span style="color: var(--primary);">리포트</span>
+    </h5>
+    <p style="font-size: 0.8rem; font-weight: 600; color: #888; margin-top: 5px; letter-spacing: -0.5px;">
+        실천할수록 김녕의 보물이 자라나요!
+    </p>
+</div>
+        
+        <div class="p-4 mb-4" style="background: #f0fafa; border-radius: 30px; border: 1px solid #e0f2f1; position: relative; overflow: hidden;">
+            <div class="d-flex align-items-center gap-3 mb-3">
+                <div style="background: white; padding: 10px; border-radius: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05);">
+                    <img id="pop-rank-img" src="" style="width: 65px; height: 65px; object-fit: contain;">
+                </div>
+                <div style="flex: 1;">
+                    <div id="pop-rank-badge" style="display:inline-block; padding:3px 10px; border-radius:12px; font-size:0.7rem; color:white; font-weight:800; margin-bottom:5px;"></div>
+                    <div class="fw-900" style="font-size: 1.2rem; color:#222;"><span id="pop-user-name"></span>님</div>
+                </div>
+            </div>
+
+            <div id="gauge-container">
+                <div class="d-flex justify-content-between small fw-bold mb-1" style="font-size: 0.65rem; color: #666;">
+                    <span>성장 에너지</span>
+                    <span id="pop-gauge-percent">0%</span>
+                </div>
+                <div style="width: 100%; height: 12px; background: #e0e0e0; border-radius: 10px; overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);">
+                    <div id="pop-gauge-bar" style="width: 0%; height: 100%; background: var(--primary-grad); transition: width 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);"></div>
+                </div>
+                <div id="pop-next-info" class="text-center mt-2 fw-800" style="font-size: 0.75rem; color: var(--primary);"></div>
+            </div>
+        </div>
+
+        <div id="rank-table-list" style="max-height: 220px; overflow-y: auto; padding-right: 5px;">
+            </div>
+        
+        <button class="btn-scan w-100 mt-3" style="padding: 15px; border-radius: 20px;" onclick="document.getElementById('rank-info-layer').style.display='none'">확인 완료</button>
+    </div>
+</div>
     <div id="page-history" class="page">
     <div class="top-nav">
         <div onclick="showPage('page-main')" style="cursor: pointer;">
@@ -1273,31 +1398,104 @@ function updateUI() {
     const welcome = document.getElementById('welcome-message');
     const pointDisplay = document.getElementById('main-u-points');
     const qrTrigger = document.getElementById('qr-trigger');
+    
+    const rankLabel = document.getElementById('mypage-rank-label');
 
-    // 🌟 추가: 마이페이지 내부 스위칭 함수 호출 (함수 상단에 배치)
     syncMypageState(); 
 
     if (userData.isLoggedIn) {
-        // ---------------------------------------------------
-        // [지훈이의 엔진 추가] 로그인 상태: 내 포인트에 맞는 해리 소환!
-        const currentRank = getRankByPoints(userData.points);
-        updateHarryCharacter(currentRank);
-        // ---------------------------------------------------
+        const currentRankKey = getRankByPoints(userData.points);
+        
+        // [🔥 절대 에러 안나는 색상 데이터 창고]
+        const rankData = {
+            'GUEST':  { text: 'GIMNYEONG PAY', color: 'linear-gradient(145deg, #ffffff, #e6e6e6)', textColor: '#333' },
+            '보말':   { text: '김녕 보말 🌱', color: 'linear-gradient(145deg, #ffdee9, #b5fffc)', textColor: '#333' },
+            '감자':   { text: '김녕 감자 🌊', color: 'linear-gradient(145deg, #e1b382, #c89666)', textColor: '#fff' },
+            '당근':   { text: '김녕 당근 💎', color: 'linear-gradient(145deg, #ff9a9e, #fecfef)', textColor: '#fff' },
+            '돌고래': { text: '김녕 돌고래 ✨', color: 'linear-gradient(145deg, #01b2ad, #00d2ff)', textColor: '#fff' },
+            '해녀':   { text: '전설의 해녀 👑', color: 'linear-gradient(145deg, #667eea, #764ba2)', textColor: '#fff' }
+        };
 
-        // [로그인 상태] 사장님 기존 코드 유지
+        // 1. 현재 등급 뱃지 업데이트 (유저 이름 위)
+        if (rankLabel) {
+            const data = rankData[currentRankKey] || rankData['GUEST'];
+            rankLabel.innerText = data.text;
+            rankLabel.style.display = 'inline-block';
+            rankLabel.style.padding = '4px 14px';
+            rankLabel.style.borderRadius = '15px';
+            rankLabel.style.background = data.color;
+            rankLabel.style.color = data.textColor;
+            rankLabel.style.fontSize = '0.75rem';
+            rankLabel.style.fontWeight = '900';
+            rankLabel.style.boxShadow = '0 4px 10px rgba(0,0,0,0.08)';
+            rankLabel.style.marginBottom = '8px';
+        }
+
+        const points = Number(userData.points || 0);
+        const ranks = [
+            { id: '보말', name: '김녕 보말 🌱', pt: 0 },
+            { id: '감자', name: '김녕 감자 🌊', pt: 1000 },
+            { id: '당근', name: '김녕 당근 💎', pt: 3000 },
+            { id: '돌고래', name: '김녕 돌고래 ✨', pt: 5000 },
+            { id: '해녀', name: '전설의 해녀 👑', pt: 10000 }
+        ];
+
+        const nextRank = ranks.find(r => r.pt > points);
+        const currentRankData = [...ranks].reverse().find(r => r.pt <= points);
+
+        const gaugeFill = document.querySelector('#page-mypage #pop-gauge-bar'); 
+        const nextInfoNum = document.querySelector('#page-mypage #pop-next-info');
+        const nextRankTitle = document.querySelector('#page-mypage #pop-rank-badge-text');
+
+        if (nextRank) {
+            const range = nextRank.pt - currentRankData.pt;
+            const progress = points - currentRankData.pt;
+            const percent = Math.min(Math.floor((progress / range) * 100), 100);
+            
+            if (gaugeFill) gaugeFill.style.width = percent + "%";
+            
+            // [🔥 수리 포인트] 다음 등급 텍스트에 고유 뱃지 색상 입히기
+            if (nextRankTitle) {
+                const nextData = rankData[nextRank.id] || rankData['GUEST'];
+                nextRankTitle.innerText = nextRank.name;
+                nextRankTitle.style.display = 'inline-block';
+                nextRankTitle.style.padding = '3px 12px';
+                nextRankTitle.style.borderRadius = '12px';
+                nextRankTitle.style.background = nextData.color; // 다음 등급 색상 주입
+                nextRankTitle.style.color = nextData.textColor;
+                nextRankTitle.style.fontSize = '0.8rem';
+                nextRankTitle.style.fontWeight = '900';
+                nextRankTitle.style.boxShadow = '0 2px 6px rgba(0,0,0,0.1)';
+            }
+
+            if (nextInfoNum) {
+                const diff = nextRank.pt - points;
+                animateValue('pop-next-info', 0, diff, 1000);
+            }
+        } else {
+            if (gaugeFill) gaugeFill.style.width = "100%";
+            if (nextRankTitle) {
+                nextRankTitle.innerText = "최고 등급 달성! 👑";
+                nextRankTitle.style.background = 'linear-gradient(145deg, #FFD700, #FFA500)';
+                nextRankTitle.style.color = '#fff';
+                nextRankTitle.style.padding = '3px 12px';
+                nextRankTitle.style.borderRadius = '12px';
+            }
+            if (nextInfoNum) nextInfoNum.innerText = "0";
+        }
+
+        updateHarryCharacter(currentRankKey);
+
         authArea.innerHTML = `<span class="auth-link" style="color:var(--primary); font-weight:800;" onclick="showPage('page-mypage')">${userData.name}님</span><span style="color:#eee; font-size:0.7rem;">|</span><span class="auth-link" onclick="logout()">로그아웃</span>`;
         welcome.innerHTML = `${userData.name}님, 반갑습니다!<br><strong>김녕을 지켜주세요!</strong>`;
         
         const targetPoints = Number(userData.points || 0);
-
         animateValue('main-u-points', 0, targetPoints, 1000);
         animateValue('my-u-points', 0, targetPoints, 1000); 
 
-        // 마이페이지 이름 업데이트 (이것도 추가하세요)
         const myName = document.getElementById('mypage-user-name');
         if(myName) myName.innerText = userData.name;
 
-        // 마이페이지 QR 업데이트
         const myQr = document.getElementById('my-qr-img');
         if(myQr) myQr.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${userData.uid}`;
 
@@ -1321,29 +1519,20 @@ function updateUI() {
             window.pointSyncInterval = setInterval(syncPointsRealtime, 5000);
         }
     } else {
-        // ---------------------------------------------------
-        // [지훈이의 엔진 추가] 비로그인 상태: 게스트용 해리 소환!
         updateHarryCharacter('GUEST');
-        // ---------------------------------------------------
-
-        // [비로그인 상태] 🌟 지혜로운 수리 구역
+        if (rankLabel) {
+            rankLabel.innerText = "GIMNYEONG PAY";
+            rankLabel.style.background = 'none';
+            rankLabel.style.padding = '0';
+            rankLabel.style.boxShadow = 'none';
+            rankLabel.style.color = 'var(--primary)';
+        }
         authArea.innerHTML = `<span class="auth-link" onclick="showPage('page-signup')">회원가입</span><span style="color:#eee; font-size:0.7rem;">|</span><span class="auth-link text-dark" onclick="showPage('page-login')">로그인</span>`;
         welcome.innerHTML = `제주에서 함께 하는<br><strong>탄소중립 실천</strong>`;
-        
         if (pointDisplay) {
-            // 메인 화면 포인트를 누르면 로그인으로 가게 하되, 
-            // 하단바를 통한 마이페이지 이동은 막지 않습니다.
             pointDisplay.innerHTML = `<span style="font-size: 0.95rem; font-weight: 800; color: var(--primary);" onclick="showPage('page-login')">로그인 후 이용하세요 <i class="bi bi-chevron-right"></i></span>`;
         }
-        
-        // 메인 중앙 QR 버튼은 로그인이 필수이므로 유지
         qrTrigger.onclick = () => showPage('page-login');
-
-        if (qrTrigger) {
-            qrTrigger.style.animation = "none";
-            void qrTrigger.offsetWidth;
-            qrTrigger.style.animation = "login-glow 2s infinite ease-in-out";
-        }
     }
 }
 // 마이페이지 진입 시마다 상태 체크해서 화면 스위칭
@@ -1478,6 +1667,39 @@ function goToMyPage() {
 
         // [새로 추가하는 함수] 이메일 주소를 입력받아 서버(GAS)에 임시비번 요청을 보냅니다.
 // 1. 팝업 열기 (기존의 prompt 대신 이걸 실행)
+
+function updateMypageGauge() {
+    if (!userData.isLoggedIn) return;
+
+    const points = Number(userData.points || 0);
+    const ranks = [
+        { id: '몽돌', name: '김녕 보말 🌱', pt: 0 },
+        { id: '파도', name: '김녕 감자 🌊', pt: 1000 },
+        { id: '심해', name: '김녕 당근 💎', pt: 3000 },
+        { id: '수호신', name: '김녕 돌고래 ✨', pt: 5000 },
+        { id: '전설', name: '전설의 해녀 👑', pt: 10000 }
+    ];
+
+    const currentRankIdx = [...ranks].reverse().findIndex(r => r.pt <= points);
+    const nextRank = ranks.find(r => r.pt > points);
+
+    const gaugeBar = document.getElementById('pop-gauge-bar');
+    const badgeText = document.getElementById('pop-rank-badge-text'); // ID 수정됨
+    const nextInfo = document.getElementById('pop-next-info');
+
+    if (nextRank) {
+        const currentRankPt = ranks[ranks.length - 1 - currentRankIdx].pt;
+        const percent = Math.floor(((points - currentRankPt) / (nextRank.pt - currentRankPt)) * 100);
+        
+        if (gaugeBar) gaugeBar.style.width = percent + "%";
+        if (badgeText) badgeText.innerText = nextRank.name; // 다음 목표 등급 이름
+        if (nextInfo) animateValue('pop-next-info', 0, nextRank.pt - points, 1000);
+    } else {
+        if (gaugeBar) gaugeBar.style.width = "100%";
+        if (badgeText) badgeText.innerText = "최고 등급 달성! 👑";
+        if (nextInfo) nextInfo.innerText = "0";
+    }
+}
 function handleForgotPassword() {
     const layer = document.getElementById('pw-reset-layer');
     if(layer) {
@@ -2141,27 +2363,48 @@ function updateHarryCharacter(rank) {
     const img = document.getElementById('harry-img');
     if (!badge || !img) return;
 
-    // [수정 포인트 1] 각 캐릭터마다 'top'과 'left' 좌표를 추가했습니다.
-    // (형님이 화면 보시면서 이 숫자들만 조금씩 깎으시면 됩니다!)
     const rankData = {
-        'GUEST': { img: '3dlog.png', color: 'linear-gradient(145deg, #222, #000)', text: '로그인 필요! 🔒', top: '-20px', left: '5px' },
-        '몽돌':   { img: 'r.png',     color: 'linear-gradient(145deg, #A67C52, #5D4037)', text: '몽돌 등급 🌱', top: '-10px', left: '10px' },
-        '파도':   { img: 'pote.png',  color: 'linear-gradient(145deg, #01d1cb, #019994)', text: '파도 등급 🌊', top: '-15px', left: '15px' },
-        '심해':   { img: 'ca.png',    color: 'linear-gradient(145deg, #1565C0, #0D47A1)', text: '심해 수호자 💎', top: '-28px', left: '8px' },
-        '수호신': { img: 'dol.png',   color: 'linear-gradient(145deg, #FFC107, #FFA000)', text: '김녕 수호신 ✨', top: '-30px', left: '5px' },
-        '전설':   { img: 'harry.png', color: 'linear-gradient(145deg, #9C27B0, #7B1FA2)', text: '바다의 전설 👑', top: '-25px', left: '5px' }
+        // [GUEST] 형님 좌표: top -20, left 5
+        'GUEST': { 
+            img: '3dlog.png', color: 'linear-gradient(145deg, #ffffff, #e6e6e6)', text: '로그인 필요! 🔒', 
+            top: '-20px', left: '5px' 
+        },
+        // [몽돌] 살색/연핑크 (r.png) / 형님 좌표: top -10, left 10
+        '보말': { 
+            img: 'r.png', color: 'linear-gradient(145deg, #ffdee9, #b5fffc)', text: '김녕 보말 🌱', 
+            top: '-10px', left: '10px' 
+        },
+        // [파도] 연브라운 감자 (pote.png) / 형님 좌표: top -15, left 15
+        '감자': { 
+            img: 'pote.png', color: 'linear-gradient(145deg, #e1b382, #c89666)', text: '김녕 감자 🌊', 
+            top: '-15px', left: '15px' 
+        },
+        // [심해] 당근 주황색 (ca.png) / 형님 좌표: top -28, left 8
+        '당근': { 
+            img: 'ca.png', color: 'linear-gradient(145deg, #ff9a9e, #fecfef)', text: '김녕 당근 💎', 
+            top: '-28px', left: '9px' 
+        },
+        // [수호신] 푸른 바다색 (dol.png) / 형님 좌표: top -25, left 5
+        '돌고래': { 
+            img: 'dol.png', color: 'linear-gradient(145deg, #01b2ad, #00d2ff)', text: '김녕 돌고래 ✨', 
+            top: '-25px', left: '5px' 
+        },
+        // [전설] 해리 (harry.png) / 형님 좌표: top -25, left 5
+        '해녀': { 
+            img: 'harry.png', color: 'linear-gradient(145deg, #667eea, #764ba2)', text: '전설의 해녀 👑', 
+            top: '-25px', left: '5px' 
+        }
     };
 
     const data = rankData[rank];
-    
-    // [수정 포인트 2] 에러 방지용 안전장치 (데이터가 있을 때만 실행)
     if (data) {
-        // 기존 형님 코드 (이미지, 색상, 글자 변경)
         img.src = `https://gnpay.my/${data.img}`;
         badge.style.background = data.color;
-        badge.innerText = data.text;
         
-        // [수정 포인트 3] 각 캐릭터에 맞는 뱃지 위치로 촥! 이동
+        // 밝은 색 뱃지(GUEST, 몽돌)에서 글자가 잘 보이게 검은색 처리
+        badge.style.color = (rank === 'GUEST' || rank === '보말') ? '#333' : '#fff';
+        
+        badge.innerText = data.text;
         badge.style.top = data.top;
         badge.style.left = data.left;
     }
@@ -2171,11 +2414,143 @@ function getRankByPoints(points) {
     if (!userData.isLoggedIn || points === undefined || points === null) return 'GUEST'; 
     
     const p = Number(points);
-    if (p >= 10000) return '전설';
-    if (p >= 5000)  return '수호신';
-    if (p >= 3000)  return '심해';
-    if (p >= 1000)  return '파도';
-    return '몽돌'; // 0~999 포인트
+    if (p >= 10000) return '해녀';
+    if (p >= 5000)  return '돌고래';
+    if (p >= 3000)  return '당근';
+    if (p >= 1000)  return '감자';
+    return '보말'; // 0~999 포인트
+}
+function openRankInfo() {
+    const layer = document.getElementById('rank-info-layer');
+    if (!layer) return;
+
+    const points = Number(userData.points || 0);
+    const currentRankKey = getRankByPoints(points); 
+    const name = userData.isLoggedIn ? userData.name : "방문자";
+    
+    const ranks = [
+        { id: '보말', name: '김녕 보말 🌱', pt: 0, img: 'r.png', desc: '작고 소중한 김녕의 시작' },
+        { id: '감자', name: '김녕 감자 🌊', pt: 1000, img: 'pote.png', desc: '포슬포슬 잘 익은 실천의 맛' },
+        { id: '당근', name: '김녕 당근 💎', pt: 3000, img: 'ca.png', desc: '땅 속 깊이 뿌리내린 진심' },
+        { id: '돌고래', name: '김녕 돌고래 ✨', pt: 5000, img: 'dol.png', desc: '바다를 자유롭게 누비는 수호자' },
+        { id: '해녀', name: '전설의 해녀 👑', pt: 10000, img: 'harry.png', desc: '바다와 하나가 된 살아있는 전설' }
+    ];
+
+    // 1. 상단 데이터 세팅
+    const nameEl = document.querySelector('#rank-info-layer #pop-user-name');
+    if (nameEl) nameEl.innerText = name;
+    
+    // [🔥 수리 1] 흰 배경 박스 제거 및 캐릭터 벌크업
+    const rankImgDisplay = document.querySelector('#rank-info-layer #pop-rank-img');
+    if (rankImgDisplay) {
+        rankImgDisplay.src = document.getElementById('harry-img').src;
+        // 스타일 강제 주입: 배경 없애고 크기 키우고 그림자 쫀득하게
+        rankImgDisplay.style.width = '100px'; 
+        rankImgDisplay.style.height = '100px';
+        rankImgDisplay.style.objectFit = 'contain';
+        rankImgDisplay.style.filter = 'drop-shadow(0 10px 15px rgba(0,0,0,0.15))'; // 캐릭터가 떠있는 느낌
+        
+        // 부모 박스(흰색이었던 것) 스타일 무력화
+        const parentBox = rankImgDisplay.parentElement;
+        if (parentBox) {
+            parentBox.style.background = 'none';
+            parentBox.style.boxShadow = 'none';
+            parentBox.style.padding = '0';
+        }
+    }
+
+    // 2. 뱃지 색상 데이터
+    const rankDataMap = {
+        'GUEST':  { text: 'GIMNYEONG PAY', color: 'linear-gradient(145deg, #ffffff, #e6e6e6)', textColor: '#333' },
+        '보말':   { text: '김녕 보말 🌱', color: 'linear-gradient(145deg, #ffdee9, #b5fffc)', textColor: '#333' },
+        '감자':   { text: '김녕 감자 🌊', color: 'linear-gradient(145deg, #e1b382, #c89666)', textColor: '#fff' },
+        '당근':   { text: '김녕 당근 💎', color: 'linear-gradient(145deg, #ff9a9e, #fecfef)', textColor: '#fff' },
+        '돌고래': { text: '김녕 돌고래 ✨', color: 'linear-gradient(145deg, #01b2ad, #00d2ff)', textColor: '#fff' },
+        '해녀':   { text: '전설의 해녀 👑', color: 'linear-gradient(145deg, #667eea, #764ba2)', textColor: '#fff' }
+    };
+
+    const badge = document.querySelector('#rank-info-layer #pop-rank-badge');
+    if (badge) {
+        const data = rankDataMap[currentRankKey] || rankDataMap['GUEST'];
+        badge.innerText = data.text;
+        badge.style.background = data.color;
+        badge.style.color = data.textColor;
+        badge.style.display = 'inline-block';
+        badge.style.padding = '4px 14px';
+        badge.style.borderRadius = '15px';
+        badge.style.fontSize = '0.75rem';
+        badge.style.fontWeight = '900';
+    }
+
+    // 3. 게이지 및 NEXT LEVEL (형님 요청대로 칼각 정렬 유지)
+    const gaugeBar = document.querySelector('#rank-info-layer #pop-gauge-bar');
+    const gaugePercent = document.querySelector('#rank-info-layer #pop-gauge-percent');
+    const nextInfoArea = document.querySelector('#rank-info-layer #pop-next-info');
+
+    const nextRank = ranks.find(r => r.pt > points);
+    const currentRankData = [...ranks].reverse().find(r => r.pt <= points);
+
+    if (nextRank) {
+        const range = nextRank.pt - currentRankData.pt;
+        const progress = points - currentRankData.pt;
+        const percent = Math.min(Math.floor((progress / range) * 100), 100);
+        
+        if (gaugeBar) {
+            gaugeBar.style.width = '0%';
+            setTimeout(() => { gaugeBar.style.width = percent + "%"; }, 50);
+        }
+        if (gaugePercent) gaugePercent.innerText = percent + "%";
+
+        const nextData = rankDataMap[nextRank.id] || rankDataMap['GUEST'];
+
+        if (nextInfoArea) {
+            nextInfoArea.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 15px;">
+                    <div style="text-align: left;">
+                        <div style="color: #aaa; font-size: 0.65rem; font-weight: 800; letter-spacing: 0.5px; margin-bottom: 5px;">NEXT LEVEL</div>
+                        <div style="display: inline-block; background: ${nextData.color}; color: ${nextData.textColor}; padding: 4px 14px; border-radius: 12px; font-size: 0.85rem; font-weight: 900; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+                            ${nextRank.name}
+                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="color: #aaa; font-size: 0.65rem; font-weight: 800; letter-spacing: 0.5px; margin-bottom: 5px;">REMAINING</div>
+                        <div style="color: var(--primary); font-size: 1.2rem; font-weight: 900; line-height: 1;">
+                            ${(nextRank.pt - points).toLocaleString()}<span style="font-size: 0.8rem; margin-left: 2px;">P</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+    } else {
+        if (gaugeBar) gaugeBar.style.width = "100%";
+        if (gaugePercent) gaugePercent.innerText = "100%";
+        if (nextInfoArea) {
+            nextInfoArea.innerHTML = `<div style="margin-top: 15px; background: #1a1a1a; padding: 12px; border-radius: 18px; text-align: center; animation: pulse 1.5s infinite;"><span style="color: #FFD700; font-size: 1.1rem; font-weight: 900;">🏆 MAX LEVEL REACHED</span></div>`;
+        }
+    }
+
+    // 4. 하단 도감 리스트 렌더링
+    let tableHtml = "";
+    ranks.forEach(r => {
+        const isCurrent = currentRankKey.includes(r.id);
+        const isLocked = points < r.pt;
+        tableHtml += `
+            <div class="d-flex align-items-center gap-3 p-3 mb-2" style="border-radius:20px; background: ${isCurrent ? '#e6f7f6' : '#f8f9fa'}; border: 2px solid ${isCurrent ? 'var(--primary)' : 'transparent'}; opacity: ${isLocked ? '0.6' : '1'}">
+                <img src="https://gnpay.my/${r.img}" style="width: 40px; height: 40px; object-fit: contain; filter: ${isLocked ? 'grayscale(100%)' : 'none'}">
+                <div style="flex:1;">
+                    <div class="fw-900" style="font-size:0.85rem; color:${isCurrent ? 'var(--primary)' : '#333'}">${r.name}</div>
+                    <div class="text-muted" style="font-size:0.65rem;">${r.desc}</div>
+                </div>
+                <div class="text-end fw-bold" style="font-size:0.7rem; color:#888;">
+                    ${r.pt === 0 ? '기본' : r.pt.toLocaleString() + 'P'}
+                </div>
+            </div>`;
+    });
+    
+    const listEl = document.getElementById('rank-table-list');
+    if (listEl) listEl.innerHTML = tableHtml;
+
+    layer.style.display = 'flex';
 }
 document.addEventListener('touchstart', e => {
     touchstartX = e.changedTouches[0].screenX;
