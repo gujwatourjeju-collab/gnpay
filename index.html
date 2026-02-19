@@ -63,33 +63,39 @@
     .amount-text { font-size: 1.8rem; font-weight: 900; background: var(--primary-grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     
     /* [수정] 마이페이지 프리미엄 카드 및 일체형 QR 디자인 */
-    .premium-card {
-        background: linear-gradient(135deg, #1a1a1a 0%, #333 100%);
-        border-radius: 35px; padding: 50px 20px 35px; margin: 20px; color: white;
-        box-shadow: 0 20px 40px rgba(0,0,0,0.3); position: relative; overflow: hidden;
-        border: 1px solid rgba(255,255,255,0.05);
-    }
+  .premium-card {
+    /* padding 상단을 50px -> 30px로 줄여 공간 확보 */
+    padding: 30px 20px 25px !important; 
+    margin: 10px 20px !important; 
+}
 
     /* 로고와 QR을 하나로 묶어 숨쉬게 하는 컨테이너 */
-    .qr-integration-box {
-        position: relative; display: inline-block; margin-bottom: 25px;
-        animation: qr-breathe 2s infinite ease-in-out; /* 통합 숨쉬기 */
-    }
+.qr-integration-box {
+    position: relative; 
+    display: inline-block; 
+    margin-top: 15px; /* 로고가 걸칠 공간 확보 */
+    margin-bottom: 15px; /* 아래쪽 간격 축소 */
+}
 
-    .qr-frame {
-        background: white; padding: 15px; border-radius: 24px; display: inline-block;
-        box-shadow: 0 0 20px rgba(1, 178, 173, 0.4);
-    }
+   .qr-frame {
+    padding: 10px !important; /* 내부 여백 줄임 */
+    border-radius: 20px !important;
+}
 
     /* 로고 상단 중앙 침범 배치 */
-    .qr-top-logo {
-        position: absolute; top: -20px; left: 50%; transform: translateX(-50%);
-        width: 55px; height: 55px; background: var(--primary-grad);
-        border-radius: 18px; border: 3px solid #1a1a1a; /* 카드 배경과 맞춘 테두리로 침범 강조 */
-        display: flex; align-items: center; justify-content: center;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.3); z-index: 10;
-        padding: 5px;
-    }
+.qr-top-logo {
+    position: absolute; 
+    /* top을 -20px 정도로 조정하면 프레임 선 중간에 딱 걸칩니다 */
+    top: -20px !important; 
+    left: 50%; 
+    transform: translateX(-50%);
+    width: 45px !important; /* 크기도 살짝 컴팩트하게 조절 */
+    height: 45px !important;
+    z-index: 10;
+}
+.user-points-display#my-u-points {
+    font-size: 2.5rem !important; /* 너무 크면 한 화면에 안 들어오니 살짝 축소 */
+}
 
     @keyframes qr-breathe {
         0% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(1, 178, 173, 0.3)); }
@@ -805,62 +811,64 @@ button[style*="background: #f8f9fa"]:active {
 
     <div id="mypage-user-content" style="display: none;">
     <div class="mt-1" style="padding-left: 20px; padding-right: 20px;">
-        <div class="premium-card text-center" style="margin: 0; background: white; border: 1px solid rgba(1, 178, 173, 0.15); box-shadow: 0 15px 35px rgba(0,0,0,0.08); border-radius: 35px; padding: 35px 20px;">
+        <div class="premium-card text-center" style="margin: 0; background: white; border: 1px solid rgba(1, 178, 173, 0.15); box-shadow: 0 15px 35px rgba(0,0,0,0.08); border-radius: 35px; padding: 20px 20px 15px;">
             
-            <div style="margin-bottom: 25px;">
+            <div style="margin-bottom: 10px;">
                 <div id="mypage-rank-label" style="color: var(--primary); font-size: 0.8rem; font-weight: 900; letter-spacing: 1px; margin-bottom: 5px; opacity: 1;">
                     &nbsp;
                 </div>
                 
-                <div style="color: #1a1a1a; font-size: 1.6rem; font-weight: 900; letter-spacing: -1px;">
+                <div style="color: #1a1a1a; font-size: 1.5rem; font-weight: 900; letter-spacing: -1px;">
                     <span id="mypage-user-name" style="color:var(--primary)"></span>님, 반가워요!
                 </div>
+            </div>
+
+          <div class="qr-integration-box" style="margin-top: 15px; margin-bottom: 20px; display: inline-block; position: relative; animation: qr-breathe 2s infinite ease-in-out;">
+    
+    <div class="qr-top-logo" style="position: absolute; top: -18px; left: 50%; transform: translateX(-50%); border: 3px solid #fff; width: 42px; height: 42px; background: #01b2ad !important; overflow: hidden; display: flex; align-items: center; justify-content: center; border-radius: 12px !important; z-index: 10; box-shadow: 0 5px 12px rgba(0,0,0,0.2);"> 
+        <img src="https://gnpay.my/log2.png" style="width: 100%; height: 100%; object-fit: contain;">
+    </div>
+
+    <div class="qr-frame" style="background: #f8fcfc; padding: 10px; border-radius: 25px; display: inline-block; border: 1px solid #edf7f6; box-shadow: 0 0 20px rgba(1, 178, 173, 0.2); animation: aurora 3s infinite alternate;">
+        <img id="my-qr-img" src="" style="width: 145px; height: 145px; border-radius: 15px; display: block;">
+    </div>
+</div>
+
+            <div style="background: #f8fcfc; padding: 15px 15px; border-radius: 28px; border: 1px solid rgba(1, 178, 173, 0.1);">
+                <div style="color: #888; font-size: 0.7rem; font-weight: 700; letter-spacing: 1px; margin-bottom: 2px;">사용가능 포인트</div>
+                <div style="display: flex; align-items: baseline; justify-content: center; gap: 4px;">
+                    <div class="user-points-display" id="my-u-points" style="font-size: 2.4rem; font-weight: 900; color: var(--primary); line-height: 1;">0</div>
+                    <div style="font-size: 1.1rem; font-weight: 800; color: #333;">P</div>
+                </div>
+                
+                <div class="text-center mt-2">
+                    <button onclick="loadActivityHistory()" 
+                            style="background: rgba(1, 178, 173, 0.08); border: none; padding: 6px 15px; border-radius: 50px; color: var(--primary); font-size: 0.75rem; font-weight: 800;">
+                        내역 보기 <i class="bi bi-chevron-right ms-1"></i>
+                    </button>
                 </div>
 
-                <div class="qr-integration-box" style="margin-bottom: 30px; display: inline-block;">
-                    <div class="qr-top-logo" style="border: 3px solid #fff; width: 40px; height: 40px; background: #01b2ad !important; overflow: hidden; display: flex; align-items: center; justify-content: center; border-radius: 12px !important;"> 
-                        <img src="https://gnpay.my/log2.png" style="width: 100%; height: 100%; object-fit: contain;">
+                <div class="level-container" onclick="openRankInfo()" style="cursor: pointer; padding: 10px 5px 0px;">
+                    <div class="level-info" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <div style="display: flex; flex-direction: column; align-items: flex-start;">
+                            <span style="font-size: 0.6rem; color: #aaa; font-weight: 800; letter-spacing: 0.5px; margin-bottom: 2px;">다음 등급</span>
+                            <span id="pop-rank-badge-text" style="font-size: 0.85rem; font-weight: 900; color: #333; letter-spacing: -0.5px;">목표 확인 중</span>
+                        </div>
+                        <div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end;">
+                            <span style="font-size: 0.6rem; color: #aaa; font-weight: 800; letter-spacing: 0.5px; margin-bottom: 2px;">남은 포인트</span>
+                            <div style="font-size: 1rem; font-weight: 900; color: var(--primary); line-height: 1;">
+                                <span id="pop-next-info">0</span><span style="font-size: 0.7rem; margin-left: 2px;">P</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="qr-frame" style="background: #f8fcfc; padding: 12px; border-radius: 25px; display: inline-block; border: 1px solid #edf7f6; box-shadow: inset 0 2px 5px rgba(0,0,0,0.02);">
-                        <img id="my-qr-img" src="" style="width: 170px; height: 170px; border-radius: 15px;">
+                    <div class="gauge-background" style="width: 100%; height: 8px; background: rgba(0,0,0,0.05); border-radius: 10px; overflow: hidden;">
+                        <div id="pop-gauge-bar" class="gauge-fill" style="width: 0%; height: 100%; background: var(--primary-grad); border-radius: 10px; transition: width 1.2s cubic-bezier(0.1, 0.9, 0.2, 1);"></div>
                     </div>
-                </div>
-
-                <div style="background: #f8fcfc; padding: 22px 15px; border-radius: 28px; border: 1px solid rgba(1, 178, 173, 0.1);">
-                    <div style="color: #888; font-size: 0.75rem; font-weight: 700; letter-spacing: 1px; margin-bottom: 5px;">사용가능 포인트</div>
-                    <div style="display: flex; align-items: baseline; justify-content: center; gap: 4px;">
-                        <div class="user-points-display" id="my-u-points" style="font-size: 3rem; font-weight: 900; color: var(--primary); line-height: 1;">0</div>
-                        <div style="font-size: 1.3rem; font-weight: 800; color: #333;">P</div>
-                    </div>
-                    <div class="text-center mt-3">
-    <button onclick="loadActivityHistory()" 
-            style="background: rgba(1, 178, 173, 0.08); border: none; padding: 8px 18px; border-radius: 50px; color: var(--primary); font-size: 0.8rem; font-weight: 800;">
-        포인트/활동 내역 보기 <i class="bi bi-chevron-right ms-1"></i>
-    </button>
-</div>
-                 <div class="level-container" onclick="openRankInfo()" style="cursor: pointer; padding: 15px 5px;">
-  <div class="level-info" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-    <div style="display: flex; flex-direction: column; align-items: flex-start;">
-      <span style="font-size: 0.65rem; color: #aaa; font-weight: 800; letter-spacing: 0.5px; margin-bottom: 4px;">NEXT LEVEL</span>
-      <span id="pop-rank-badge-text" style="font-size: 0.95rem; font-weight: 900; color: #333; letter-spacing: -0.5px;">목표 확인 중</span>
-    </div>
-    <div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end;">
-      <span style="font-size: 0.65rem; color: #aaa; font-weight: 800; letter-spacing: 0.5px; margin-bottom: 4px;">REMAINING</span>
-      <div style="font-size: 1.1rem; font-weight: 900; color: var(--primary); line-height: 1;">
-        <span id="pop-next-info">0</span><span style="font-size: 0.8rem; margin-left: 2px;">P</span>
-      </div>
-    </div>
-  </div>
-  
-  <div class="gauge-background" style="width: 100%; height: 10px; background: rgba(0,0,0,0.05); border-radius: 10px; overflow: hidden;">
-    <div id="pop-gauge-bar" class="gauge-fill" style="width: 0%; height: 100%; background: var(--primary-grad); border-radius: 10px; transition: width 1.2s cubic-bezier(0.1, 0.9, 0.2, 1);"></div>
-  </div>
-</div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+</div></div>
 
         
   <div id="page-login" class="page">
@@ -2433,12 +2441,19 @@ function getRankByPoints(points) {
     return '보말'; // 0~999 포인트
 }
 function openRankInfo() {
+    // 1. 로그인 체크: 알림창 없이 바로 로그인 페이지로 슝!
+    if (!userData || !userData.isLoggedIn) {
+        showPage('page-login');
+        return; 
+    }
+
     const layer = document.getElementById('rank-info-layer');
     if (!layer) return;
 
+    // 2. 데이터 준비
     const points = Number(userData.points || 0);
     const currentRankKey = getRankByPoints(points); 
-    const name = userData.isLoggedIn ? userData.name : "방문자";
+    const name = userData.name || "사용자";
     
     const ranks = [
         { id: '보말', name: '김녕 보말 🐚', pt: 0, img: 'r.png', desc: '작고 소중한 김녕의 시작' },
@@ -2448,21 +2463,18 @@ function openRankInfo() {
         { id: '해녀', name: '전설의 해녀 👑', pt: 10000, img: 'harry.png', desc: '바다와 하나가 된 살아있는 전설' }
     ];
 
-    // 1. 상단 데이터 세팅
+    // 3. 사용자 정보 및 캐릭터 세팅 (스타일 포함)
     const nameEl = document.querySelector('#rank-info-layer #pop-user-name');
     if (nameEl) nameEl.innerText = name;
     
-    // [🔥 수리 1] 흰 배경 박스 제거 및 캐릭터 벌크업
     const rankImgDisplay = document.querySelector('#rank-info-layer #pop-rank-img');
     if (rankImgDisplay) {
         rankImgDisplay.src = document.getElementById('harry-img').src;
-        // 스타일 강제 주입: 배경 없애고 크기 키우고 그림자 쫀득하게
         rankImgDisplay.style.width = '100px'; 
         rankImgDisplay.style.height = '100px';
         rankImgDisplay.style.objectFit = 'contain';
-        rankImgDisplay.style.filter = 'drop-shadow(0 10px 15px rgba(0,0,0,0.15))'; // 캐릭터가 떠있는 느낌
+        rankImgDisplay.style.filter = 'drop-shadow(0 10px 15px rgba(0,0,0,0.15))';
         
-        // 부모 박스(흰색이었던 것) 스타일 무력화
         const parentBox = rankImgDisplay.parentElement;
         if (parentBox) {
             parentBox.style.background = 'none';
@@ -2471,15 +2483,15 @@ function openRankInfo() {
         }
     }
 
-    // 2. 뱃지 색상 데이터
+    // 4. 뱃지 색상 매핑
     const rankDataMap = {
-    'GUEST':  { text: 'GIMNYEONG PAY', color: 'linear-gradient(145deg, #ffffff, #e6e6e6)', textColor: '#333' },
-    '보말':   { text: '김녕 보말 🐚', color: 'linear-gradient(145deg, #ffdee9, #b5fffc)', textColor: '#333' },
-    '감자':   { text: '김녕 감자 🥔', color: 'linear-gradient(145deg, #e1b382, #c89666)', textColor: '#fff' },
-    '당근':   { text: '김녕 당근 🥕', color: 'linear-gradient(145deg, #ff9a9e, #fecfef)', textColor: '#fff' },
-    '돌고래': { text: '김녕 돌고래 🐬', color: 'linear-gradient(145deg, #01b2ad, #00d2ff)', textColor: '#fff' },
-    '해녀':   { text: '전설의 해녀 👑', color: 'linear-gradient(145deg, #667eea, #764ba2)', textColor: '#fff' }
-};
+        'GUEST':  { text: 'GIMNYEONG PAY', color: 'linear-gradient(145deg, #ffffff, #e6e6e6)', textColor: '#333' },
+        '보말':   { text: '김녕 보말 🐚', color: 'linear-gradient(145deg, #ffdee9, #b5fffc)', textColor: '#333' },
+        '감자':   { text: '김녕 감자 🥔', color: 'linear-gradient(145deg, #e1b382, #c89666)', textColor: '#fff' },
+        '당근':   { text: '김녕 당근 🥕', color: 'linear-gradient(145deg, #ff9a9e, #fecfef)', textColor: '#fff' },
+        '돌고래': { text: '김녕 돌고래 🐬', color: 'linear-gradient(145deg, #01b2ad, #00d2ff)', textColor: '#fff' },
+        '해녀':   { text: '전설의 해녀 👑', color: 'linear-gradient(145deg, #667eea, #764ba2)', textColor: '#fff' }
+    };
 
     const badge = document.querySelector('#rank-info-layer #pop-rank-badge');
     if (badge) {
@@ -2494,7 +2506,7 @@ function openRankInfo() {
         badge.style.fontWeight = '900';
     }
 
-    // 3. 게이지 및 NEXT LEVEL (형님 요청대로 칼각 정렬 유지)
+    // 5. 게이지 바 및 다음 등급 텍스트 렌더링
     const gaugeBar = document.querySelector('#rank-info-layer #pop-gauge-bar');
     const gaugePercent = document.querySelector('#rank-info-layer #pop-gauge-percent');
     const nextInfoArea = document.querySelector('#rank-info-layer #pop-next-info');
@@ -2519,13 +2531,13 @@ function openRankInfo() {
             nextInfoArea.innerHTML = `
                 <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 15px;">
                     <div style="text-align: left;">
-                        <div style="color: #aaa; font-size: 0.65rem; font-weight: 800; letter-spacing: 0.5px; margin-bottom: 5px;">NEXT LEVEL</div>
+                        <div style="color: #aaa; font-size: 0.65rem; font-weight: 800; letter-spacing: 0.5px; margin-bottom: 5px;">다음 등급</div>
                         <div style="display: inline-block; background: ${nextData.color}; color: ${nextData.textColor}; padding: 4px 14px; border-radius: 12px; font-size: 0.85rem; font-weight: 900; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
                             ${nextRank.name}
                         </div>
                     </div>
                     <div style="text-align: right;">
-                        <div style="color: #aaa; font-size: 0.65rem; font-weight: 800; letter-spacing: 0.5px; margin-bottom: 5px;">REMAINING</div>
+                        <div style="color: #aaa; font-size: 0.65rem; font-weight: 800; letter-spacing: 0.5px; margin-bottom: 5px;">남은 포인트</div>
                         <div style="color: var(--primary); font-size: 1.2rem; font-weight: 900; line-height: 1;">
                             ${(nextRank.pt - points).toLocaleString()}<span style="font-size: 0.8rem; margin-left: 2px;">P</span>
                         </div>
@@ -2537,11 +2549,11 @@ function openRankInfo() {
         if (gaugeBar) gaugeBar.style.width = "100%";
         if (gaugePercent) gaugePercent.innerText = "100%";
         if (nextInfoArea) {
-            nextInfoArea.innerHTML = `<div style="margin-top: 15px; background: #1a1a1a; padding: 12px; border-radius: 18px; text-align: center; animation: pulse 1.5s infinite;"><span style="color: #FFD700; font-size: 1.1rem; font-weight: 900;">🏆 MAX LEVEL REACHED</span></div>`;
+            nextInfoArea.innerHTML = `<div style="margin-top: 15px; background: #1a1a1a; padding: 12px; border-radius: 18px; text-align: center; animation: pulse 1.5s infinite;"><span style="color: #FFD700; font-size: 1.1rem; font-weight: 900;">🏆현재 최고 등급 달성</span></div>`;
         }
     }
 
-    // 4. 하단 도감 리스트 렌더링
+    // 6. 도감 리스트 생성
     let tableHtml = "";
     ranks.forEach(r => {
         const isCurrent = currentRankKey.includes(r.id);
@@ -2562,6 +2574,7 @@ function openRankInfo() {
     const listEl = document.getElementById('rank-table-list');
     if (listEl) listEl.innerHTML = tableHtml;
 
+    // 7. 레이어 표시
     layer.style.display = 'flex';
 }
 document.addEventListener('touchstart', e => {
