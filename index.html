@@ -170,22 +170,22 @@
     .form-label { font-size: 0.8rem; font-weight: 700; color: #666; margin-left: 5px; margin-bottom: 5px; }
 .activity-badge {
     position: absolute;
-    top: -5px;      /* 위쪽에서 -5px 만큼 */
-    right: -5px;     /* 오른쪽에서 -5px 만큼 */
-    background-color: #FF3B30; /* 아이폰 레드 */
+    top: 15px;      /* 위에서 15px */
+    right: 15px;    /* 오른쪽에서 15px */
+    background-color: #FF3B30; /* 아이폰 느낌 강렬한 레드 */
     color: white;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     font-weight: 900;
-    min-width: 20px;
-    height: 20px;
+    min-width: 18px;
+    height: 18px;
     border-radius: 10px;
-    display: flex; /* 숫자 중앙 정렬 */
+    display: flex;
     align-items: center;
     justify-content: center;
-    border: 2px solid white;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    z-index: 100;
-    padding: 0 5px;
+    border: 2px solid white; /* 흰색 테두리가 있어야 고급스럽습니다 */
+    box-shadow: 0 2px 8px rgba(255, 59, 48, 0.3);
+    z-index: 10;
+    padding: 0 4px;
 }
 /* 팝업 배경 - 아이폰 스타일 유리창 효과 */
 .qr-glass-effect {
@@ -459,46 +459,96 @@ button[style*="background: #f8f9fa"]:active {
 .page-active { transform: translateX(0); opacity: 1; }
 
 /* 핀테크 스타일 메뉴 아이템 */
-    .menu-item-new {
-        background: white;
-        padding: 24px 16px;
-        text-align: center;
-        border-radius: 28px; /* 더 둥글게 */
-        border: 1px solid rgba(0,0,0,0.03); /* 테두리는 아주 연하게 */
-        cursor: pointer;
-        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.04); /* 은은한 그림자 */
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        position: relative;
+/* 1. 그리드 설정: 1줄에 4개(1fr 1fr 1fr 1fr) */
+    .menu-grid-iphone {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+        padding: 10px 15px;
+        margin-top: 10px;
+        background: transparent; /* 배경 삭제 */
     }
 
-    /* 아이콘 배경 원형 */
-    .icon-box {
-        width: 54px;
-        height: 54px;
-        border-radius: 18px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 12px;
-        font-size: 1.6rem;
-    }
+    /* 2. 아이템 설정: 프레임 없이 투명하게 */
+.menu-item-iphone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+    /* [핵심] 부드러운 복귀를 위한 트랜지션 */
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
 
-    .menu-title-new {
-        font-size: 0.9rem;
-        font-weight: 800;
-        color: #333;
-        letter-spacing: -0.5px;
-    }
+.menu-item-iphone:active .icon-circle {
+    /* 기존에 하단바에 쓰던 jellyPop 엔진을 여기서 호출합니다 */
+    animation: jellyPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+ @keyframes jellyPopMain {
+    0% { transform: scale(1); }
+    30% { transform: scale(1.2); } /* 살짝 벌크업 */
+    50% { transform: scale(0.9); } /* 훅 줄어들었다가 */
+    100% { transform: scale(1); } /* 복귀 */
+}
+.menu-item-iphone:active .icon-circle {
+    animation: jellyPopMain 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
 
-    .menu-desc {
-        font-size: 0.7rem;
-        color: #999;
-        margin-top: 4px;
-        font-weight: 500;
-    }
+/* 3. 아이콘 박스: 배경 없이 아이콘만 강조하거나 아주 연한 원형 */
+.icon-circle {
+    position: relative;
+    width: 58px;
+    height: 58px;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    background: #ffffff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    overflow: visible !important;
+    
+    /* [수정 포인트] 간격을 8px에서 12px~14px 정도로 넓힙니다 */
+    margin-bottom: 10px; 
+}
+
+    /* 4. 앱 이름 스타일 */
+ .menu-title-iphone {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #333;
+    letter-spacing: -0.5px;
+    text-align: center;
+    white-space: nowrap;
+    
+    /* [추가 포인트] 혹시 모르니 줄간격을 줘서 답답함을 해소합니다 */
+    line-height: 1.4; 
+}
+    /* 빨간 배지: 아이콘 오른쪽 상단에 딱! */
+.badge-iphone {
+    position: absolute;
+    /* [수정 포인트] 
+       마이너스 값을 주면 아이콘 박스 '바깥쪽'으로 밀려납니다. 
+       -5px 정도가 아이폰 앱 배지 위치와 가장 흡사합니다.
+    */
+    top: -5px; 
+    right: -5px; 
+    
+    background: #FF3B30;
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 900;
+    min-width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid white; /* 배경과 대비되는 테두리 필수 */
+    z-index: 10;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    padding: 0 2px;
+}
 
 </style>
 </head>
@@ -542,38 +592,33 @@ button[style*="background: #f8f9fa"]:active {
             <div><div class="small fw-bold text-muted">MY POINTS</div><div class="amount-text user-points-display" id="main-u-points">0</div></div>
             <div style="background: var(--primary-grad); color:white; width:50px; height:50px; border-radius:18px; display:flex; align-items:center; justify-content:center; font-size:1.5rem;"><i class="bi bi-qr-code"></i></div>
         </div>
-       <div class="menu-grid">
-    <div class="menu-item-new" onclick="openSubmit('우리 마을 플로깅 (자유)', 2000, '...')">
-        <div class="icon-box" style="background: rgba(1, 178, 173, 0.1); color: var(--primary);">
+       <div class="menu-grid-iphone">
+    <div class="menu-item-iphone" onclick="openSubmit('우리 마을 플로깅 (자유)', 2000, '...')">
+        <div class="icon-circle" style="color: #01b2ad;">
             <i class="bi bi-tree-fill"></i>
         </div>
-        <div class="menu-title-new">자유 활동</div>
-        <div class="menu-desc">지구 닦고 포인트</div>
+        <div class="menu-title-iphone">자유활동</div>
     </div>
 
-    <div class="menu-item-new" onclick="showPage('page-partners')">
-        <div class="icon-box" style="background: rgba(255, 152, 0, 0.1); color: #ff9800;">
+    <div class="menu-item-iphone" onclick="showPage('page-partners')">
+        <div class="icon-circle" style="color: #ff9800;">
             <i class="bi bi-bag-heart-fill"></i>
         </div>
-        <div class="menu-title-new">가맹점</div>
-        <div class="menu-desc">포인트 사용처</div>
+        <div class="menu-title-iphone">가맹점</div>
     </div>
-
-    <div class="menu-item-new" onclick="showPage('page-activities')">
-        <div id="activity-badge-count" class="activity-badge" style="top: 15px; right: 15px;">0</div>
-        <div class="icon-box" style="background: rgba(0, 210, 255, 0.1); color: #00d2ff;">
-            <i class="bi bi-lightning-charge-fill"></i>
-        </div>
-        <div class="menu-title-new">미션 퀘스트</div>
-        <div class="menu-desc">함께하면 더 큰 혜택</div>
+<div class="menu-item-iphone" onclick="showPage('page-activities')">
+    <div class="icon-circle" style="color: #00d2ff;">
+        <div id="activity-badge-count" class="badge-iphone" style="display: none;">0</div>
+        <i class="bi bi-lightning-charge-fill"></i>
     </div>
+    <div class="menu-title-iphone">퀘스트</div>
+</div>
 
-    <div class="menu-item-new" onclick="showPage('page-guide')">
-        <div class="icon-box" style="background: rgba(103, 58, 183, 0.1); color: #673ab7;">
+    <div class="menu-item-iphone" onclick="showPage('page-guide')">
+        <div class="icon-circle" style="color: #673ab7;">
             <i class="bi bi-info-circle-fill"></i>
         </div>
-        <div class="menu-title-new">이용 가이드</div>
-        <div class="menu-desc">처음이신가요?</div>
+        <div class="menu-title-iphone">이용안내</div>
     </div>
 </div>
     </div> 
