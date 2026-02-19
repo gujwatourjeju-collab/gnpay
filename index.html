@@ -1433,12 +1433,12 @@ function updateUI() {
 
         const points = Number(userData.points || 0);
         const ranks = [
-            { id: '보말', name: '김녕 보말 🌱', pt: 0 },
-            { id: '감자', name: '김녕 감자 🌊', pt: 1000 },
-            { id: '당근', name: '김녕 당근 💎', pt: 3000 },
-            { id: '돌고래', name: '김녕 돌고래 ✨', pt: 5000 },
-            { id: '해녀', name: '전설의 해녀 👑', pt: 10000 }
-        ];
+    { id: '보말', name: '김녕 보말 🐚', pt: 0 },
+    { id: '감자', name: '김녕 감자 🥔', pt: 1000 },
+    { id: '당근', name: '김녕 당근 🥕', pt: 3000 },
+    { id: '돌고래', name: '김녕 돌고래 🐬', pt: 5000 },
+    { id: '해녀', name: '전설의 해녀 👑', pt: 10000 }
+];
 
         const nextRank = ranks.find(r => r.pt > points);
         const currentRankData = [...ranks].reverse().find(r => r.pt <= points);
@@ -2461,13 +2461,13 @@ function openRankInfo() {
 
     // 2. 뱃지 색상 데이터
     const rankDataMap = {
-        'GUEST':  { text: 'GIMNYEONG PAY', color: 'linear-gradient(145deg, #ffffff, #e6e6e6)', textColor: '#333' },
-        '보말':   { text: '김녕 보말 🌱', color: 'linear-gradient(145deg, #ffdee9, #b5fffc)', textColor: '#333' },
-        '감자':   { text: '김녕 감자 🌊', color: 'linear-gradient(145deg, #e1b382, #c89666)', textColor: '#fff' },
-        '당근':   { text: '김녕 당근 💎', color: 'linear-gradient(145deg, #ff9a9e, #fecfef)', textColor: '#fff' },
-        '돌고래': { text: '김녕 돌고래 ✨', color: 'linear-gradient(145deg, #01b2ad, #00d2ff)', textColor: '#fff' },
-        '해녀':   { text: '전설의 해녀 👑', color: 'linear-gradient(145deg, #667eea, #764ba2)', textColor: '#fff' }
-    };
+    'GUEST':  { text: 'GIMNYEONG PAY', color: 'linear-gradient(145deg, #ffffff, #e6e6e6)', textColor: '#333' },
+    '보말':   { text: '김녕 보말 🐚', color: 'linear-gradient(145deg, #ffdee9, #b5fffc)', textColor: '#333' },
+    '감자':   { text: '김녕 감자 🥔', color: 'linear-gradient(145deg, #e1b382, #c89666)', textColor: '#fff' },
+    '당근':   { text: '김녕 당근 🥕', color: 'linear-gradient(145deg, #ff9a9e, #fecfef)', textColor: '#fff' },
+    '돌고래': { text: '김녕 돌고래 🐬', color: 'linear-gradient(145deg, #01b2ad, #00d2ff)', textColor: '#fff' },
+    '해녀':   { text: '전설의 해녀 👑', color: 'linear-gradient(145deg, #667eea, #764ba2)', textColor: '#fff' }
+};
 
     const badge = document.querySelector('#rank-info-layer #pop-rank-badge');
     if (badge) {
