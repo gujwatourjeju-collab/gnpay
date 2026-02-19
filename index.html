@@ -465,7 +465,7 @@ button[style*="background: #f8f9fa"]:active {
         grid-template-columns: repeat(4, 1fr);
         gap: 10px;
         padding: 10px 15px;
-        margin-top: 10px;
+        margin-top: 9px;
         background: transparent; /* 배경 삭제 */
     }
 
@@ -549,7 +549,10 @@ button[style*="background: #f8f9fa"]:active {
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     padding: 0 2px;
 }
-
+@keyframes harryFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
 </style>
 </head>
 <body>
@@ -585,9 +588,30 @@ button[style*="background: #f8f9fa"]:active {
 </div>
             <div class="auth-links" id="auth-area"></div>
         </div>
-        <div class="pb-4" style="padding-left: 35px; padding-right: 25px;">
-            <h1 class="fw-bolder mt-2" id="welcome-message">제주에서 함께 하는<br><strong>탄소중립 실천</strong></h1>
+      <div class="pb-4" style="padding-left: 35px; padding-right: 25px; position: relative;">
+    <h1 class="fw-bolder mt-2" id="welcome-message">
+        제주에서 함께 하는<br><strong>탄소중립 실천</strong>
+    </h1>
+
+<div class="harry-float-container" style="position: absolute; right: 22px; bottom: 5px; width: 110px; height: 110px; z-index: 10;">
+    <div id="harry-motion-box" style="width: 100%; height: 100%; position: relative; animation: harryFloat 3s infinite ease-in-out;">
+        
+        <div id="harry-badge" style="
+            position: absolute; top: -20px; left: 5px; 
+            background: linear-gradient(145deg, #222, #000); 
+            color: #ffffff; padding: 5px 12px; border-radius: 20px; 
+            font-size: 0.7rem; font-weight: 800; white-space: nowrap; 
+            box-shadow: 3px 3px 8px rgba(0,0,0,0.3), inset 1px 1px 2px rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.1); z-index: 11;">
+            반가워요! 🌊
         </div>
+
+        <img id="harry-img" src="https://gnpay.my/harry_guest.png" 
+             style="width: 100%; height: 100%; object-fit: contain;"
+             onerror="this.src='https://gnpay.my/harry.png'">
+    </div>
+</div>
+</div>
         <div class="dashboard-card" id="qr-trigger">
             <div><div class="small fw-bold text-muted">MY POINTS</div><div class="amount-text user-points-display" id="main-u-points">0</div></div>
             <div style="background: var(--primary-grad); color:white; width:50px; height:50px; border-radius:18px; display:flex; align-items:center; justify-content:center; font-size:1.5rem;"><i class="bi bi-qr-code"></i></div>
@@ -1254,6 +1278,12 @@ function updateUI() {
     syncMypageState(); 
 
     if (userData.isLoggedIn) {
+        // ---------------------------------------------------
+        // [지훈이의 엔진 추가] 로그인 상태: 내 포인트에 맞는 해리 소환!
+        const currentRank = getRankByPoints(userData.points);
+        updateHarryCharacter(currentRank);
+        // ---------------------------------------------------
+
         // [로그인 상태] 사장님 기존 코드 유지
         authArea.innerHTML = `<span class="auth-link" style="color:var(--primary); font-weight:800;" onclick="showPage('page-mypage')">${userData.name}님</span><span style="color:#eee; font-size:0.7rem;">|</span><span class="auth-link" onclick="logout()">로그아웃</span>`;
         welcome.innerHTML = `${userData.name}님, 반갑습니다!<br><strong>김녕을 지켜주세요!</strong>`;
@@ -1291,6 +1321,11 @@ function updateUI() {
             window.pointSyncInterval = setInterval(syncPointsRealtime, 5000);
         }
     } else {
+        // ---------------------------------------------------
+        // [지훈이의 엔진 추가] 비로그인 상태: 게스트용 해리 소환!
+        updateHarryCharacter('GUEST');
+        // ---------------------------------------------------
+
         // [비로그인 상태] 🌟 지혜로운 수리 구역
         authArea.innerHTML = `<span class="auth-link" onclick="showPage('page-signup')">회원가입</span><span style="color:#eee; font-size:0.7rem;">|</span><span class="auth-link text-dark" onclick="showPage('page-login')">로그인</span>`;
         welcome.innerHTML = `제주에서 함께 하는<br><strong>탄소중립 실천</strong>`;
@@ -1336,24 +1371,31 @@ function updateActivityBadge() {
     }
 }
 
-        async function syncPointsRealtime() {
-            if (!userData.isLoggedIn) return;
-            try {
-                const res = await fetch(GAS_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({ type: 'login', email: userData.email, password: userData.password })
-                }).then(r => r.json());
+async function syncPointsRealtime() {
+    if (!userData.isLoggedIn) return;
+    try {
+        const res = await fetch(GAS_URL, {
+            method: 'POST',
+            body: JSON.stringify({ type: 'login', email: userData.email, password: userData.password })
+        }).then(r => r.json());
 
-                if (res.result === 'success') {
-                    userData.points = res.user.points;
-                    localStorage.setItem('gnpay_user', JSON.stringify(userData));
-                    document.querySelectorAll('.user-points-display').forEach(el => {
-                        el.innerText = Number(res.user.points).toLocaleString();
-                    });
-                }
-            } catch (e) { console.log("sync..."); }
+        if (res.result === 'success') {
+            userData.points = res.user.points;
+            localStorage.setItem('gnpay_user', JSON.stringify(userData));
+            
+            // 1. 화면의 숫자(포인트) 업데이트
+            document.querySelectorAll('.user-points-display').forEach(el => {
+                el.innerText = Number(res.user.points).toLocaleString();
+            });
+
+            // ---------------------------------------------------
+            // [지훈이의 엔진 추가] 백그라운드에서 포인트가 변하면 해리도 즉시 갱신!
+            const currentRank = getRankByPoints(res.user.points);
+            updateHarryCharacter(currentRank);
+            // ---------------------------------------------------
         }
-
+    } catch (e) { console.log("sync..."); }
+}
 function goToMyPage() {
     // 1. 마이페이지로 화면 전환
     showPage('page-mypage');
@@ -2094,7 +2136,47 @@ function executePageTransition(index) {
         updateTab(tabs[index]);
     }
 }
+function updateHarryCharacter(rank) {
+    const badge = document.getElementById('harry-badge');
+    const img = document.getElementById('harry-img');
+    if (!badge || !img) return;
 
+    // [수정 포인트 1] 각 캐릭터마다 'top'과 'left' 좌표를 추가했습니다.
+    // (형님이 화면 보시면서 이 숫자들만 조금씩 깎으시면 됩니다!)
+    const rankData = {
+        'GUEST': { img: '3dlog.png', color: 'linear-gradient(145deg, #222, #000)', text: '로그인 필요! 🔒', top: '-20px', left: '5px' },
+        '몽돌':   { img: 'r.png',     color: 'linear-gradient(145deg, #A67C52, #5D4037)', text: '몽돌 등급 🌱', top: '-10px', left: '10px' },
+        '파도':   { img: 'pote.png',  color: 'linear-gradient(145deg, #01d1cb, #019994)', text: '파도 등급 🌊', top: '-15px', left: '15px' },
+        '심해':   { img: 'ca.png',    color: 'linear-gradient(145deg, #1565C0, #0D47A1)', text: '심해 수호자 💎', top: '-28px', left: '8px' },
+        '수호신': { img: 'dol.png',   color: 'linear-gradient(145deg, #FFC107, #FFA000)', text: '김녕 수호신 ✨', top: '-30px', left: '5px' },
+        '전설':   { img: 'harry.png', color: 'linear-gradient(145deg, #9C27B0, #7B1FA2)', text: '바다의 전설 👑', top: '-25px', left: '5px' }
+    };
+
+    const data = rankData[rank];
+    
+    // [수정 포인트 2] 에러 방지용 안전장치 (데이터가 있을 때만 실행)
+    if (data) {
+        // 기존 형님 코드 (이미지, 색상, 글자 변경)
+        img.src = `https://gnpay.my/${data.img}`;
+        badge.style.background = data.color;
+        badge.innerText = data.text;
+        
+        // [수정 포인트 3] 각 캐릭터에 맞는 뱃지 위치로 촥! 이동
+        badge.style.top = data.top;
+        badge.style.left = data.left;
+    }
+}
+function getRankByPoints(points) {
+    // 로그인이 안 되어 있거나 포인트가 없으면 게스트
+    if (!userData.isLoggedIn || points === undefined || points === null) return 'GUEST'; 
+    
+    const p = Number(points);
+    if (p >= 10000) return '전설';
+    if (p >= 5000)  return '수호신';
+    if (p >= 3000)  return '심해';
+    if (p >= 1000)  return '파도';
+    return '몽돌'; // 0~999 포인트
+}
 document.addEventListener('touchstart', e => {
     touchstartX = e.changedTouches[0].screenX;
 }, {passive: true});
