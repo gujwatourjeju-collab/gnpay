@@ -611,6 +611,11 @@ button[style*="background: #f8f9fa"]:active {
 .level-labels {
     display: none; /* 일단 숨겨서 미니멀하게 유지 */
 }
+.harry-float-container {
+    /* 기존 bottom: 5px에서 더 위로 올립니다 */
+    bottom: 20px !important; 
+    transition: all 0.3s ease-in-out;
+}
 </style>
 </head>
 <body>
@@ -1431,7 +1436,7 @@ function updateUI() {
         // [🔥 절대 에러 안나는 색상 데이터 창고]
         const rankData = {
             'GUEST':  { text: 'GIMNYEONG PAY', color: 'linear-gradient(145deg, #ffffff, #e6e6e6)', textColor: '#333' },
-            '보말':   { text: '김녕 보말 🌱', color: 'linear-gradient(145deg, #ffdee9, #b5fffc)', textColor: '#333' },
+            '보말':   { text: '김녕 보말 🐚', color: 'linear-gradient(145deg, #ffdee9, #b5fffc)', textColor: '#333' },
             '감자':   { text: '김녕 감자 🌊', color: 'linear-gradient(145deg, #e1b382, #c89666)', textColor: '#fff' },
             '당근':   { text: '김녕 당근 💎', color: 'linear-gradient(145deg, #ff9a9e, #fecfef)', textColor: '#fff' },
             '돌고래': { text: '김녕 돌고래 🐬', color: 'linear-gradient(145deg, #01b2ad, #00d2ff)', textColor: '#fff' },
@@ -2172,15 +2177,27 @@ function forceShowPage(pageId) {
     }
 }  
 function checkAndSignup() {
-    const agree = document.getElementById('reg-agree').checked;
+    // 1. 입력 요소들 가져오기
+    const name = document.getElementById('reg-name').value.trim();
+    const email = document.getElementById('reg-email').value.trim();
+    const pw = document.getElementById('reg-pw').value.trim();
+    const phone = document.getElementById('reg-phone').value.trim();
     const gender = document.getElementById('reg-gender').value;
     const region = document.getElementById('reg-region').value;
+    const agree = document.getElementById('reg-agree').checked;
 
+    // 2. 빈칸 및 유효성 체크 (형님, 여기가 핵심입니다)
+    if (!name) return alert("이름을 입력해주세요.");
     if (!gender) return alert("성별을 선택해주세요.");
+    if (!email) return alert("이메일을 입력해주세요.");
+    if (email.indexOf('@') === -1) return alert("올바른 이메일 형식이 아닙니다.");
+    if (!pw) return alert("비밀번호를 입력해주세요.");
+    if (pw.length < 4) return alert("비밀번호는 최소 4자리 이상이어야 합니다.");
+    if (!phone) return alert("전화번호를 입력해주세요.");
     if (!region) return alert("거주 지역을 선택해주세요.");
     if (!agree) return alert("개인정보 제공에 동의해주세요.");
     
-    // 모든 체크 통과 시 기존 가입 함수 실행
+    // 모든 체크 통과 시에만 기존 가입 함수 실행
     submitSignup(); 
 }
 document.addEventListener('keypress', function (e) {
