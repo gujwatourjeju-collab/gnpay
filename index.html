@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -621,6 +622,35 @@ button[style*="background: #f8f9fa"]:active {
     /* 기존 bottom: 5px에서 더 위로 올립니다 */
     bottom: 20px !important; 
     transition: all 0.3s ease-in-out;
+}
+/* 캐릭터 산책로 전용 베이스 */
+.walk-path {
+    position: fixed;
+    bottom: 85px; 
+    left: 0;
+    width: 100%;
+    height: 100px; /* 캐릭터가 커졌으니 경로 높이도 확보 */
+    z-index: 9998;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+#walking-harry {
+    width: 95px; /* 기존 65px -> 약 1.5배인 95px로 확대 */
+    height: 95px;
+    position: absolute;
+    object-fit: contain;
+    /* 캐릭터가 커진 만큼 그림자도 살짝 더 깊게 줘야 바닥에 딱 붙어 보입니다 */
+    filter: drop-shadow(4px 8px 6px rgba(0,0,0,0.2));
+    animation: harryWalk 18s linear infinite; /* 덩치가 커졌으니 속도를 살짝 늦춰야 더 묵직하고 귀엽습니다 */
+}
+
+@keyframes harryWalk {
+    0% { left: -100px; transform: scaleX(1); } /* 시작 위치도 캐릭터 크기만큼 조절 */
+    48% { transform: scaleX(1); }
+    50% { left: calc(100% + 20px); transform: scaleX(-1); }
+    98% { transform: scaleX(-1); }
+    100% { left: -100px; transform: scaleX(1); }
 }
 </style>
 </head>
@@ -1293,6 +1323,9 @@ button[style*="background: #f8f9fa"]:active {
             <div class="text-center text-muted mt-5 small">랭킹 정보를 불러오는 중...</div>
         </div>
     </div>
+</div>
+<div class="walk-path">
+    <img id="walking-harry" src="https://gnpay.my/harry_walk.gif" onerror="this.src='https://gnpay.my/3dlog.png'">
 </div>
 </body>
     <script src="https://unpkg.com/html5-qrcode"></script>
@@ -2408,7 +2441,9 @@ function executePageTransition(index) {
 function updateHarryCharacter(rank) {
     const badge = document.getElementById('harry-badge');
     const img = document.getElementById('harry-img');
-    if (!badge || !img) return;
+    const walkingImg = document.getElementById('walking-harry'); // 산책로 캐릭터 추가
+    
+    if (!img) return;
 
     const rankData = {
         'GUEST': { img: '3dlog.png', color: 'linear-gradient(145deg, #ffffff, #e6e6e6)', text: '로그인 필요! 🔒', top: '-20px', left: '5px' },
@@ -2421,12 +2456,30 @@ function updateHarryCharacter(rank) {
 
     const data = rankData[rank];
     if (data) {
+        // 1. 우측 하단 둥둥 떠있는 정지 캐릭터
         img.src = `https://gnpay.my/${data.img}`;
-        badge.style.background = data.color;
-        badge.style.color = (rank === 'GUEST' || rank === '보말') ? '#333' : '#fff';
-        badge.innerText = data.text;
-        badge.style.top = data.top;
-        badge.style.left = data.left;
+        
+        // 2. 하단 산책로 GIF 캐릭터 (파일명 규칙: r_walk.gif, pote_walk.gif 등)
+        // GIF가 아직 없다면 정지 이미지(.png)를 그대로 보여주도록 예외처리함
+        if (walkingImg) {
+            const gifName = data.img.replace('.png', '_walk.gif');
+            walkingImg.src = `https://gnpay.my/${gifName}`;
+            
+            // 만약 GIF가 없는 등급은 다시 정지 이미지로 빽(Back)
+            walkingImg.onerror = function() {
+                this.src = `https://gnpay.my/${data.img}`;
+                this.onerror = null; 
+            };
+        }
+
+        // 3. 뱃지 업데이트 (뱃지가 있을 때만 실행하여 에러 방지)
+        if (badge) {
+            badge.style.background = data.color;
+            badge.style.color = (rank === 'GUEST' || rank === '보말') ? '#333' : '#fff';
+            badge.innerText = data.text;
+            badge.style.top = data.top;
+            badge.style.left = data.left;
+        }
     }
 }
 function getRankByPoints(points) {
