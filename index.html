@@ -1381,7 +1381,12 @@ function showPage(pageId) {
     if (pageId === 'page-mypage') {
         syncMypageState(); 
     }
-
+const walkPath = document.querySelector('.walk-path');
+    if (walkPath) {
+        // 로그인(page-login)이나 회원가입(page-signup) 페이지일 때만 숨김
+        const isAuthPage = ['page-login', 'page-signup'].includes(pageId);
+        walkPath.style.display = isAuthPage ? 'none' : 'block';
+    }
     // 2. 방향 계산 (currentPage가 없을 때를 대비해 기본값 -1 설정)
     const order = ['page-login', 'page-signup', 'page-main', 'page-history', 'page-guide', 'page-mypage'];
     const curIdx = currentPage ? order.indexOf(currentPage.id) : -1;
