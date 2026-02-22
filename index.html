@@ -2836,24 +2836,22 @@ function renderRanking(data) {
 window.addEventListener('load', async function() {
     const splash = document.getElementById('splash-screen');
     
-    // [보완 1] 강제 진입 타임아웃: 서버가 응답 없어도 5초 뒤엔 무조건 앱 실행
-    const forceExitTimeout = setTimeout(() => {
-        if (document.getElementById('splash-screen')) {
-            console.warn("⚠️ 로딩 지연으로 인해 강제로 진입합니다.");
-            finishSplash();
-        }
-    }, 5000);
+    // [다이어트 1] 최소 대기시간을 0.8초로 단축 (로고 얼굴만 비추고 바로 통과)
+    const minSplashTime = new Promise(resolve => setTimeout(resolve, 800));
 
-    // 1. 최소 2초 대기 약속
-    const minSplashTime = new Promise(resolve => setTimeout(resolve, 2000));
+    // [다이어트 2] 강제 진입 타임아웃을 3초로 단축 (너무 오래 기다리게 안 함)
+    const forceExitTimeout = setTimeout(() => {
+        if (document.getElementById('splash-screen')) finishSplash();
+    }, 3000);
+
+    // [다이어트 3] 시작하자마자 상단바 검정색 방지 (즉시 민트색 주입)
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    if (metaTheme) metaTheme.setAttribute('content', '#e6f7f6');
 
     try {
-        console.log("🚀 데이터 선행 로딩 엔진 가동...");
-
-        // 2. [보완 2] 개별 에러 핸들링: 하나라도 서버가 죽었을 때 앱 전체가 멈추는 것 방지
         const safeLoad = async (fn, ...args) => {
             if (typeof fn === 'function') {
-                try { await fn(...args); } catch(e) { console.error("로딩 실패:", e); }
+                try { await fn(...args); } catch(e) { console.log("로딩 패스"); }
             }
         };
 
@@ -2867,29 +2865,24 @@ window.addEventListener('load', async function() {
             tasks.push(safeLoad(syncPointsRealtime));
         }
 
-        // 모든 데이터가 도착할 때까지 대기
+        // 데이터 로딩과 최소시간 중 늦은 쪽이 끝나면 바로 진입
         await Promise.all(tasks);
-        console.log("✅ 모든 데이터 준비 완료");
 
     } catch (e) {
-        console.error("로딩 프로세스 중 에러:", e);
+        console.log("진입");
     } finally {
-        // 3. 최소 대기시간 보장 후 종료
-        await minSplashTime;
-        clearTimeout(forceExitTimeout); // 정상 로딩 시 타임아웃 해제
+        await minSplashTime; 
+        clearTimeout(forceExitTimeout);
         finishSplash();
     }
 
-    // [보완 3] 종료 로직 통합 (상단바 검은색 이슈 해결 포함)
     function finishSplash() {
         const splashEl = document.getElementById('splash-screen');
         if (!splashEl) return;
 
-        // [핵심] 상단바 색상을 원래 민트색으로 강제 복구 (검은색 방지)
-        const metaTheme = document.querySelector('meta[name="theme-color"]');
+        // 퇴장할 때 상단바 색상 다시 한 번 확인
         if (metaTheme) metaTheme.setAttribute('content', '#e6f7f6');
 
-        // 뒤편 메인 페이지 세팅
         const allPages = document.querySelectorAll('.page');
         const mainPage = document.getElementById('page-main');
 
@@ -2911,13 +2904,12 @@ window.addEventListener('load', async function() {
             updateHarryCharacter(getRankByPoints(userData.points));
         }
 
-        // 암막 걷어내기
         splashEl.classList.add('splash-fade-out');
         
         setTimeout(() => {
             splashEl.remove();
             if (typeof updateUI === 'function') updateUI();
-        }, 600);
+        }, 400); // 사라지는 속도도 더 빠르게 (0.6s -> 0.4s)
     }
 });
 </script>
