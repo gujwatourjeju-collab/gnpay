@@ -467,30 +467,24 @@ button[style*="background: #f8f9fa"]:active {
 
 /* 핀테크 스타일 메뉴 아이템 */
 /* 1. 그리드 설정: 1줄에 4개(1fr 1fr 1fr 1fr) */
-    .menu-grid-iphone {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 10px;
-        padding: 10px 15px;
-        margin-top: 9px;
-        background: transparent; /* 배경 삭제 */
-    }
+.menu-grid-iphone {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4열 유지 */
+    gap: 12px;
+    padding: 10px 18px;
+    margin-top: 12px;
+}
 
-    /* 2. 아이템 설정: 프레임 없이 투명하게 */
+/* 2. 아이템: 기존 쫀득한 트랜지션에 그림자 변화 추가 */
 .menu-item-iphone {
     display: flex;
     flex-direction: column;
     align-items: center;
     cursor: pointer;
     position: relative;
-    /* [핵심] 부드러운 복귀를 위한 트랜지션 */
     transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-.menu-item-iphone:active .icon-circle {
-    /* 기존에 하단바에 쓰던 jellyPop 엔진을 여기서 호출합니다 */
-    animation: jellyPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
  @keyframes jellyPopMain {
     0% { transform: scale(1); }
     30% { transform: scale(1.2); } /* 살짝 벌크업 */
@@ -498,24 +492,33 @@ button[style*="background: #f8f9fa"]:active {
     100% { transform: scale(1); } /* 복귀 */
 }
 .menu-item-iphone:active .icon-circle {
-    animation: jellyPopMain 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    /* 사장님 기존 코드 그대로 유지! */
+    animation: jellyPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
-
 /* 3. 아이콘 박스: 배경 없이 아이콘만 강조하거나 아주 연한 원형 */
 .icon-circle {
     position: relative;
-    width: 66px;       /* 기존 58px -> 66px로 확대 */
-    height: 66px;      /* 기존 58px -> 66px로 확대 */
-    border-radius: 20px; /* 덩치가 커졌으니 둥글기도 아이폰 비율에 맞게 20px로 조정 */
+    width: 64px;
+    height: 64px;
+    border-radius: 22px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 2.2rem;   /* 내부 그림(이모티콘)도 1.8rem -> 2.2rem으로 시원하게 확대! */
+    font-size: 2rem;
     background: #ffffff;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    overflow: visible !important;
-    margin-bottom: 8px;  /* 아이콘이 커졌으니 글자와의 간격은 살짝 좁혀서 안정감 부여 */
+    /* 은은한 3D 입체감 주입 */
+    box-shadow: 
+        0 8px 15px rgba(0, 0, 0, 0.05),
+        inset 0 -3px 5px rgba(0, 0, 0, 0.02);
+    margin-bottom: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
+.menu-item-iphone:nth-child(1) .icon-circle { color: #01b2ad; background: #f0fbfb; }
+.menu-item-iphone:nth-child(2) .icon-circle { color: #ff9800; background: #fff9f0; }
+.menu-item-iphone:nth-child(3) .icon-circle { color: #00d2ff; background: #f0faff; }
+.menu-item-iphone:nth-child(4) .icon-circle { color: #ffc107; background: #fffcf0; }
+.menu-item-iphone:nth-child(5) .icon-circle { color: #673ab7; background: #f5f0ff; }
 
     /* 4. 앱 이름 스타일 */
 .menu-title-iphone {
@@ -652,6 +655,69 @@ button[style*="background: #f8f9fa"]:active {
     98% { transform: scaleX(-1); }
     100% { left: -100px; transform: scaleX(1); }
 }
+@keyframes splashPulse {
+    0%, 100% { transform: scale(1); opacity: 0.9; }
+    50% { transform: scale(1.08); opacity: 1; }
+}
+
+.splash-fade-out {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    transition: opacity 0.8s ease-out, visibility 0.8s;
+}
+.my-rank-sticky {
+    position: sticky;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: var(--primary-grad);
+    color: white;
+    padding: 15px 25px;
+    border-top-left-radius: 25px;
+    border-top-right-radius: 25px;
+    box-shadow: 0 -10px 20px rgba(1, 178, 173, 0.2);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 100;
+    margin-top: 10px;
+}
+
+.my-rank-num {
+    font-size: 1.2rem;
+    font-weight: 900;
+}
+.my-rank-fixed-bar {
+    position: fixed;
+    bottom: 95px; /* 탭바 바로 위 */
+    left: 50%;
+    transform: translateX(-50%); /* 좌우 중앙 정렬만 유지 */
+    width: 90%;
+    max-width: 400px;
+    background: var(--primary-grad);
+    color: white;
+    padding: 16px 22px;
+    border-radius: 24px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    display: flex; /* 처음부터 display는 flex로 */
+    justify-content: space-between;
+    align-items: center;
+    z-index: 10002;
+    /* 나타나는 애니메이션만 따로 부여 */
+    animation: luxurySlideUp 0.5s ease-out;
+}
+
+@keyframes luxurySlideUp {
+    from { transform: translate(-50%, 100px); opacity: 0; }
+    to { transform: translate(-50%, 0); opacity: 1; }
+}
+
+/* 데이터가 들어오면 이 클래스를 붙여서 등장시킴 */
+.my-rank-fixed-bar.show {
+    transform: translate(-50%, 0);
+    opacity: 1;
+    pointer-events: auto;
+}
 </style>
 </head>
 <body>
@@ -661,6 +727,24 @@ button[style*="background: #f8f9fa"]:active {
         <div class="spinner-border text-info" role="status"></div>
         <div class="mt-3 fw-bold" style="color:var(--primary)">처리 중입니다...</div>
     </div>
+   <div id="splash-screen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #121212; z-index: 20000; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+    
+    <div style="margin-bottom: 25px;">
+        <img src="https://gnpay.my/log2.png" style="width: 120px; height: auto; filter: drop-shadow(0 0 15px rgba(1, 178, 173, 0.4)); animation: splashPulse 2s infinite ease-in-out;">
+    </div>
+    
+    <div style="color: #01b2ad; font-weight: 900; font-size: 1.8rem; letter-spacing: 1px; margin-bottom: 8px;">
+        GIMNYEONG PAY
+    </div>
+    
+    <div style="color: #ffffff; font-weight: 500; font-size: 0.95rem; opacity: 0.8; letter-spacing: -0.5px;">
+        내 손안의 탄소중립 실천 포인트
+    </div>
+
+    <div style="position: absolute; bottom: 60px; color: #444; font-size: 0.75rem; font-weight: 600; letter-spacing: 1px;">
+        © GIMNYEONG PAY
+    </div>
+</div>
 
     <div id="qr-focus-layer" onclick="this.style.display='none'" class="qr-glass-effect" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center;">
         <div class="bg-white p-4 rounded-5 text-center shadow-lg qr-slide-up" style="width:85%; max-width:350px; border: 1px solid rgba(255,255,255,0.3); position: relative;" onclick="event.stopPropagation()">
@@ -1318,11 +1402,11 @@ button[style*="background: #f8f9fa"]:active {
         <div id="tab-rank-total" class="flex-fill text-center py-2 inactive-tab" onclick="switchRankTab('total')" style="cursor:pointer; font-weight:800; border-radius:15px; font-size:0.9rem;">전체 랭킹</div>
     </div>
 
-    <div style="padding-left: 20px; padding-right: 20px;">
-        <div id="ranking-list">
-            <div class="text-center text-muted mt-5 small">랭킹 정보를 불러오는 중...</div>
-        </div>
+    <div id="ranking-list" style="padding: 0 20px 120px; height: calc(100vh - 220px); overflow-y: auto;">
+        <div class="text-center text-muted mt-5 small">순위를 집계 중입니다...</div>
     </div>
+
+    <div id="my-rank-bar-container"></div>
 </div>
 <div class="walk-path">
     <img id="walking-harry" src="https://gnpay.my/harry_walk.gif" onerror="this.src='https://gnpay.my/3dlog.png'">
@@ -2692,23 +2776,24 @@ async function loadRankingData(mode) {
 // 3. 랭킹 렌더링 (디자인 핵심)
 function renderRanking(data) {
     const listContainer = document.getElementById('ranking-list');
-    const rankDataMap = {
-        '보말': '🐚', '감자': '🥔', '당근': '🥕', '돌고래': '🐬', '해녀': '👑'
-    };
+    const barContainer = document.getElementById('my-rank-bar-container');
+    const rankDataMap = { '보말': '🐚', '감자': '🥔', '당근': '🥕', '돌고래': '🐬', '해녀': '👑' };
 
+    if (!listContainer) return;
+
+    // 1. 전체 리스트 HTML 빌드
     let html = '';
     data.forEach((user, idx) => {
         const isTop3 = idx < 3;
         const medal = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : (idx + 1);
-        
+        const isMe = userData && userData.isLoggedIn && user.name === userData.name;
+
         html += `
-            <div class="dashboard-card mb-3" style="padding:15px 20px; animation: breathe 2s infinite ease-in-out; border-left: 5px solid ${isTop3 ? 'var(--primary)' : '#eee'};">
+            <div class="dashboard-card mb-3" style="padding:15px 20px; border-left: 5px solid ${isTop3 ? 'var(--primary)' : '#eee'}; background: ${isMe ? '#f0fbfb' : 'white'};">
                 <div class="d-flex align-items-center gap-3 w-100">
-                    <div class="fw-900" style="font-size: 1.1rem; min-width: 30px; color: ${isTop3 ? 'var(--primary)' : '#888'};">
-                        ${medal}
-                    </div>
+                    <div class="fw-900" style="font-size: 1.1rem; min-width: 30px; color: ${isTop3 ? 'var(--primary)' : '#888'};">${medal}</div>
                     <div style="flex:1;">
-                        <div class="fw-bold" style="font-size:1rem; color:#333;">${user.name}</div>
+                        <div class="fw-bold" style="font-size:1rem; color:#333;">${user.name} ${isMe ? '<span class="text-primary" style="font-size:0.7rem;">(나)</span>' : ''}</div>
                         <div class="small text-muted" style="font-size:0.7rem;">${rankDataMap[user.rank] || '🐚'} ${user.rank} 등급</div>
                     </div>
                     <div class="text-end">
@@ -2720,8 +2805,100 @@ function renderRanking(data) {
             </div>`;
     });
     listContainer.innerHTML = html;
-}
 
+    // 2. 내 순위 바 빌드 (리스트와 별개로 처리)
+    if (userData && userData.isLoggedIn && barContainer) {
+        const myIdx = data.findIndex(u => u.name === userData.name);
+        const myInfo = myIdx !== -1 ? data[myIdx] : { name: userData.name, points: userData.points, rank: getRankByPoints(userData.points) };
+        const myRankNum = myIdx !== -1 ? (myIdx + 1) + "위" : "순위 외";
+
+        barContainer.innerHTML = `
+            <div class="my-rank-fixed-bar">
+                <div class="d-flex align-items-center gap-3">
+                    <div style="font-size: 1.3rem; font-weight: 900;">${myRankNum}</div>
+                    <div>
+                        <div class="fw-bold" style="font-size:0.95rem;">${myInfo.name}</div>
+                        <div style="font-size:0.7rem; background:rgba(255,255,255,0.2); padding:2px 6px; border-radius:6px; display:inline-block;">
+                            ${rankDataMap[myInfo.rank] || '🐚'} ${myInfo.rank}
+                        </div>
+                    </div>
+                </div>
+                <div class="text-end">
+                    <div class="fw-900" style="font-size:1.3rem;">${Number(myInfo.points).toLocaleString()}P</div>
+                    <div style="font-size:0.6rem; opacity:0.8; font-weight:800;">MY RANKING</div>
+                </div>
+            </div>`;
+    }
+}
+// 앱이 켜질 때 모든 데이터를 미리 땡겨오는 '프리로딩' 엔진
+// [형님 전용] 앱 시작 시 모든 데이터를 미리 로딩하고 메인으로 강제 고정하는 엔진
+window.addEventListener('load', async function() {
+    const splash = document.getElementById('splash-screen');
+    
+    // 1. 최소 2초는 로고를 보여주며 간지 유지 (로딩이 빨라도 2초는 대기)
+    const minSplashTime = new Promise(resolve => setTimeout(resolve, 2000));
+
+    try {
+        console.log("🚀 데이터 선행 로딩 엔진 가동...");
+
+        // 2. [병렬 로딩] 랭킹 데이터(오늘/전체)를 서버에서 동시에 땡겨옴
+        const tasks = [
+            loadRankingData('today'),
+            loadRankingData('total')
+        ];
+
+        // 3. [로그인 상태일 때] 포인트 내역, 활동 내역, 최신 등급 동기화
+        if (userData && userData.isLoggedIn) {
+            tasks.push(loadActivityHistory()); // 포인트/활동 내역 미리 HTML 그려둠
+            tasks.push(syncPointsRealtime());  // 최신 포인트 및 등급 갱신
+        }
+
+        // 모든 데이터가 도착할 때까지 대기 (스플래시는 아직 암막 상태)
+        await Promise.all(tasks);
+        console.log("✅ 모든 데이터 준비 완료");
+
+    } catch (e) {
+        console.error("로딩 중 에러 발생, 일단 진입합니다:", e);
+    } finally {
+        // 4. 최소 대기시간(2초)이 지났는지 확인
+        await minSplashTime;
+        
+        if (splash) {
+            // [5. 은밀한 밑작업] 로고가 사라지기 전, 뒤편에서 메인 페이지를 0순위로 세팅
+            const allPages = document.querySelectorAll('.page');
+            const mainPage = document.getElementById('page-main');
+
+            allPages.forEach(p => {
+                p.classList.remove('active');
+                p.style.display = 'none'; // 다른 페이지 완전 차단
+                p.style.transform = 'none'; // 슬라이드 애니메이션 효과 제거
+                p.style.opacity = '0';
+            });
+
+            if (mainPage) {
+                mainPage.style.display = 'block';
+                mainPage.style.opacity = '1';
+                mainPage.classList.add('active');
+            }
+
+            // [6. 탭바 및 캐릭터 세팅] 
+            syncTabBar('page-main'); // 탭바 '홈'에 불 들어오게
+            if (userData && userData.isLoggedIn) {
+                // 등급에 맞는 해리 캐릭터 즉시 배치
+                const currentRank = getRankByPoints(userData.points);
+                updateHarryCharacter(currentRank);
+            }
+
+            // [7. 암막 걷어내기] 이제 완벽하게 준비된 메인화면 공개
+            splash.classList.add('splash-fade-out');
+            
+            setTimeout(() => {
+                splash.remove(); // 메모리 확보를 위해 스플래시 완전 제거
+                updateUI();      // 숫자 애니메이션 등 UI 최종 마감
+            }, 600); // CSS transition 시간(0.6s)과 동기화
+        }
+    }
+});
 </script>
 
 </body>
