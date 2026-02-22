@@ -713,20 +713,23 @@ button[style*="background: #f8f9fa"]:active {
     to { transform: translate(-50%, 0); opacity: 1; }
 }
 
-/* 데이터가 들어오면 이 클래스를 붙여서 등장시킴 */
-.my-rank-fixed-bar.show {
-    transform: translate(-50%, 0);
-    opacity: 1;
-    pointer-events: auto;
-}
-body {
-    background-color: #e6f7f6 !important; /* 앱 기본 배경색 */
-}
+html, body {
+        background-color: #e6f7f6 !important;
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        width: 100%;
+    }
 
-/* 다이나믹 아일랜드 영역까지 배경색을 꽉 채우는 설정 */
-html {
-    background-color: #e6f7f6 !important;
-}
+    /* 2. 모든 페이지 컨테이너도 흰색 말고 이 색으로! */
+    .page, #page-main {
+        background-color: #e6f7f6 !important;
+    }
+
+    /* 3. 스플래시 화면도 이 색으로 맞춰야 들어갈 때 안 끊깁니다 */
+    #splash-screen {
+        background-color: #e6f7f6 !important;
+    }
 </style>
 </head>
 <body>
