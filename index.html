@@ -2836,68 +2836,88 @@ function renderRanking(data) {
 window.addEventListener('load', async function() {
     const splash = document.getElementById('splash-screen');
     
-    // 1. 최소 2초는 로고를 보여주며 간지 유지 (로딩이 빨라도 2초는 대기)
+    // [보완 1] 강제 진입 타임아웃: 서버가 응답 없어도 5초 뒤엔 무조건 앱 실행
+    const forceExitTimeout = setTimeout(() => {
+        if (document.getElementById('splash-screen')) {
+            console.warn("⚠️ 로딩 지연으로 인해 강제로 진입합니다.");
+            finishSplash();
+        }
+    }, 5000);
+
+    // 1. 최소 2초 대기 약속
     const minSplashTime = new Promise(resolve => setTimeout(resolve, 2000));
 
     try {
         console.log("🚀 데이터 선행 로딩 엔진 가동...");
 
-        // 2. [병렬 로딩] 랭킹 데이터(오늘/전체)를 서버에서 동시에 땡겨옴
+        // 2. [보완 2] 개별 에러 핸들링: 하나라도 서버가 죽었을 때 앱 전체가 멈추는 것 방지
+        const safeLoad = async (fn, ...args) => {
+            if (typeof fn === 'function') {
+                try { await fn(...args); } catch(e) { console.error("로딩 실패:", e); }
+            }
+        };
+
         const tasks = [
-            loadRankingData('today'),
-            loadRankingData('total')
+            safeLoad(loadRankingData, 'today'),
+            safeLoad(loadRankingData, 'total')
         ];
 
-        // 3. [로그인 상태일 때] 포인트 내역, 활동 내역, 최신 등급 동기화
         if (userData && userData.isLoggedIn) {
-            tasks.push(loadActivityHistory()); // 포인트/활동 내역 미리 HTML 그려둠
-            tasks.push(syncPointsRealtime());  // 최신 포인트 및 등급 갱신
+            tasks.push(safeLoad(loadActivityHistory));
+            tasks.push(safeLoad(syncPointsRealtime));
         }
 
-        // 모든 데이터가 도착할 때까지 대기 (스플래시는 아직 암막 상태)
+        // 모든 데이터가 도착할 때까지 대기
         await Promise.all(tasks);
         console.log("✅ 모든 데이터 준비 완료");
 
     } catch (e) {
-        console.error("로딩 중 에러 발생, 일단 진입합니다:", e);
+        console.error("로딩 프로세스 중 에러:", e);
     } finally {
-        // 4. 최소 대기시간(2초)이 지났는지 확인
+        // 3. 최소 대기시간 보장 후 종료
         await minSplashTime;
-        
-        if (splash) {
-            // [5. 은밀한 밑작업] 로고가 사라지기 전, 뒤편에서 메인 페이지를 0순위로 세팅
-            const allPages = document.querySelectorAll('.page');
-            const mainPage = document.getElementById('page-main');
+        clearTimeout(forceExitTimeout); // 정상 로딩 시 타임아웃 해제
+        finishSplash();
+    }
 
-            allPages.forEach(p => {
-                p.classList.remove('active');
-                p.style.display = 'none'; // 다른 페이지 완전 차단
-                p.style.transform = 'none'; // 슬라이드 애니메이션 효과 제거
-                p.style.opacity = '0';
-            });
+    // [보완 3] 종료 로직 통합 (상단바 검은색 이슈 해결 포함)
+    function finishSplash() {
+        const splashEl = document.getElementById('splash-screen');
+        if (!splashEl) return;
 
-            if (mainPage) {
-                mainPage.style.display = 'block';
-                mainPage.style.opacity = '1';
-                mainPage.classList.add('active');
-            }
+        // [핵심] 상단바 색상을 원래 민트색으로 강제 복구 (검은색 방지)
+        const metaTheme = document.querySelector('meta[name="theme-color"]');
+        if (metaTheme) metaTheme.setAttribute('content', '#e6f7f6');
 
-            // [6. 탭바 및 캐릭터 세팅] 
-            syncTabBar('page-main'); // 탭바 '홈'에 불 들어오게
-            if (userData && userData.isLoggedIn) {
-                // 등급에 맞는 해리 캐릭터 즉시 배치
-                const currentRank = getRankByPoints(userData.points);
-                updateHarryCharacter(currentRank);
-            }
+        // 뒤편 메인 페이지 세팅
+        const allPages = document.querySelectorAll('.page');
+        const mainPage = document.getElementById('page-main');
 
-            // [7. 암막 걷어내기] 이제 완벽하게 준비된 메인화면 공개
-            splash.classList.add('splash-fade-out');
-            
-            setTimeout(() => {
-                splash.remove(); // 메모리 확보를 위해 스플래시 완전 제거
-                updateUI();      // 숫자 애니메이션 등 UI 최종 마감
-            }, 600); // CSS transition 시간(0.6s)과 동기화
+        allPages.forEach(p => {
+            p.classList.remove('active');
+            p.style.display = 'none';
+            p.style.transform = 'none';
+            p.style.opacity = '0';
+        });
+
+        if (mainPage) {
+            mainPage.style.display = 'block';
+            mainPage.style.opacity = '1';
+            mainPage.classList.add('active');
         }
+
+        syncTabBar('page-main');
+        if (userData && userData.isLoggedIn && typeof updateHarryCharacter === 'function') {
+            updateHarryCharacter(getRankByPoints(userData.points));
+        }
+
+        // 암막 걷어내기
+        splashEl.classList.add('splash-fade-out');
+        
+        setTimeout(() => {
+            splashEl.remove();
+            if (typeof updateUI === 'function') updateUI();
+        }, 600);
     }
 });
 </script>
