@@ -788,7 +788,7 @@ html, body {
     background: rgba(20, 35, 45, 0.9) !important;
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    
+    overflow: hidden !important;
     /* 2. [수리 핵심] 아래 .dashboard-card와 똑같이 마진 20px를 좌우에 박습니다 */
     margin-left: -3px !important;
     margin-right: -3px !important;
@@ -809,6 +809,33 @@ html, body {
     border: 1px solid rgba(255, 255, 255, 0.1);
     position: relative;
     box-sizing: border-box !important; /* 패딩이 너비에 영향을 안 주게 함 */
+}
+/* 광택 효과 엔진 추가 */
+.live-dashboard-card::after {
+    content: "";
+    position: absolute;
+    top: -100%;
+    left: -150%;
+    width: 60%; 
+    height: 300%;
+    background: linear-gradient(
+        to right,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.4) 50%, 
+        rgba(255, 255, 255, 0) 100%
+    );
+    transform: rotate(30deg);
+    animation: metalShine 4s infinite cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+}
+
+/* 빛이 왼쪽에서 오른쪽으로 훑고 지나가는 애니메이션 */
+@keyframes metalShine {
+    0% { left: -150%; opacity: 0; }
+    10% { opacity: 1; } /* 나타나면서 시작 */
+    30% { left: 150%; opacity: 1; } /* 빠르게 통과 */
+    40% { left: 150%; opacity: 0; } /* 사라짐 */
+    100% { left: 150%; opacity: 0; } /* 다음 턴까지 대기 */
 }
 /* 왼쪽 콘텐츠 */
 .card-left-content { flex: 1; }
@@ -847,8 +874,8 @@ html, body {
 /* 캐릭터 위에 올라가는 뱃지 스타일 */
 .rank-badge-on-card {
     position: absolute;
-    top: -25px;
-    right: 30px;
+    top: -20px;
+    right: 10px;
     padding: 4px 12px;
     border-radius: 20px;
     font-size: 0.75rem;
@@ -875,6 +902,88 @@ html, body {
     margin-left: 0 !important; /* 기존 왼쪽 마진 제거 */
     margin-bottom: 0 !important; /* 기존 아래 마진 제거 */
     white-space: nowrap; /* 글자가 밑으로 꺾이지 않게 고정 */
+}
+/* QR 퀵패스 카드만 정밀 타격해서 디자인 변경 */
+/* 1. 유리 질감 + 입체감 부여 */
+#white-qr-card {
+    background: rgba(255, 255, 255, 0.45) !important;
+    backdrop-filter: blur(25px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(25px) saturate(180%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.6) !important;
+    margin: 0 20px 20px !important;
+    padding: 15px 20px !important;
+    display: flex !important;
+    align-items: center !important;
+    border-radius: 28px !important;
+    min-height: 100px;
+
+    /* [🚨 수리 포인트] 위에서 물려받은 숨쉬기 애니메이션을 강제로 꺼버립니다 */
+    animation: none !important; 
+}
+#white-qr-card::after {
+    content: none !important;
+    display: none !important;
+}
+
+/* 2. [핵심] QR 미리보기 박스 - 60px에서 85px로 대폭 확대 */
+.qr-preview-box {
+    width: 85px !important; /* 시원하게 키움 */
+    height: 85px !important;
+    background: white !important;
+    padding: 6px !important; /* 테두리 여백은 줄여서 QR 실면적 확보 */
+    border-radius: 18px !important;
+    box-shadow: 0 8px 20px rgba(1, 178, 173, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0; /* 찌그러짐 방지 */
+}
+
+/* 3. 텍스트 영역 여백 조정 */
+.qr-info-text {
+    margin-left: 20px !important;
+    flex: 1;
+}
+
+.qr-title {
+    font-size: 1.1rem !important; /* 제목도 같이 밸런스 맞춤 */
+    font-weight: 900;
+    color: #1a1a1a;
+}
+
+.qr-subtitle {
+    font-size: 0.8rem;
+    color: #666;
+    margin-top: 4px;
+    line-height: 1.3;
+}
+
+#white-qr-card:active {
+    transform: scale(0.95) !important;
+    background: rgba(255, 255, 255, 0.7) !important;
+}
+#welcome-message {
+    /* 좌측 여백을 26px에서 20px로 조정 (로고 위치와 맞춤) */
+    padding: 15px 20px 10px 10px !important; 
+    font-size: 1.2rem !important;
+    line-height: 1.3;
+    color: #333;
+    font-weight: 700;
+    text-align: left; /* 혹시 모를 중앙정렬 방지 */
+}
+
+/* 김녕 민트 그라데이션 타이틀 */
+#welcome-message strong {
+    display: block; 
+    font-size: 1.7rem !important; /* 회원가입 페이지 제목 크기와 맞춤 */
+    font-weight: 900 !important;
+    
+    background: var(--primary-grad); 
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    
+    margin-top: 6px;
+    letter-spacing: -1.2px; /* 폰트가 커진 만큼 자간을 더 좁혀서 엣지있게 */
 }
 </style>
 </head>
@@ -989,22 +1098,21 @@ html, body {
     </div>
 </div>
 </div>
-       <div class="dashboard-card" style="display: flex; align-items: center; padding: 22px 25px; ...">
-    <div style="width: 65px; height: 65px; display: flex; align-items: center; justify-content: center;">
+      <div class="dashboard-card" id="white-qr-card">
+    <div class="qr-preview-box">
         <img id="main-qr-preview" src="" style="width: 100%; height: 100%; object-fit: contain;">
     </div>
 
-    <div style="margin-left: 20px; flex: 1;">
-        <div style="font-size: 1.05rem; font-weight: 900; color: #333; letter-spacing: -1px;">
-            QR 퀵패스 <i class="bi bi-check-circle-fill" style="color:var(--primary); font-size:0.8rem;"></i>
+    <div class="qr-info-text">
+        <div class="qr-title">
+            QR 퀵패스 <i class="bi bi-check-circle-fill"></i>
         </div>
-        <div style="font-size: 0.82rem; color: #888; font-weight: 600; margin-top: 2px;">
+        <div class="qr-subtitle">
             가맹점 결제 및 포인트 적립
         </div>
     </div>
 
-    <i class="bi bi-chevron-right" style="color: #eee; font-size: 1.2rem;"></i>
-
+    <i class="bi bi-chevron-right qr-arrow"></i>
 </div>
        <div class="menu-grid-iphone">
     <div class="menu-item-iphone" onclick="openSubmit('우리 마을 플로깅 (자유)', 2000, '...')">
@@ -1631,7 +1739,7 @@ function updateTab(element) {
     if (tabName === '내정보') {
         refreshUserData(); 
         showPage('page-mypage'); 
-        
+        updateMypageGauge();
         if (userData && userData.isLoggedIn) {
             setTimeout(() => {
                 /* ... (기존 마이페이지 데이터 채우기 코드는 그대로 유지) ... */
@@ -1788,7 +1896,7 @@ function updateUI() {
             '해녀':    { text: '전설의 해녀 👑', color: 'linear-gradient(145deg, #667eea, #764ba2)', textColor: '#fff' }
         };
 
-        // 1. [🔥 검은색 카드] 순위 및 메달 업데이트
+        // 1. [🔥 검은색 카드] 순위 및 메달 업데이트 (사장님 원본 로직)
         if (mainMyRankEl) {
             const allRanking = window.lastRankingData || []; 
             const myIdx = allRanking.findIndex(u => String(u.name).trim() === String(userData.name).trim());
@@ -1833,6 +1941,21 @@ function updateUI() {
             if (mainNextNeeded) mainNextNeeded.innerText = (nextRank.pt - points).toLocaleString();
             if (mainGaugeBar) mainGaugeBar.style.width = percent + "%";
             if (mainGaugePercent) mainGaugePercent.innerText = percent + "%";
+
+            // [🌟 사장님 요청 수리] 마이페이지 글자랑 게이지 업데이트 추가
+            const popBadgeText = document.getElementById('pop-rank-badge-text');
+            const popNextInfo = document.getElementById('pop-next-info');
+            const popGaugeBar = document.getElementById('pop-gauge-bar');
+            
+            if (popBadgeText) popBadgeText.innerText = nextRank.name; // 확인 중 -> 등급명
+            if (popNextInfo) popNextInfo.innerText = (nextRank.pt - points).toLocaleString();
+            if (popGaugeBar) popGaugeBar.style.width = percent + "%";
+        } else {
+            // 해녀 등급(만렙) 처리
+            const popBadgeText = document.getElementById('pop-rank-badge-text');
+            if (popBadgeText) popBadgeText.innerText = "최고 등급 달성! 👑";
+            const popGaugeBar = document.getElementById('pop-gauge-bar');
+            if (popGaugeBar) popGaugeBar.style.width = "100%";
         }
 
         // 3. [🔥 하얀색 카드] QR 미리보기 및 클릭 세팅
@@ -1852,12 +1975,15 @@ function updateUI() {
             };
         }
 
-        // [🔥 중요] 검은색 카드의 통짜 클릭은 해제 (HTML 내부 영역별 클릭만 작동하게)
+        // [🔥 중요] 검은색 카드 클릭 시 -> 랭킹 페이지 이동 (사장님 원본 의도 복구)
         if (blackCard) {
-            blackCard.onclick = null; 
+            blackCard.onclick = () => {
+                showPage('page-ranking');
+                loadRankingData('today');
+            };
         }
 
-        // 마이페이지 랭킹 동기화 등 기타 처리
+        // 4. 나머지 랭킹 라벨 스타일링 (사장님 원본 그대로)
         if (rankLabel) {
             const data = rankData[currentRankKey] || rankData['GUEST'];
             rankLabel.innerText = data.text;
@@ -1895,7 +2021,6 @@ function updateUI() {
             window.pointSyncInterval = setInterval(syncPointsRealtime, 5000);
         }
     } else {
-        // 비로그인 처리
         updateHarryCharacter('GUEST');
         authArea.innerHTML = `<span class="auth-link" onclick="showPage('page-signup')">회원가입</span><span style="color:#eee; font-size:0.7rem;">|</span><span class="auth-link text-dark" onclick="showPage('page-login')">로그인</span>`;
         if (blackCard) blackCard.onclick = () => showPage('page-login');
@@ -1930,21 +2055,30 @@ async function syncPointsRealtime() {
         }).then(r => r.json());
 
         if (res.result === 'success') {
+            // 1. 데이터 업데이트
             userData.points = res.user.points;
             localStorage.setItem('gnpay_user', JSON.stringify(userData));
             
-            // 1. 화면의 숫자(포인트) 업데이트
+            // 2. [추가] 랭킹 데이터도 최신으로 긁어오기
+            // 이게 있어야 수호자 카드에 "몇 위"인지가 실시간으로 바뀝니다.
+            await loadRankingData('total'); 
+
+            // 3. 화면의 숫자(포인트) 업데이트
             document.querySelectorAll('.user-points-display').forEach(el => {
                 el.innerText = Number(res.user.points).toLocaleString();
             });
 
-            // ---------------------------------------------------
-            // [지훈이의 엔진 추가] 백그라운드에서 포인트가 변하면 해리도 즉시 갱신!
+            // 4. [보강] 수호자 카드 전체 UI 리프레쉬
+            // 게이지 바, 다음 등급까지 남은 포인트 계산을 여기서 다시 때려줍니다.
+            updateUI(); 
+
+            // 5. 캐릭터 및 등급 즉시 갱신
             const currentRank = getRankByPoints(res.user.points);
             updateHarryCharacter(currentRank);
-            // ---------------------------------------------------
         }
-    } catch (e) { console.log("sync..."); }
+    } catch (e) { 
+        console.log("실시간 동기화 중..."); 
+    }
 }
 function goToMyPage() {
     // 1. 마이페이지로 화면 전환
@@ -2029,36 +2163,45 @@ function goToMyPage() {
         // [새로 추가하는 함수] 이메일 주소를 입력받아 서버(GAS)에 임시비번 요청을 보냅니다.
 // 1. 팝업 열기 (기존의 prompt 대신 이걸 실행)
 
+// [수정된 게이지 업데이트 엔진]
 function updateMypageGauge() {
     if (!userData.isLoggedIn) return;
 
     const points = Number(userData.points || 0);
     const ranks = [
-        { id: '몽돌', name: '김녕 보말 🐚', pt: 0 },
-        { id: '파도', name: '김녕 감자 🥔', pt: 1000 },
-        { id: '심해', name: '김녕 당근 🥕', pt: 3000 },
-        { id: '수호신', name: '김녕 돌고래 🐬', pt: 5000 },
-        { id: '전설', name: '전설의 해녀 👑', pt: 10000 }
+        { id: '보말', name: '김녕 보말 🐚', pt: 0 },
+        { id: '감자', name: '김녕 감자 🥔', pt: 1000 },
+        { id: '당근', name: '김녕 당근 🥕', pt: 3000 },
+        { id: '돌고래', name: '김녕 돌고래 🐬', pt: 5000 },
+        { id: '해녀', name: '전설의 해녀 👑', pt: 10000 }
     ];
 
-    const currentRankIdx = [...ranks].reverse().findIndex(r => r.pt <= points);
+    // 다음 등급과 현재 등급 기준 찾기
     const nextRank = ranks.find(r => r.pt > points);
+    const currentRankData = [...ranks].reverse().find(r => r.pt <= points);
 
-    const gaugeBar = document.getElementById('pop-gauge-bar');
-    const badgeText = document.getElementById('pop-rank-badge-text'); // ID 수정됨
+    // HTML 요소 가져오기 (사장님 코드의 ID 기준)
+    const badgeText = document.getElementById('pop-rank-badge-text'); 
     const nextInfo = document.getElementById('pop-next-info');
+    const gaugeBar = document.getElementById('pop-gauge-bar');
 
     if (nextRank) {
-        const currentRankPt = ranks[ranks.length - 1 - currentRankIdx].pt;
-        const percent = Math.floor(((points - currentRankPt) / (nextRank.pt - currentRankPt)) * 100);
+        const range = nextRank.pt - currentRankData.pt;
+        const progress = points - currentRankData.pt;
+        const percent = Math.min(Math.floor((progress / range) * 100), 100);
         
-        if (gaugeBar) gaugeBar.style.width = percent + "%";
-        if (badgeText) badgeText.innerText = nextRank.name; // 다음 목표 등급 이름
-        if (nextInfo) animateValue('pop-next-info', 0, nextRank.pt - points, 1000);
+        // 텍스트 업데이트
+        if (badgeText) badgeText.innerText = nextRank.name;
+        if (nextInfo) nextInfo.innerText = (nextRank.pt - points).toLocaleString();
+        
+        // 게이지 바 애니메이션
+        if (gaugeBar) {
+            gaugeBar.style.width = percent + "%";
+        }
     } else {
-        if (gaugeBar) gaugeBar.style.width = "100%";
         if (badgeText) badgeText.innerText = "최고 등급 달성! 👑";
         if (nextInfo) nextInfo.innerText = "0";
+        if (gaugeBar) gaugeBar.style.width = "100%";
     }
 }
 function handleForgotPassword() {
@@ -2730,11 +2873,11 @@ function updateHarryCharacter(rank) {
 
     const rankData = {
         'GUEST': { img: '3dlog.png', color: 'linear-gradient(145deg, #ffffff, #e6e6e6)', text: '로그인 필요! 🔒', badgeText: 'GUEST', top: '-20px', left: '5px', walkBottom: '10px', walkWidth: '70px' },
-        '보말': { img: 'r.png', color: 'linear-gradient(145deg, #ffdee9, #b5fffc)', text: '김녕 보말 🐚', badgeText: '보말', top: '-10px', left: '10px', walkBottom: '-12px', walkWidth: '65px' },
-        '감자': { img: 'pote.png', color: 'linear-gradient(145deg, #e1b382, #c89666)', text: '김녕 감자 🥔', badgeText: '감자', top: '-15px', left: '15px', walkBottom: '-9px', walkWidth: '75px' },
-        '당근': { img: 'ca.png', color: 'linear-gradient(145deg, #ff9a9e, #fecfef)', text: '김녕 당근 🥕', badgeText: '당근', top: '-28px', left: '9px', walkBottom: '-1px', walkWidth: '75px' },
-        '돌고래': { img: 'dol.png', color: 'linear-gradient(145deg, #01b2ad, #00d2ff)', text: '김녕 돌고래 🐬', badgeText: '돌고래', top: '-25px', left: '5px', walkBottom: '3px', walkWidth: '90px' },
-        '해녀': { img: 'harry.png', color: 'linear-gradient(145deg, #667eea, #764ba2)', text: '전설의 해녀 👑', badgeText: '해녀', top: '-25px', left: '5px', walkBottom: '-4px', walkWidth: '85px' }
+        '보말': { img: 'r.png', color: 'linear-gradient(145deg, #ffdee9, #b5fffc)', text: '김녕 보말 🐚', badgeText: '김녕보말🐚', top: '-10px', left: '10px', walkBottom: '-12px', walkWidth: '65px' },
+        '감자': { img: 'pote.png', color: 'linear-gradient(145deg, #e1b382, #c89666)', text: '김녕 감자 🥔', badgeText: '김녕감자🥔', top: '-15px', left: '15px', walkBottom: '-9px', walkWidth: '75px' },
+        '당근': { img: 'ca.png', color: 'linear-gradient(145deg, #ff9a9e, #fecfef)', text: '김녕 당근 🥕', badgeText: '김녕당근🥕', top: '-28px', left: '9px', walkBottom: '-1px', walkWidth: '75px' },
+        '돌고래': { img: 'dol.png', color: 'linear-gradient(145deg, #01b2ad, #00d2ff)', text: '김녕 돌고래 🐬', badgeText: '김녕돌고래🐬', top: '-25px', left: '5px', walkBottom: '3px', walkWidth: '90px' },
+        '해녀': { img: 'harry.png', color: 'linear-gradient(145deg, #667eea, #764ba2)', text: '전설의 해녀 👑', badgeText: '전설의해녀👑', top: '-25px', left: '5px', walkBottom: '-4px', walkWidth: '85px' }
     };
 
     const data = rankData[rank];
