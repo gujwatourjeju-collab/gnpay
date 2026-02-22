@@ -2542,38 +2542,42 @@ function executePageTransition(index) {
 function updateHarryCharacter(rank) {
     const badge = document.getElementById('harry-badge');
     const img = document.getElementById('harry-img');
-    const walkingImg = document.getElementById('walking-harry'); // 산책로 캐릭터 추가
+    const walkingImg = document.getElementById('walking-harry'); 
     
     if (!img) return;
 
+    // [업그레이드] walkBottom: 산책로 바닥 높이, walkWidth: 캐릭터 크기
     const rankData = {
-        'GUEST': { img: '3dlog.png', color: 'linear-gradient(145deg, #ffffff, #e6e6e6)', text: '로그인 필요! 🔒', top: '-20px', left: '5px' },
-        '보말': { img: 'r.png', color: 'linear-gradient(145deg, #ffdee9, #b5fffc)', text: '김녕 보말 🐚', top: '-10px', left: '10px' },
-        '감자': { img: 'pote.png', color: 'linear-gradient(145deg, #e1b382, #c89666)', text: '김녕 감자 🥔', top: '-15px', left: '15px' },
-        '당근': { img: 'ca.png', color: 'linear-gradient(145deg, #ff9a9e, #fecfef)', text: '김녕 당근 🥕', top: '-28px', left: '9px' },
-        '돌고래': { img: 'dol.png', color: 'linear-gradient(145deg, #01b2ad, #00d2ff)', text: '김녕 돌고래 🐬', top: '-25px', left: '5px' },
-        '해녀': { img: 'harry.png', color: 'linear-gradient(145deg, #667eea, #764ba2)', text: '전설의 해녀 👑', top: '-25px', left: '5px' }
+        'GUEST': { img: '3dlog.png', color: 'linear-gradient(145deg, #ffffff, #e6e6e6)', text: '로그인 필요! 🔒', top: '-20px', left: '5px', walkBottom: '10px', walkWidth: '70px' },
+        '보말': { img: 'r.png', color: 'linear-gradient(145deg, #ffdee9, #b5fffc)', text: '김녕 보말 🐚', top: '-10px', left: '10px', walkBottom: '-12px', walkWidth: '65px' },
+        '감자': { img: 'pote.png', color: 'linear-gradient(145deg, #e1b382, #c89666)', text: '김녕 감자 🥔', top: '-15px', left: '15px', walkBottom: '-9px', walkWidth: '75px' },
+        '당근': { img: 'ca.png', color: 'linear-gradient(145deg, #ff9a9e, #fecfef)', text: '김녕 당근 🥕', top: '-28px', left: '9px', walkBottom: '0px', walkWidth: '75px' },
+        '돌고래': { img: 'dol.png', color: 'linear-gradient(145deg, #01b2ad, #00d2ff)', text: '김녕 돌고래 🐬', top: '-25px', left: '5px', walkBottom: '5px', walkWidth: '90px' },
+        '해녀': { img: 'harry.png', color: 'linear-gradient(145deg, #667eea, #764ba2)', text: '전설의 해녀 👑', top: '-25px', left: '5px', walkBottom: '-4px', walkWidth: '85px' }
     };
 
     const data = rankData[rank];
     if (data) {
-        // 1. 우측 하단 둥둥 떠있는 정지 캐릭터
+        // 1. 메인 우측 하단 정지 캐릭터
         img.src = `https://gnpay.my/${data.img}`;
         
-        // 2. 하단 산책로 GIF 캐릭터 (파일명 규칙: r_walk.gif, pote_walk.gif 등)
-        // GIF가 아직 없다면 정지 이미지(.png)를 그대로 보여주도록 예외처리함
+        // 2. 산책로 캐릭터 업데이트 및 개별 높이/크기 조정
         if (walkingImg) {
             const gifName = data.img.replace('.png', '_walk.gif');
             walkingImg.src = `https://gnpay.my/${gifName}`;
             
-            // 만약 GIF가 없는 등급은 다시 정지 이미지로 빽(Back)
+            // [추가된 마법] 등급별 개별 위치 세팅
+            walkingImg.style.bottom = data.walkBottom; // 캐릭터별 바닥 높이
+            walkingImg.style.width = data.walkWidth;   // 캐릭터별 크기
+            walkingImg.style.position = 'absolute';    // 스타일 확실히 고정
+            
             walkingImg.onerror = function() {
                 this.src = `https://gnpay.my/${data.img}`;
                 this.onerror = null; 
             };
         }
 
-        // 3. 뱃지 업데이트 (뱃지가 있을 때만 실행하여 에러 방지)
+        // 3. 뱃지 업데이트
         if (badge) {
             badge.style.background = data.color;
             badge.style.color = (rank === 'GUEST' || rank === '보말') ? '#333' : '#fff';
