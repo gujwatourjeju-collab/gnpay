@@ -9,7 +9,12 @@
 
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>김녕페이 2.0</title>
-
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://gnpay.my">
+<meta property="og:title" content="김녕페이 2.0">
+<meta property="og:description" content="제주에서 함께하는 탄소중립 실천 포인트">
+<meta property="og:image" content="https://gnpay.my/og-image.png"> <meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
 <link rel="icon" href="https://gnpay.my/log2.png" type="image/png">
 <link rel="apple-touch-icon" href="https://gnpay.my/log2.png">
 <link rel="shortcut icon" href="https://gnpay.my/log2.png">
@@ -36,14 +41,40 @@
     -webkit-overflow-scrolling: touch; /* 아이폰에서 쫀득한 탄력 스크롤 활성화 */
 }
     
-    .top-nav { 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: flex-start; 
-    padding: 20px 20px 5px 26px; 
-    /* 3. sticky 삭제! 이제 글자들과 함께 자연스럽게 스크롤 됩니다 */
-    position: relative; 
-    z-index: 10;
+/* [최종 수리] 모든 페이지 상단 로고 & 타이틀 위치/크기 100% 일치 */
+.top-nav {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: env(safe-area-inset-top, 20px) 20px 10px 20px !important; /* 노치 대응 포함 */
+    height: 80px !important; /* 높이 고정으로 페이지 전환 시 덜컹거림 방지 */
+}
+
+/* 왼쪽 로고+타이틀 그룹 */
+.nav-left-group {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important; /* 로고와 글자 사이 간격 고정 */
+    cursor: pointer;
+}
+
+/* 로고 이미지 규격화 */
+.nav-left-group img {
+    width: 42px !important; /* 가로폭 통일 */
+    height: 42px !important; /* 세로폭 통일 */
+    object-fit: contain !important;
+    margin: 0 !important;
+}
+
+/* 타이틀 폰트 규격화 */
+.nav-left-group .nav-title {
+    color: var(--primary) !important;
+    font-weight: 900 !important;
+    font-size: 1.3rem !important; /* 폰트 크기 1.3rem 고정 */
+    letter-spacing: -1px !important;
+    line-height: 1.2 !important;
+    margin: 0 !important;
+    white-space: nowrap !important;
 }
     .auth-links { display: flex; gap: 5px; align-items: center; }
     .auth-link { font-size: 0.8rem; font-weight: 700; color: #888; text-decoration: none; cursor: pointer; padding: 5px; line-height: 1; }
@@ -1749,7 +1780,9 @@ html, body {
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script>
         const GAS_URL = "https://script.google.com/macros/s/AKfycby6C0tEYO3LYB2LrTEQwW2W5kzA5JiTgs1UVserc_w8g7vsfcvGM-5Qlt7QPv9Zc5-oDg/exec";
-function updateTab(element) {
+    let currentRankMode = 'today';
+    let totalRankingData = [];
+    function updateTab(element) {
     document.querySelectorAll('.tab-item').forEach(tab => tab.classList.remove('active'));
     element.classList.add('active');
 
@@ -1783,7 +1816,7 @@ function updateTab(element) {
     }
 }
         let userData = JSON.parse(localStorage.getItem('gnpay_user')) || { isLoggedIn: false, points: 0 };
-        let selectedImages = [];
+                let selectedImages = [];
         let currentAct = { title: "", amount: 0 };
         const loading = document.getElementById('loading-overlay');
         let html5QrCode;
@@ -1888,12 +1921,10 @@ function updateUI() {
     const authArea = document.getElementById('auth-area');
     const welcome = document.getElementById('welcome-message');
     
-    // 1. [변수 분리] 검은색 카드(Live 카드)와 하얀색 카드(My Points/QR카드) 타겟팅
     const blackCard = document.getElementById('qr-trigger'); 
-    const whiteCard = document.getElementById('white-qr-card'); // ID로 정확히 타겟팅
+    const whiteCard = document.getElementById('white-qr-card'); 
     const qrPreview = document.getElementById('main-qr-preview');
     
-    // [메인 카드 전용 엘리먼트]
     const mainMyRankEl = document.getElementById('main-my-rank');
     const medalBox = document.getElementById('main-rank-pills');
     const mainNextRankName = document.getElementById('main-next-rank-name');
@@ -1904,30 +1935,27 @@ function updateUI() {
 
     syncMypageState(); 
 
-    // [🚨 QR 카드 섹션 분리 처리]
     const qrLogged = document.getElementById('qr-content-logged-in');
     const qrGuest = document.getElementById('qr-content-guest');
 
     if (userData.isLoggedIn) {
-        // --- [로그인 상태 로직 시작] ---
-        
-        // QR 섹션 스위칭
         if(qrLogged) qrLogged.style.display = 'flex';
         if(qrGuest) qrGuest.style.display = 'none';
 
         const currentRankKey = getRankByPoints(userData.points);
         const rankData = {
             'GUEST':   { text: 'GIMNYEONG PAY', color: 'linear-gradient(145deg, #ffffff, #e6e6e6)', textColor: '#333' },
-            '보말':    { text: '보말 🐚', color: 'linear-gradient(145deg, #ffdee9, #b5fffc)', textColor: '#333' },
-            '감자':    { text: '감자 🌊', color: 'linear-gradient(145deg, #e1b382, #c89666)', textColor: '#fff' },
-            '당근':    { text: '당근 💎', color: 'linear-gradient(145deg, #ff9a9e, #fecfef)', textColor: '#fff' },
-            '돌고래':  { text: '돌고래 🐬', color: 'linear-gradient(145deg, #01b2ad, #00d2ff)', textColor: '#fff' },
+            '보말':    { text: '김녕 보말 🐚', color: 'linear-gradient(145deg, #ffdee9, #b5fffc)', textColor: '#333' },
+            '감자':    { text: '김녕 감자 🥔', color: 'linear-gradient(145deg, #e1b382, #c89666)', textColor: '#fff' },
+            '당근':    { text: '김녕 당근 🥕', color: 'linear-gradient(145deg, #ff9a9e, #fecfef)', textColor: '#fff' },
+            '돌고래':  { text: '김녕 돌고래 🐬', color: 'linear-gradient(145deg, #01b2ad, #00d2ff)', textColor: '#fff' },
             '해녀':    { text: '전설의 해녀 👑', color: 'linear-gradient(145deg, #667eea, #764ba2)', textColor: '#fff' }
         };
 
-        // 1. 순위 및 메달 업데이트
+        // 🌟 [수정 포인트] 순위 업데이트 로직 🌟
         if (mainMyRankEl) {
-            const allRanking = window.lastRankingData || []; 
+            // [중요] lastRankingData(오늘/전체 가변형)가 아니라 totalRankingData(전체 고정형)를 봅니다.
+            const allRanking = totalRankingData || []; 
             const myIdx = allRanking.findIndex(u => String(u.name).trim() === String(userData.name).trim());
             
             if (allRanking.length > 0) { 
@@ -1944,11 +1972,12 @@ function updateUI() {
                     if (medalBox) medalBox.innerHTML = '';
                 }
             } else {
+                // 아직 전체 랭킹 데이터를 한 번도 안 불러왔을 때 표시
                 mainMyRankEl.innerText = "-위"; 
             }
         }
 
-        // 2. 게이지 및 다음 등급 계산
+        // 2. 게이지 및 다음 등급 계산 (기존 로직 유지)
         const points = Number(userData.points || 0);
         const ranks = [
             { id: '보말', name: '보말', pt: 0 },
@@ -1984,7 +2013,7 @@ function updateUI() {
             if (mainGaugeBar) mainGaugeBar.style.width = "100%";
         }
 
-        // 3. QR 클릭 세팅
+        // 3. QR 클릭 세팅 및 나머지 (기존 로직 유지)
         if (qrPreview) {
             qrPreview.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${userData.uid}`;
         }
@@ -2007,7 +2036,6 @@ function updateUI() {
             };
         }
 
-        // 4. 랭킹 라벨 스타일링
         if (rankLabel) {
             const data = rankData[currentRankKey] || rankData['GUEST'];
             rankLabel.innerText = data.text;
@@ -2045,19 +2073,13 @@ function updateUI() {
         }
 
     } else {
-        // --- [비로그인 상태 로직] ---
-        
-        // QR 섹션 스위칭
+        // 비로그인 로직 (기존 유지)
         if(qrLogged) qrLogged.style.display = 'none';
         if(qrGuest) qrGuest.style.display = 'flex';
-
         updateHarryCharacter('GUEST');
         authArea.innerHTML = `<span class="auth-link" onclick="showPage('page-signup')">회원가입</span><span style="color:#eee; font-size:0.7rem;">|</span><span class="auth-link text-dark" onclick="showPage('page-login')">로그인</span>`;
-        
-        // 비로그인 시 카드 클릭하면 로그인으로 보내기
         if (blackCard) blackCard.onclick = () => showPage('page-login');
         if (whiteCard) whiteCard.onclick = () => showPage('page-login');
-        
         welcome.innerHTML = `내손안의 탄소중립포인트(실천)<br><strong>로그인 후 김녕을 지켜주세요!</strong>`;
     }
 }
@@ -2095,7 +2117,7 @@ async function syncPointsRealtime() {
             
             // 2. [추가] 랭킹 데이터도 최신으로 긁어오기
             // 이게 있어야 수호자 카드에 "몇 위"인지가 실시간으로 바뀝니다.
-            await loadRankingData('total'); 
+            await loadRankingData(currentRankMode);
 
             // 3. 화면의 숫자(포인트) 업데이트
             document.querySelectorAll('.user-points-display').forEach(el => {
@@ -3111,6 +3133,10 @@ document.addEventListener('touchend', e => {
 }, {passive: true});
 // 1. 탭 전환 (활동 기록 방식 계승)
 function switchRankTab(type) {
+    // 🌟 [핵심 보완] 현재 모드를 전역 변수에 저장합니다.
+    // 이 한 줄이 있어야 5초마다 자동 갱신될 때도 이 모드를 유지합니다.
+    currentRankMode = type; 
+
     const todayTab = document.getElementById('tab-rank-today');
     const totalTab = document.getElementById('tab-rank-total');
 
@@ -3128,11 +3154,7 @@ function switchRankTab(type) {
 // 2. 랭킹 데이터 로드 (서버 연동용 프레임)
 async function loadRankingData(mode) {
     const listContainer = document.getElementById('ranking-list');
-    
-    // 랭킹 탭이 아닐 때는 메시지를 띄우지 않음
-    if (listContainer && document.getElementById('page-ranking').classList.contains('active')) {
-        listContainer.innerHTML = '<div class="text-center p-5 small text-muted">순위를 집계 중입니다...</div>';
-    }
+    const rankingPage = document.getElementById('page-ranking');
 
     try {
         const res = await fetch(GAS_URL, {
@@ -3141,20 +3163,27 @@ async function loadRankingData(mode) {
         }).then(r => r.json());
 
         if (res.result === 'success' && res.data) {
-            // 창고에 저장하고 UI 갱신 (여기서 대시보드 숫자가 바뀜)
+            // 1. 현재 화면 렌더링용 데이터 저장
             window.lastRankingData = res.data; 
+
+            // 🌟 [추가] 메인 카드를 위한 전용 창고에 '전체 데이터' 따로 저장
+            // 이 줄이 있어야 랭킹 탭에서 '오늘'을 봐도 메인 순위가 안 깨집니다.
+            if (mode === 'total') {
+                totalRankingData = res.data;
+            }
+
+            // 2. 랭킹 페이지가 활성 상태일 때만 리스트 그림 (깜빡임 방지)
+            if (rankingPage && rankingPage.classList.contains('active')) {
+                renderRanking(res.data);
+            }
             
-            // 랭킹 페이지가 열려있을 때만 리스트 렌더링
-            if (listContainer) renderRanking(res.data);
-            
-            // 메인 대시보드 숫자 업데이트
+            // 3. 메인 대시보드 및 전체 UI 갱신
             updateUI(); 
         }
-    } catch (e) {
-        console.log("Ranking Preload Error");
+    } catch (e) { 
+        console.log("Ranking 로딩 스킵"); 
     }
 }
-
 // 3. 랭킹 렌더링 (디자인 핵심)
 function renderRanking(data) {
     const listContainer = document.getElementById('ranking-list');
