@@ -1885,39 +1885,42 @@ html, body {
 <div class="walk-path">
     <img id="walking-harry" src="https://gnpay.my/harry_walk.gif" onerror="this.src='https://gnpay.my/3dlog.png'">
 </div>
-<div id="eco-report-layer" class="qr-glass-effect" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 10001; display: none; flex-direction: column; align-items: center; justify-content: center;" onclick="this.style.display='none'">
-    <div class="bg-white p-4 rounded-5 shadow-lg qr-slide-up" style="width:88%; max-width:360px; position: relative; border: 1px solid rgba(255,255,255,0.3);" onclick="event.stopPropagation()">
+<div id="eco-report-layer" style="position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; z-index: 99999 !important; display: none; align-items: center !important; justify-content: center !important; background: rgba(0,0,0,0.6) !important; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);" onclick="this.style.display='none'">
+    
+    <div style="width: 88% !important; max-width: 350px !important; background: white !important; border-radius: 30px !important; padding: 30px 20px !important; position: relative !important; box-shadow: 0 25px 50px rgba(0,0,0,0.3) !important; border: 1px solid rgba(255,255,255,0.3) !important; margin: 0 auto !important;" onclick="event.stopPropagation()">
         
-        <div style="position: absolute; top: -25px; left: 20px; width: 60px; height: 60px; background: #333; border-radius: 15px; border: 4px solid #fff; box-shadow: 0 8px 15px rgba(0,0,0,0.2); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10;">
-    <span style="color: #fff; font-size: 0.6rem; font-weight: 800; line-height: 1; margin-top: 2px;">6</span> <span style="color: #01b2ad; font-size: 1.8rem; font-weight: 900; line-height: 1; margin-top: -2px;">C</span> </div>
+        <div style="position: absolute !important; top: -30px !important; left: 25px !important; width: 65px !important; height: 65px !important; background: #222 !important; border-radius: 18px !important; border: 4px solid #fff !important; display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important; z-index: 100 !important;">
+            <span style="color: #fff !important; font-size: 0.7rem !important; font-weight: 800 !important; line-height: 1 !important; margin-top: 2px !important; opacity: 0.8 !important;">6</span>
+            <span style="color: #01b2ad !important; font-size: 2rem !important; font-weight: 900 !important; line-height: 1 !important; margin-top: -2px !important;">C</span>
+        </div>
 
-        <div class="text-center mt-3 mb-4">
-            <h5 class="fw-900" style="color: #1a1a1a; letter-spacing: -1.5px; font-size: 1.4rem;">김녕 <span style="color: var(--primary);">에코 리포트</span></h5>
-            <p style="font-size: 0.8rem; font-weight: 600; color: #888; margin-top: 5px;">환경부 온실가스 감축 가이드라인 기반</p>
+        <div style="text-align: center !important; margin-top: 10px !important; margin-bottom: 25px !important;">
+            <h5 style="font-weight: 900 !important; color: #111 !important; letter-spacing: -1.5px !important; font-size: 1.5rem !important; margin: 0 !important; font-family: 'Pretendard', sans-serif !important;">김녕 <span style="color: #01b2ad !important;">에코 리포트</span></h5>
+            <p style="font-size: 0.8rem !important; font-weight: 700 !important; color: #999 !important; margin-top: 5px !important; letter-spacing: -0.5px !important;">ENVIRONMENTAL IMPACT REPORT</p>
         </div>
         
-        <div class="px-1">
-            <div style="background: #f0fafa; padding: 20px; border-radius: 25px; border: 1px solid #e0f2f1; margin-bottom: 20px;">
-                <div style="font-size: 0.75rem; color: #01b2ad; font-weight: 800; margin-bottom: 10px; letter-spacing: 1px;">CARBON REDUCTION</div>
-                <div style="display: flex; align-items: baseline; gap: 5px; margin-bottom: 5px;">
-                    <span id="popup-eco-carbon" style="font-size: 2.2rem; font-weight: 900; color: #333;">0.00</span>
-                    <span style="font-size: 1.1rem; font-weight: 800; color: #333;">kg</span>
-                </div>
-                <p style="font-size: 0.85rem; color: #666; line-height: 1.5; margin: 0;">
-                    <strong id="popup-eco-name" style="color:#01b2ad;">-</strong>님의 실천으로<br>
-                    어린 소나무 <b id="popup-eco-tree" style="color:#1a1a1a;">0.0</b>그루를 심은 효과를 거두었습니다.
-                </p>
+        <div style="background: linear-gradient(145deg, #f0fafa, #e6f7f6) !important; padding: 25px !important; border-radius: 25px !important; border: 1px solid #d1efee !important; margin-bottom: 20px !important; text-align: left !important;">
+            <div style="font-size: 0.7rem !important; color: #01b2ad !important; font-weight: 800 !important; margin-bottom: 12px !important; letter-spacing: 1.5px !important;">CARBON REDUCTION</div>
+            
+            <div style="display: flex !important; align-items: baseline !important; gap: 6px !important; margin-bottom: 10px !important;">
+                <span id="popup-eco-carbon" style="font-size: 2.8rem !important; font-weight: 900 !important; color: #222 !important; line-height: 1 !important;">0.00</span>
+                <span style="font-size: 1.2rem !important; font-weight: 800 !important; color: #444 !important;">kg</span>
             </div>
+            
+            <p style="font-size: 0.9rem !important; color: #555 !important; line-height: 1.6 !important; margin: 0 !important;">
+                <strong id="popup-eco-name" style="color:#01b2ad !important; font-weight: 800 !important;">-</strong>님의 실천으로<br>
+                소나무 <b id="popup-eco-tree" style="color:#111 !important; font-weight: 900 !important;">0.0</b>그루를 심은 효과입니다! 🌲
+            </p>
+        </div>
 
-            <div style="padding: 0 10px; margin-bottom: 25px;">
-                <h6 style="font-size: 0.85rem; font-weight: 800; color: #333;"><i class="bi bi-check2-circle me-1"></i> 산출 근거</h6>
-                <p style="font-size: 0.75rem; color: #888; line-height: 1.6; margin-top: 8px;">
-                    본 수치는 환경부 비산업부문 온실가스 감축 가이드라인을 준수합니다. 플로깅 1회당 평균 폐기물 수거량(약 2kg)에 따른 탄소 배출 절감 비용을 보수적으로 환산($2,000P = 0.9kg$)하여 계산되었습니다.
-                </p>
-            </div>
+        <div style="padding: 0 10px !important; margin-bottom: 30px !important; text-align: left !important;">
+            <h6 style="font-size: 0.9rem !important; font-weight: 800 !important; color: #333 !important; margin-bottom: 8px !important;">📊 산출 근거</h6>
+            <p style="font-size: 0.75rem !important; color: #888 !important; line-height: 1.6 !important; margin: 0 !important;">
+                환경부 가이드라인에 따른 탄소 배출 절감 비용을 보수적으로 환산하였습니다. ($2,000P = 0.9kg$ 저감)
+            </p>
         </div>
         
-        <button class="btn-scan w-100" style="padding: 15px; border-radius: 20px; font-size: 1rem;" onclick="document.getElementById('eco-report-layer').style.display='none'">확인 완료</button>
+        <button style="width: 100% !important; padding: 18px !important; border-radius: 20px !important; font-size: 1.1rem !important; font-weight: 800 !important; border: none !important; background: linear-gradient(135deg, #01b2ad, #00d2ff) !important; color: white !important; cursor: pointer !important; box-shadow: 0 10px 20px rgba(1, 178, 173, 0.2) !important;" onclick="document.getElementById('eco-report-layer').style.display='none'">확인 완료</button>
     </div>
 </div>
 </body>
