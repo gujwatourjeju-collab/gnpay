@@ -3300,67 +3300,54 @@ function renderRanking(data) {
 // [형님 전용] 앱 시작 시 모든 데이터를 미리 로딩하고 메인으로 강제 고정하는 엔진
 // [형님 전용] 앱 시작 시 데이터를 미리 로딩하고 메인으로 강제 고정하는 최종 엔진
 window.addEventListener('load', async function() {
-    const splash = document.getElementById('splash-screen');
-    const minSplashTime = new Promise(resolve => setTimeout(resolve, 800));
-    const forceExitTimeout = setTimeout(() => {
-        if (document.getElementById('splash-screen')) finishSplash();
-    }, 3000);
-
-    const metaTheme = document.querySelector('meta[name="theme-color"]');
-    if (metaTheme) metaTheme.setAttribute('content', '#e6f7f6');
-
-    try {
-        const safeLoad = async (fn, ...args) => {
-            if (typeof fn === 'function') {
-                try { await fn(...args); } catch(e) { console.log("로딩 패스"); }
-            }
-        };
-
-        // [핵심] 메인 대시보드가 '종합' 순위이므로, 앱 켤 때 total만 빠르고 확실하게 가져옵니다.
-        const tasks = [
-            safeLoad(loadRankingData, 'total') 
-        ];
-
-        if (userData && userData.isLoggedIn) {
-            tasks.push(safeLoad(loadActivityHistory));
-            tasks.push(safeLoad(syncPointsRealtime));
-        }
-
-        await Promise.all(tasks);
-
-    } catch (e) {
-        console.log("진입");
-    } finally {
-        await minSplashTime; 
-        clearTimeout(forceExitTimeout);
-        finishSplash();
+    // 1. 카카오톡 인앱 브라우저 탈출 안내 레이어 생성
+    const userAgent = navigator.userAgent.toLowerCase();
+    if (userAgent.includes('kakaotalk')) {
+        const kakaoGuide = document.createElement('div');
+        kakaoGuide.id = 'kakao-out-guide';
+        kakaoGuide.innerHTML = `
+            <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(20, 35, 45, 0.96); z-index: 999999; color: white; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px;">
+                <img src="https://gnpay.my/log2.png" style="width: 80px; margin-bottom: 25px; filter: drop-shadow(0 0 10px rgba(1, 178, 173, 0.3));">
+                <div style="font-size: 1.4rem; font-weight: 900; line-height: 1.5; letter-spacing: -1px; margin-bottom: 30px;">
+                    더 쾌적한 사용을 위해<br>
+                    <span style="color: #01b2ad;">외부 브라우저</span>로 연결합니다.
+                </div>
+                <div style="background: rgba(255,255,255,0.08); padding: 25px 20px; border-radius: 24px; width: 95%; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 40px;">
+                    <p style="font-size: 1rem; opacity: 0.9; margin: 0; line-height: 1.6;">
+                        우측 상단 <b style="font-size: 1.5rem; color: #ffcc00; vertical-align: middle;">⋮</b> 버튼을 누른 후<br>
+                        <span style="background: #ffcc00; color: #000; padding: 2px 10px; border-radius: 6px; font-weight: 800; font-size: 1.1rem;">다른 브라우저로 열기</span><br>를 선택해주세요!
+                    </p>
+                </div>
+                <button onclick="this.parentElement.remove()" style="background: none; border: 1px solid rgba(255,255,255,0.4); color: white; padding: 14px 50px; border-radius: 50px; font-size: 0.9rem; font-weight: 700; cursor: pointer;">닫기</button>
+            </div>
+        `;
+        document.body.appendChild(kakaoGuide);
     }
 
-    function finishSplash() {
+    // 2. 스플래시 종료 핵심 함수 (내부 선언으로 충돌 방지)
+    const finishSplash = () => {
         const splashEl = document.getElementById('splash-screen');
         if (!splashEl) return;
 
-        if (metaTheme) metaTheme.setAttribute('content', '#e6f7f6');
-
-        const allPages = document.querySelectorAll('.page');
-        const mainPage = document.getElementById('page-main');
-
-        allPages.forEach(p => {
+        // 모든 페이지 초기화
+        document.querySelectorAll('.page').forEach(p => {
             p.classList.remove('active');
             p.style.display = 'none';
             p.style.transform = 'none';
             p.style.opacity = '0';
         });
 
+        // 메인 페이지 강제 활성화
+        const mainPage = document.getElementById('page-main');
         if (mainPage) {
             mainPage.style.display = 'block';
             mainPage.style.opacity = '1';
             mainPage.classList.add('active');
         }
 
-        syncTabBar('page-main');
+        // 탭바 및 캐릭터 상태 복구
+        if (typeof syncTabBar === 'function') syncTabBar('page-main');
         
-        // [복구] 아까 지운 아이디 기억하기 기능 여기에 이식
         const savedEmail = localStorage.getItem('gnpay_remember_email');
         if (savedEmail) {
             const emailInput = document.getElementById('login-email');
@@ -3373,12 +3360,45 @@ window.addEventListener('load', async function() {
             updateHarryCharacter(getRankByPoints(userData.points));
         }
 
+        // 스플래시 제거 애니메이션
         splashEl.classList.add('splash-fade-out');
-        
         setTimeout(() => {
-            splashEl.remove();
-            if (typeof updateUI === 'function') updateUI(); // 여기서 최종 숫자가 뙇! 박힙니다.
-        }, 400); 
+            if (splashEl.parentNode) splashEl.remove();
+            if (typeof updateUI === 'function') updateUI();
+        }, 400);
+    };
+
+    // 3. 실행 타이머 및 데이터 로딩 시작
+    const minSplashTime = new Promise(resolve => setTimeout(resolve, 800));
+    const forceExitTimeout = setTimeout(() => {
+        finishSplash(); // 무조건 4초 뒤에는 스플래시 끎 (먹통 방지)
+    }, 4000);
+
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    if (metaTheme) metaTheme.setAttribute('content', '#e6f7f6');
+
+    try {
+        const safeLoad = async (fn, ...args) => {
+            if (typeof fn === 'function') {
+                try { await fn(...args); } catch(e) { console.log("로딩 패스"); }
+            }
+        };
+
+        // 데이터 로딩 태스크
+        const tasks = [ safeLoad(loadRankingData, 'total') ];
+        if (userData && userData.isLoggedIn) {
+            tasks.push(safeLoad(loadActivityHistory));
+            tasks.push(safeLoad(syncPointsRealtime));
+        }
+
+        await Promise.all(tasks);
+
+    } catch (e) {
+        console.log("초기 로딩 에러:", e);
+    } finally {
+        await minSplashTime;
+        clearTimeout(forceExitTimeout);
+        finishSplash(); // 🌟 모든 로딩 끝나면 스플래시 끎
     }
 });
 function handleQRClick() {
