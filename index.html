@@ -3408,8 +3408,8 @@ window.addEventListener('load', async function() {
 // [별도 정의] 닫기 버튼 없는 웹브라우저 가두리 차단막
 function showStrictInstallBlocker() {
     const isIOS = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
-    const icon = isIOS ? '📤' : '⋮';
-    const location = isIOS ? '하단 중앙' : '우측 상단';
+    const icon = isIOS ? '···' : '⋮';
+    const location = isIOS ? '주소창 우측' : '우측 상단';
     
     const blocker = document.createElement('div');
     blocker.id = 'web-strict-blocker';
