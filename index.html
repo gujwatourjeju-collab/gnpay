@@ -3335,6 +3335,9 @@ window.addEventListener('load', async function() {
         `;
         document.body.appendChild(kakaoGuide);
     }
+    if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js');
+}
     // 2. 스플래시 종료 핵심 함수 (내부 선언으로 충돌 방지)
     const finishSplash = () => {
         const splashEl = document.getElementById('splash-screen');
@@ -3410,24 +3413,82 @@ window.addEventListener('load', async function() {
         await minSplashTime;
         clearTimeout(forceExitTimeout);
         finishSplash(); // 🌟 모든 로딩 끝나면 스플래시 끎
+await minSplashTime;
+        clearTimeout(forceExitTimeout);
+        finishSplash(); // 🌟 여기서 스플래시가 딱 꺼지면!
+
+        // [추가] 스플래시 꺼진 직후 설치 유도 팝업 등판
+        setTimeout(() => {
+            showAutoInstallPopup();
+        }, 500); 
     }
 });
+
+/* --- [수리] 접속하자마자 뜨는 자동 팝업 엔진 --- */
+function showAutoInstallPopup() {
+    // 1. 이미 앱으로 접속 중이거나, 오늘 이미 팝업을 닫았다면 중단
+    const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+    const isHiddenToday = localStorage.getItem('gnpay_install_popup_hide');
+    const today = new Date().toDateString();
+
+    if (isStandalone || isHiddenToday === today) return;
+
+    const userAgent = navigator.userAgent.toLowerCase();
+    const isIOS = /iphone|ipad|ipod/.test(userAgent);
+    
+    // 2. 기종별 맞춤형 아이콘 & 위치 설정
+    const icon = isIOS ? '⎋' : '⋮';
+    const location = isIOS ? '하단 중앙' : '우측 상단';
+    
+    const popup = document.createElement('div');
+    popup.id = 'auto-install-popup';
+    popup.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.75); z-index:999999; display:flex; align-items:center; justify-content:center; padding:20px; backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);';
+    
+    popup.innerHTML = `
+        <div style="background:white; width:100%; max-width:320px; border-radius:30px; padding:35px 25px; text-align:center; position:relative; box-shadow:0 20px 50px rgba(0,0,0,0.4); animation: luxurySlideUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+            <img src="https://gnpay.my/log2.png" style="width:70px; margin-bottom:20px; filter: drop-shadow(0 4px 8px rgba(1,178,173,0.2));">
+            <h4 style="font-weight:900; color:#1a1a1a; letter-spacing:-1.5px; margin-bottom:12px; font-size:1.3rem;">앱 설치하고 더 편하게!</h4>
+            <p style="font-size:0.9rem; color:#666; line-height:1.6; margin-bottom:25px; word-break:keep-all;">
+                바탕화면에 추가하면 주소 입력 없이<br><b>김녕페이</b>를 앱처럼 바로 쓸 수 있어요.
+            </p>
+            <div style="background:#f0fbfb; padding:18px; border-radius:20px; font-size:0.9rem; color:#01b2ad; font-weight:800; margin-bottom:30px; line-height:1.6; border:1px solid rgba(1,178,173,0.1);">
+                ${location} <b style="font-size:1.3rem; color:#ffcc00; vertical-align:middle;">${icon}</b> 버튼 클릭!<br>
+                <span style="color:#333; font-size:1rem;">'홈 화면에 추가'</span>
+            </div>
+            <button onclick="closeInstallPopup()" style="width:100%; background:#01b2ad; color:white; border:none; padding:16px; border-radius:50px; font-weight:800; font-size:1.1rem; box-shadow:0 10px 20px rgba(1, 178, 173, 0.2);">알겠습니다!</button>
+            <div onclick="closeInstallPopup(true)" style="margin-top:15px; font-size:0.8rem; color:#bbb; text-decoration:underline; cursor:pointer;">오늘 하루 보지 않기</div>
+        </div>
+    `;
+    document.body.appendChild(popup);
+}
+
+// 팝업 닫기 및 '오늘 하루 보지 않기' 저장
+function closeInstallPopup(hideToday = false) {
+    if (hideToday) {
+        localStorage.setItem('gnpay_install_popup_hide', new Date().toDateString());
+    }
+    const popup = document.getElementById('auto-install-popup');
+    if (popup) popup.remove();
+}
+
 /* --- [PWA 앱 설치 제어 엔진] --- */
+/* --- [수정 완료] 안드로이드 진짜 설치 + 아이폰 안내 통합 엔진 --- */
 let deferredPrompt; 
 
-// 1. 브라우저가 설치 가능 상태가 되면 신호를 잡습니다.
+// 1. 안드로이드 설치 신호 대기
 window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault(); // 브라우저 자체 팝업 차단
-    deferredPrompt = e; // 신호 보관
-    
-    // 메인 페이지에 있는 '앱 설치 버튼'을 화면에 보이게 합니다.
-    const installBtn = document.getElementById('main-install-btn');
-    if (installBtn) installBtn.style.display = 'block'; 
+    e.preventDefault(); 
+    deferredPrompt = e; 
+    console.log("안드로이드 설치 준비 완료");
 });
 
-// 2. 사용자가 설치 버튼을 눌렀을 때 실행될 함수
+// 2. 팝업에서 "알겠습니다" 눌렀을 때 실행될 통합 함수
 async function installApp() {
-    // 안드로이드/크롬 환경일 때
+    // 팝업 닫기
+    const autoPopup = document.getElementById('auto-install-popup');
+    if (autoPopup) autoPopup.remove();
+
+    // 상황 1: 안드로이드에서 진짜 설치 신호가 있을 때
     if (deferredPrompt) {
         deferredPrompt.prompt(); 
         const { outcome } = await deferredPrompt.userChoice;
@@ -3438,18 +3499,19 @@ async function installApp() {
         }
         deferredPrompt = null;
     } 
-    // 아이폰(iOS) 환경일 때 (설치 팝업이 안 뜨므로 안내 팝업을 띄움)
+    // 상황 2: 아이폰(iOS)일 때
     else {
         const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
         if (isIOS) {
-            showIOSInstallGuide(); // 아이폰용 화살표 안내 팝업 실행
+            showIOSInstallGuide(); // 아이폰 전용 안내 팝업 띄우기
         } else {
-            alert("이미 설치되어 있거나 이 브라우저에서는 설치를 지원하지 않습니다.");
+            // 설치 신호가 아직 안 왔거나 이미 설치된 경우
+            console.log("설치할 수 없는 환경이거나 이미 설치됨");
         }
     }
 }
 
-// 3. [아이폰 전용] 홈 화면 추가 안내 팝업 함수
+// 3. [아이폰 전용] 홈 화면 추가 안내 팝업 (사장님 코드 유지)
 function showIOSInstallGuide() {
     const guideId = 'ios-install-guide';
     if (document.getElementById(guideId)) return;
@@ -3468,6 +3530,35 @@ function showIOSInstallGuide() {
         </div>
     `;
     document.body.appendChild(guide);
+}
+
+// 4. 자동 팝업 (여기서 installApp을 호출하게 연결!)
+function showAutoInstallPopup() {
+    if (window.innerWidth > 768) return; 
+    const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+    if (isStandalone) return;
+
+    const userAgent = navigator.userAgent.toLowerCase();
+    const isIOS = /iphone|ipad|ipod/.test(userAgent);
+    const icon = isIOS ? '⎋' : '⋮';
+    const location = isIOS ? '하단 중앙' : '우측 상단';
+    
+    const popup = document.createElement('div');
+    popup.id = 'auto-install-popup';
+    popup.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:999999; display:flex; align-items:center; justify-content:center; padding:20px;';
+    
+    popup.innerHTML = `
+        <div style="background:white; width:100%; max-width:320px; border-radius:28px; padding:30px 20px; text-align:center;">
+            <img src="https://gnpay.my/log2.png" style="width:70px; margin-bottom:20px;">
+            <h4 style="font-weight:900;">앱으로 설치할까요?</h4>
+            <p style="font-size:0.9rem; color:#666; margin-bottom:20px;">바탕화면에 추가하면 앱처럼 쓰기 편해요!</p>
+            <div style="background:#f0fbfb; padding:15px; border-radius:18px; margin-bottom:20px;">
+                ${location} <b>${icon}</b> 버튼 클릭 후<br>'홈 화면에 추가'
+            </div>
+            <button onclick="installApp()" style="width:100%; background:#01b2ad; color:white; border:none; padding:15px; border-radius:50px; font-weight:800;">알겠습니다!</button>
+        </div>
+    `;
+    document.body.appendChild(popup);
 }
 function handleQRClick() {
     if (!userData.isLoggedIn) {
