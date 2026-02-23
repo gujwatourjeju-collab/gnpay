@@ -3475,91 +3475,98 @@ function closeInstallPopup(hideToday = false) {
 /* --- [수정 완료] 안드로이드 진짜 설치 + 아이폰 안내 통합 엔진 --- */
 let deferredPrompt; 
 
-// 1. 안드로이드 설치 신호 대기
+// 1. 안드로이드/크롬 설치 신호 대기
 window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault(); 
     deferredPrompt = e; 
     console.log("안드로이드 설치 준비 완료");
 });
 
-// 2. 팝업에서 "알겠습니다" 눌렀을 때 실행될 통합 함수
+// 2. 통합 설치 실행 함수 (안드로이드 시스템 팝업 or 아이폰 안내창)
 async function installApp() {
-    // 팝업 닫기
+    // 기존 팝업 제거
     const autoPopup = document.getElementById('auto-install-popup');
     if (autoPopup) autoPopup.remove();
 
-    // 상황 1: 안드로이드에서 진짜 설치 신호가 있을 때
     if (deferredPrompt) {
+        // [안드로이드] 브라우저 자체 설치창 띄움
         deferredPrompt.prompt(); 
         const { outcome } = await deferredPrompt.userChoice;
         if (outcome === 'accepted') {
-            console.log('설치 완료');
-            const installBtn = document.getElementById('main-install-btn');
-            if (installBtn) installBtn.style.display = 'none';
+            console.log('사용자가 앱 설치를 수락했습니다.');
         }
         deferredPrompt = null;
-    } 
-    // 상황 2: 아이폰(iOS)일 때
-    else {
+    } else {
+        // [아이폰] 또는 신호가 없을 때 안내 가이드 노출
         const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
         if (isIOS) {
-            showIOSInstallGuide(); // 아이폰 전용 안내 팝업 띄우기
+            showIOSInstallGuide();
         } else {
-            // 설치 신호가 아직 안 왔거나 이미 설치된 경우
-            console.log("설치할 수 없는 환경이거나 이미 설치됨");
+            alert("바탕화면에 추가하여 앱처럼 이용해 보세요! 😊");
         }
     }
 }
 
-// 3. [아이폰 전용] 홈 화면 추가 안내 팝업 (사장님 코드 유지)
+// 3. [아이폰 전용] 홈 화면 추가 상세 가이드 (사장님 요청 아이콘 반영)
 function showIOSInstallGuide() {
     const guideId = 'ios-install-guide';
     if (document.getElementById(guideId)) return;
 
     const guide = document.createElement('div');
     guide.id = guideId;
+    // 사장님이 말씀하신 "네모 안에 플러스" 모양을 가장 비슷하게 재현
     guide.innerHTML = `
-        <div style="position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); width: 90%; background: white; color: #333; padding: 20px; border-radius: 20px; z-index: 100000; box-shadow: 0 10px 30px rgba(0,0,0,0.3); border: 2px solid #01b2ad;">
-            <div style="font-weight: 800; margin-bottom: 12px; text-align: center; color:#01b2ad;">🍎 아이폰 앱 설치 방법</div>
-            <div style="font-size: 0.95rem; line-height: 1.6; word-break: keep-all;">
-                1. 브라우저 주소창 우측에 <b> ···버튼</b>을 누르세요.<br>
-                2. 📤공유 버튼을 누르고 <b>'···더보기 버튼'</b>을 선택하세요.<br>
-                3. '+홈화면에 추가'를 누르세요.
+        <div style="position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); width: 92%; max-width: 350px; background: white; color: #333; padding: 25px; border-radius: 25px; z-index: 100000; box-shadow: 0 15px 40px rgba(0,0,0,0.3); border: 2px solid #01b2ad; animation: luxurySlideUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+            <div style="font-weight: 900; margin-bottom: 15px; text-align: center; color:#01b2ad; font-size:1.1rem;">🍎 아이폰 앱 추가 방법</div>
+            <div style="font-size: 0.95rem; line-height: 1.8; word-break: keep-all; font-weight:600;">
+                1. 하단 중앙의 <b style="font-size:1.3rem; background:#f0f0f0; padding:2px 6px; border-radius:6px; color:#333;">📤</b> (공유) 버튼 클릭!<br>
+                2. 리스트를 올려 <b style="font-size:1.3rem; background:#f0f0f0; padding:2px 6px; border-radius:6px; color:#333;">⊞</b> (홈 화면에 추가) 선택!<br>
+                <span style="color:#888; font-size:0.85rem;">* ⊞ 또는 [+] 모양의 버튼을 찾아보세요.</span>
             </div>
-            <button onclick="this.parentElement.remove()" style="width: 100%; margin-top: 15px; background: #01b2ad; color: white; border: none; padding: 12px; border-radius: 12px; font-weight: 700;">확인했습니다</button>
+            <button onclick="this.parentElement.remove()" style="width: 100%; margin-top: 20px; background: #01b2ad; color: white; border: none; padding: 15px; border-radius: 15px; font-weight: 800;">확인했습니다</button>
             <div style="position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); width: 20px; height: 20px; background: white; border-right: 2px solid #01b2ad; border-bottom: 2px solid #01b2ad; transform: translateX(-50%) rotate(45deg);"></div>
         </div>
     `;
     document.body.appendChild(guide);
 }
 
-// 4. 자동 팝업 (여기서 installApp을 호출하게 연결!)
+// 4. [수정] 자동 팝업 - 문구를 더 깔끔하고 직관적으로 수리
 function showAutoInstallPopup() {
     if (window.innerWidth > 768) return; 
     const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
-    if (isStandalone) return;
+    const isHiddenToday = localStorage.getItem('gnpay_install_popup_hide');
+    const today = new Date().toDateString();
 
-    const userAgent = navigator.userAgent.toLowerCase();
-    const isIOS = /iphone|ipad|ipod/.test(userAgent);
-    const icon = isIOS ? '⎋' : '⋮';
+    if (isStandalone || isHiddenToday === today) return;
+
+    const isIOS = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
+    const icon = isIOS ? '📤' : '⋮'; 
     const location = isIOS ? '하단 중앙' : '우측 상단';
     
     const popup = document.createElement('div');
     popup.id = 'auto-install-popup';
-    popup.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:999999; display:flex; align-items:center; justify-content:center; padding:20px;';
+    popup.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:999999; display:flex; align-items:center; justify-content:center; padding:20px; backdrop-filter:blur(5px);';
     
     popup.innerHTML = `
-        <div style="background:white; width:100%; max-width:320px; border-radius:28px; padding:30px 20px; text-align:center;">
+        <div style="background:white; width:100%; max-width:320px; border-radius:30px; padding:35px 25px; text-align:center; box-shadow:0 20px 50px rgba(0,0,0,0.4);">
             <img src="https://gnpay.my/log2.png" style="width:70px; margin-bottom:20px;">
-            <h4 style="font-weight:900;">앱으로 설치할까요?</h4>
-            <p style="font-size:0.9rem; color:#666; margin-bottom:20px;">바탕화면에 추가하면 앱처럼 쓰기 편해요!</p>
-            <div style="background:#f0fbfb; padding:15px; border-radius:18px; margin-bottom:20px;">
-                ${location} <b>${icon}</b>주소입력 창 우측···버튼 클릭 후<br>📤공유 버튼 누르고<br>'+홈 화면에 추가'
+            <h4 style="font-weight:900; color:#1a1a1a; letter-spacing:-1px;">앱 설치하고 더 편하게!</h4>
+            <p style="font-size:0.9rem; color:#666; line-height:1.6; margin-bottom:25px;">바탕화면에 추가하면 매번 주소를<br>칠 필요 없이 앱처럼 바로 실행됩니다.</p>
+            <div style="background:#f0fbfb; padding:18px; border-radius:20px; font-size:0.95rem; color:#01b2ad; font-weight:800; margin-bottom:25px;">
+                ${location} <span style="font-size:1.4rem; vertical-align:middle; background:#fff; padding:2px 6px; border-radius:8px; border:1px solid #ddd; color:#333;">${icon}</span> 버튼 클릭!<br>
+                <span style="color:#333; font-size:1rem;">'홈 화면에 추가' ➕</span>
             </div>
-            <button onclick="installApp()" style="width:100%; background:#01b2ad; color:white; border:none; padding:15px; border-radius:50px; font-weight:800;">알겠습니다!</button>
+            <button onclick="installApp()" style="width:100%; background:#01b2ad; color:white; border:none; padding:16px; border-radius:50px; font-weight:800; font-size:1.1rem; box-shadow:0 10px 20px rgba(1, 178, 173, 0.2);">알겠습니다! 👍</button>
+            <div onclick="closeInstallPopup(true)" style="margin-top:15px; font-size:0.8rem; color:#bbb; text-decoration:underline; cursor:pointer;">오늘 하루 보지 않기</div>
         </div>
     `;
     document.body.appendChild(popup);
+}
+
+function closeInstallPopup(hideToday = false) {
+    if (hideToday) localStorage.setItem('gnpay_install_popup_hide', new Date().toDateString());
+    const popup = document.getElementById('auto-install-popup');
+    if (popup) popup.remove();
 }
 function handleQRClick() {
     if (!userData.isLoggedIn) {
@@ -3572,5 +3579,6 @@ function handleQRClick() {
 
 </body>
 </html>
+
 
 
