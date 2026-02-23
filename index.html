@@ -1885,6 +1885,41 @@ html, body {
 <div class="walk-path">
     <img id="walking-harry" src="https://gnpay.my/harry_walk.gif" onerror="this.src='https://gnpay.my/3dlog.png'">
 </div>
+<div id="eco-report-layer" class="qr-glass-effect" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 10001; display: none; flex-direction: column; align-items: center; justify-content: center;" onclick="this.style.display='none'">
+    <div class="bg-white p-4 rounded-5 shadow-lg qr-slide-up" style="width:88%; max-width:360px; position: relative; border: 1px solid rgba(255,255,255,0.3);" onclick="event.stopPropagation()">
+        
+        <div style="position: absolute; top: -25px; left: 20px; width: 60px; height: 60px; background: #333; border-radius: 15px; border: 4px solid #fff; box-shadow: 0 8px 15px rgba(0,0,0,0.2); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10;">
+    <span style="color: #fff; font-size: 0.6rem; font-weight: 800; line-height: 1; margin-top: 2px;">6</span> <span style="color: #01b2ad; font-size: 1.8rem; font-weight: 900; line-height: 1; margin-top: -2px;">C</span> </div>
+
+        <div class="text-center mt-3 mb-4">
+            <h5 class="fw-900" style="color: #1a1a1a; letter-spacing: -1.5px; font-size: 1.4rem;">김녕 <span style="color: var(--primary);">에코 리포트</span></h5>
+            <p style="font-size: 0.8rem; font-weight: 600; color: #888; margin-top: 5px;">환경부 온실가스 감축 가이드라인 기반</p>
+        </div>
+        
+        <div class="px-1">
+            <div style="background: #f0fafa; padding: 20px; border-radius: 25px; border: 1px solid #e0f2f1; margin-bottom: 20px;">
+                <div style="font-size: 0.75rem; color: #01b2ad; font-weight: 800; margin-bottom: 10px; letter-spacing: 1px;">CARBON REDUCTION</div>
+                <div style="display: flex; align-items: baseline; gap: 5px; margin-bottom: 5px;">
+                    <span id="popup-eco-carbon" style="font-size: 2.2rem; font-weight: 900; color: #333;">0.00</span>
+                    <span style="font-size: 1.1rem; font-weight: 800; color: #333;">kg</span>
+                </div>
+                <p style="font-size: 0.85rem; color: #666; line-height: 1.5; margin: 0;">
+                    <strong id="popup-eco-name" style="color:#01b2ad;">-</strong>님의 실천으로<br>
+                    어린 소나무 <b id="popup-eco-tree" style="color:#1a1a1a;">0.0</b>그루를 심은 효과를 거두었습니다.
+                </p>
+            </div>
+
+            <div style="padding: 0 10px; margin-bottom: 25px;">
+                <h6 style="font-size: 0.85rem; font-weight: 800; color: #333;"><i class="bi bi-check2-circle me-1"></i> 산출 근거</h6>
+                <p style="font-size: 0.75rem; color: #888; line-height: 1.6; margin-top: 8px;">
+                    본 수치는 환경부 비산업부문 온실가스 감축 가이드라인을 준수합니다. 플로깅 1회당 평균 폐기물 수거량(약 2kg)에 따른 탄소 배출 절감 비용을 보수적으로 환산($2,000P = 0.9kg$)하여 계산되었습니다.
+                </p>
+            </div>
+        </div>
+        
+        <button class="btn-scan w-100" style="padding: 15px; border-radius: 20px; font-size: 1rem;" onclick="document.getElementById('eco-report-layer').style.display='none'">확인 완료</button>
+    </div>
+</div>
 </body>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script>
@@ -2184,32 +2219,33 @@ function updateUI() {
         authArea.innerHTML = `<span class="auth-link" style="color:var(--primary); font-weight:800;" onclick="showPage('page-mypage')">${userData.name}님</span><span style="color:#eee; font-size:0.7rem;">|</span><span class="auth-link" onclick="logout()">로그아웃</span>`;
         // 1. 포인트 기반 탄소 계산 (1000P = 1kg)
 const currentPoints = Number(userData.points || 0);
-const carbonWeight = (currentPoints / 1000).toFixed(2); // 소수점 2자리까지
+    const carbonWeight = (currentPoints * 0.00045).toFixed(2); 
+    const treeCount = (carbonWeight / 6.6).toFixed(1); // 소나무는 소수점 1자리까지
 
-// 2. 상단 환영 문구 및 탄소 수치 UI 교체
-// [사장님 요청] "김녕을 지켜주세요"를 지우고 실시간 탄소량으로 갈아끼웁니다.
-welcome.innerHTML = `
-    <div style="padding-top: 5px;"> <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 5px;">
-            <span style="width: 7px; height: 7px; background: #4cd964; border-radius: 50%; display: inline-block; animation: pulse-green 1.5s infinite;"></span>
-            <span style="font-size: 0.7rem; color: #01b2ad; font-weight: 800; letter-spacing: 0.5px;">MY ECO ACTION</span>
+    // 2. UI 교체 (소나무 환산 수치 추가)
+    welcome.innerHTML = `
+        <div onclick="showCarbonInfo()" style="cursor:pointer; padding-top: 5px;">
+            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 5px;">
+                <span class="live-dot" style="width: 7px; height: 7px; background: #4cd964; border-radius: 50%; display: inline-block; animation: pulse-green 1.5s infinite;"></span>
+                <span style="font-size: 0.7rem; color: #01b2ad; font-weight: 800; letter-spacing: 0.5px;">MY ECO ACTION <i class="bi bi-info-circle-fill" style="font-size:0.6rem; opacity:0.6;"></i></span>
+            </div>
+            <div style="font-size: 1.1rem; font-weight: 700; color: #333; line-height: 1.3;">
+                ${userData.name}님, 제주에서 지금까지<br>
+                <strong style="display: block; font-size: 1.7rem !important; font-weight: 900 !important; background: var(--primary-grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-top: 4px; letter-spacing: -1.2px;">
+                    탄소 <span id="main-carbon-odometer">0.00</span>kg 저감 
+                    <span style="font-size: 0.9rem; -webkit-text-fill-color: #555; font-weight: 700; letter-spacing: -0.5px;">
+                        (🌲${treeCount}그루)
+                    </span>
+                </strong>
+            </div>
         </div>
-        <div style="font-size: 1.1rem; font-weight: 700; color: #333; line-height: 1.3;">
-            ${userData.name}님, 제주에서 지금까지<br>
-            <strong style="display: block; font-size: 1.8rem !important; font-weight: 900 !important; background: var(--primary-grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-top: 4px; letter-spacing: -1.2px;">
-                탄소 <span id="main-carbon-odometer">0.00</span>kg 저감 🌱
-            </strong>
-        </div>
-    </div>
-`;
+    `;
 
 // 3. 숫자가 0.00부터 촤르르 올라가는 효과 실행
 // 페이지가 그려진 직후에 작동하도록 약간의 지연(setTimeout)을 줍니다.
 setTimeout(() => {
-    const carbonEl = document.getElementById('main-carbon-odometer');
-    if (carbonEl) {
-        animateCarbonValue('main-carbon-odometer', 0, carbonWeight, 1200);
-    }
-}, 100);
+    animateCarbonValue('main-carbon-odometer', 0, carbonWeight, 1000);
+}, 50);
         const targetPoints = Number(userData.points || 0);
         const pDisplay = document.getElementById('main-u-points');
         if (pDisplay) animateValue('main-u-points', 0, targetPoints, 1000);
@@ -3796,6 +3832,29 @@ function animateCarbonValue(id, start, end, duration) {
         }
     }
     window.requestAnimationFrame(step);
+}
+// [신규] 탄소 저감 상세 근거 팝업 엔진
+// [최종 수리] 에코 리포트 전용 엔진 (레이어 팝업 방식)
+function showCarbonInfo() {
+    // 1. 데이터 계산 (보수적 수치 적용)
+    const points = Number(userData.points || 0);
+    const carbon = (points * 0.00045).toFixed(2); // 2000P = 0.9kg
+    const trees = (carbon / 6.6).toFixed(1); // 소나무 1그루 6.6kg 기준
+
+    // 2. 팝업창에 데이터 꽂기 (HTML 아이디와 연결)
+    const popupName = document.getElementById('popup-eco-name');
+    const popupCarbon = document.getElementById('popup-eco-carbon');
+    const popupTree = document.getElementById('popup-eco-tree');
+
+    if (popupName) popupName.innerText = userData.name || "사용자";
+    if (popupCarbon) popupCarbon.innerText = carbon;
+    if (popupTree) popupTree.innerText = trees;
+
+    // 3. 레이어 팝업 열기 (디자인은 아래 HTML 껍데기가 담당)
+    const layer = document.getElementById('eco-report-layer');
+    if (layer) {
+        layer.style.display = 'flex'; // 슥~ 나타나게 함
+    }
 }
 </script>
 
