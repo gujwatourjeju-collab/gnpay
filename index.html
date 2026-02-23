@@ -1208,7 +1208,7 @@ html, body {
 
         <img id="harry-img" src="https://gnpay.my/3dlog.png" 
              style="width: 100%; height: 100%; object-fit: contain;"
-             onerror="this.src='https://gnpay.my/harry.png'">
+             onerror="this.src='https://gnpay.my/st.png'">
     </div>
 </div>
 </div>
@@ -1883,7 +1883,7 @@ html, body {
     <div id="my-rank-bar-container"></div>
 </div>
 <div class="walk-path">
-    <img id="walking-harry" src="https://gnpay.my/harry_walk.gif" onerror="this.src='https://gnpay.my/3dlog.png'">
+    <img id="walking-harry" src="https://gnpay.my/harry_walk.gif" onerror="this.src='https://gnpay.my/st.png'">
 </div>
 <div id="eco-report-layer" style="position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; z-index: 99999 !important; display: none; align-items: center !important; justify-content: center !important; background: rgba(0,0,0,0.6) !important; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);" onclick="this.style.display='none'">
     
@@ -2112,9 +2112,8 @@ function updateUI() {
             '해녀':    { text: '전설의 해녀 👑', color: 'linear-gradient(145deg, #667eea, #764ba2)', textColor: '#fff' }
         };
 
-        // 🌟 [수정 포인트] 순위 업데이트 로직 🌟
+        // 🌟 순위 업데이트 로직 (유지)
         if (mainMyRankEl) {
-            // [중요] lastRankingData(오늘/전체 가변형)가 아니라 totalRankingData(전체 고정형)를 봅니다.
             const allRanking = totalRankingData || []; 
             const myIdx = allRanking.findIndex(u => String(u.name).trim() === String(userData.name).trim());
             
@@ -2132,12 +2131,11 @@ function updateUI() {
                     if (medalBox) medalBox.innerHTML = '';
                 }
             } else {
-                // 아직 전체 랭킹 데이터를 한 번도 안 불러왔을 때 표시
                 mainMyRankEl.innerText = "-위"; 
             }
         }
 
-        // 2. 게이지 및 다음 등급 계산 (기존 로직 유지)
+        // 🌟 게이지 및 다음 등급 계산 (유지)
         const points = Number(userData.points || 0);
         const ranks = [
             { id: '보말', name: '보말', pt: 0 },
@@ -2150,11 +2148,9 @@ function updateUI() {
         const nextRank = ranks.find(r => r.pt > points);
         const currentRankData = [...ranks].reverse().find(r => r.pt <= points);
         
-        // 게이지 텍스트 영역 (부모 요소를 통째로 제어해서 '까지', 'P'를 지웁니다)
         const gaugeTextArea = document.querySelector('.main-card-gauge-area .d-flex.justify-content-between');
 
         if (nextRank) {
-            // [일반 등급] 다음 목표가 있을 때 (기존 틀 유지)
             if (gaugeTextArea) {
                 gaugeTextArea.innerHTML = `
                     <div style="color: rgba(255,255,255,0.6);">
@@ -2166,7 +2162,6 @@ function updateUI() {
             }
             if (mainGaugeBar) mainGaugeBar.style.width = Math.min(Math.floor(((points - currentRankData.pt) / (nextRank.pt - currentRankData.pt)) * 100), 100) + "%";
         } else {
-            // 🌟 [최고 등급] '해녀' 달성 시 (틀을 새로 짭니다)
             if (gaugeTextArea) {
                 gaugeTextArea.innerHTML = `
                     <div style="color: #fff; font-weight: 800; letter-spacing: -0.5px;">
@@ -2180,7 +2175,8 @@ function updateUI() {
                 mainGaugeBar.style.background = "linear-gradient(90deg, #01b2ad, #00d2ff)";
             }
         }
-        // 3. QR 클릭 세팅 및 나머지 (기존 로직 유지)
+
+        // 🌟 QR 클릭 세팅 및 나머지 (유지)
         if (qrPreview) {
             qrPreview.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${userData.uid}`;
         }
@@ -2217,38 +2213,38 @@ function updateUI() {
             rankLabel.style.marginBottom = '8px';
         }
 
+        // 🔥 [추가] 동료들이 기차놀이 하며 따라오는 캐릭터 로직 호출
         updateHarryCharacter(currentRankKey);
 
         authArea.innerHTML = `<span class="auth-link" style="color:var(--primary); font-weight:800;" onclick="showPage('page-mypage')">${userData.name}님</span><span style="color:#eee; font-size:0.7rem;">|</span><span class="auth-link" onclick="logout()">로그아웃</span>`;
-        // 1. 포인트 기반 탄소 계산 (1000P = 1kg)
-const currentPoints = Number(userData.points || 0);
-    const carbonWeight = (currentPoints * 0.00045).toFixed(2); 
-    const treeCount = (carbonWeight / 6.6).toFixed(1); // 소나무는 소수점 1자리까지
+        
+        // 🌟 [최종 완성] 탄소 와꾸 정렬 (점 제거 + 소나무 우측 하단 고정)
+        const currentPoints = Number(userData.points || 0);
+        const carbonWeight = (currentPoints * 0.00045).toFixed(2); 
+        const treeCount = (carbonWeight / 6.6).toFixed(1);
 
-    // 2. UI 교체 (소나무 환산 수치 추가)
-    welcome.innerHTML = `
-        <div onclick="showCarbonInfo()" style="cursor:pointer; padding-top: 5px;">
-            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 5px;">
-                <span class="live-dot" style="width: 7px; height: 7px; background: #4cd964; border-radius: 50%; display: inline-block; animation: pulse-green 1.5s infinite;"></span>
-                <span style="font-size: 0.7rem; color: #01b2ad; font-weight: 800; letter-spacing: 0.5px;">MY ECO ACTION <i class="bi bi-info-circle-fill" style="font-size:0.6rem; opacity:0.6;"></i></span>
-            </div>
-            <div style="font-size: 1.1rem; font-weight: 700; color: #333; line-height: 1.3;">
-                ${userData.name}님, 제주에서 지금까지<br>
-                <strong style="display: block; font-size: 1.7rem !important; font-weight: 900 !important; background: var(--primary-grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-top: 4px; letter-spacing: -1.2px;">
-                    탄소 <span id="main-carbon-odometer">0.00</span>kg 저감 
-                    <span style="font-size: 0.9rem; -webkit-text-fill-color: #555; font-weight: 700; letter-spacing: -0.5px;">
+        welcome.innerHTML = `
+            <div onclick="showCarbonInfo()" style="cursor:pointer; padding-top: 10px; text-align: left;">
+                <div style="font-size: 1.1rem; font-weight: 700; color: #333; line-height: 1.2; margin-bottom: 5px;">
+                    ${userData.name}님, 지금까지 제주에서
+                </div>
+                
+                <div style="display: flex; align-items: flex-end; gap: 6px;">
+                    <strong style="font-size: 1.9rem !important; font-weight: 900 !important; background: var(--primary-grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -1.5px; line-height: 1;">
+                        탄소 <span id="main-carbon-odometer">0.00</span>kg 저감
+                    </strong>
+
+                    <span style="font-size: 0.9rem; color: #666; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 3px;">
                         (🌲${treeCount}그루)
                     </span>
-                </strong>
+                </div>
             </div>
-        </div>
-    `;
+        `;
 
-// 3. 숫자가 0.00부터 촤르르 올라가는 효과 실행
-// 페이지가 그려진 직후에 작동하도록 약간의 지연(setTimeout)을 줍니다.
-setTimeout(() => {
-    animateCarbonValue('main-carbon-odometer', 0, carbonWeight, 1000);
-}, 50);
+        setTimeout(() => {
+            animateCarbonValue('main-carbon-odometer', 0, carbonWeight, 1000);
+        }, 50);
+
         const targetPoints = Number(userData.points || 0);
         const pDisplay = document.getElementById('main-u-points');
         if (pDisplay) animateValue('main-u-points', 0, targetPoints, 1000);
@@ -2267,14 +2263,64 @@ setTimeout(() => {
         }
 
     } else {
-        // 비로그인 로직 (기존 유지)
+        // 🌟 비로그인 로직
         if(qrLogged) qrLogged.style.display = 'none';
         if(qrGuest) qrGuest.style.display = 'flex';
-        updateHarryCharacter('GUEST');
+        
+        // 🔥 비로그인 시 GUEST 전달 -> 숨김 처리됨
+        updateHarryCharacter('GUEST'); 
+        
         authArea.innerHTML = `<span class="auth-link" onclick="showPage('page-signup')">회원가입</span><span style="color:#eee; font-size:0.7rem;">|</span><span class="auth-link text-dark" onclick="showPage('page-login')">로그인</span>`;
         if (blackCard) blackCard.onclick = () => showPage('page-login');
         if (whiteCard) whiteCard.onclick = () => showPage('page-login');
         welcome.innerHTML = `내손안의 탄소중립포인트(실천)<br><strong>로그인 후 김녕을 지켜주세요!</strong>`;
+    }
+}
+
+
+// [최종] 사장님 rankData 100% 동기화 버전
+// [최종 보고] 간격 및 정렬 오류 완벽 수정 버전
+function updateHarryCharacter(rankKey) {
+    const leader = document.getElementById('walking-harry');
+    const path = document.querySelector('.walk-path');
+    
+    if (!path || !leader) return;
+
+    // 1. [비로그인/GUEST 멸종] 로그인 안 됐으면 산책로 박스 자체를 숨깁니다.
+    if (!userData || !userData.isLoggedIn || rankKey === 'GUEST') {
+        path.style.display = 'none';
+        leader.src = ""; // 이미지 소스도 비워버림
+        return;
+    }
+
+    // 2. [로그인 상태] 산책로 노출
+    path.style.display = 'block';
+
+    // 사장님 원본 rankData (위치/크기 100% 유지)
+    const rankData = {
+        '보말': { img: 'r_walk.gif', walkBottom: '-12px', walkWidth: '95px' },
+        '감자': { img: 'pote_walk.gif', walkBottom: '-9px', walkWidth: '95px' },
+        '당근': { img: 'ca_walk.gif', walkBottom: '-1px', walkWidth: '95px' },
+        '돌고래': { img: 'dol_walk.gif', walkBottom: '3px', walkWidth: '95px' },
+        '해녀': { img: 'harry_walk.gif', walkBottom: '-4px', walkWidth: '95px' }
+    };
+
+    const config = rankData[rankKey];
+    if (!config) return;
+
+    // 3. 🔥 [버러지 방지 로직] 이미 같은 캐릭터가 걷고 있으면 절대 건드리지 마라!
+    // 이 체크가 없으면 5초마다 이미지가 리로드되면서 캐릭터가 제자리 걸음만 합니다.
+    const newSrc = `https://gnpay.my/${config.img}`;
+    if (leader.src === newSrc) return; 
+
+    // 4. 등급이 진짜로 바뀌었을 때만 딱 한 번 실행 (애니메이션 시작)
+    leader.src = newSrc;
+    leader.style.bottom = config.walkBottom;
+    leader.style.width = config.walkWidth;
+    
+    // 사장님의 harryWalk 18s 애니메이션이 혹시라도 멈췄을까봐 재확인
+    if (leader.style.animation === "" || !leader.style.animation) {
+        leader.style.animation = 'harryWalk 18s linear infinite';
     }
 }
 function updateActivityBadge() {
@@ -3122,7 +3168,7 @@ function updateHarryCharacter(rank) {
     if (!img) return;
 
     const rankData = {
-        'GUEST': { img: '3dlog.png', color: 'linear-gradient(145deg, #ffffff, #e6e6e6)', text: '로그인 필요! 🔒', badgeText: 'GUEST', top: '-20px', left: '5px', walkBottom: '10px', walkWidth: '70px' },
+        'GUEST': { img: 'st.png', color: 'linear-gradient(145deg, #ffffff, #e6e6e6)', text: '로그인 필요! 🔒', badgeText: 'GUEST', top: '-20px', left: '5px', walkBottom: '10px', walkWidth: '70px' },
         '보말': { img: 'r.png', color: 'linear-gradient(145deg, #ffdee9, #b5fffc)', text: '김녕 보말 🐚', badgeText: '김녕보말🐚', top: '-10px', left: '10px', walkBottom: '-12px', walkWidth: '65px' },
         '감자': { img: 'pote.png', color: 'linear-gradient(145deg, #e1b382, #c89666)', text: '김녕 감자 🥔', badgeText: '김녕감자🥔', top: '-15px', left: '15px', walkBottom: '-9px', walkWidth: '75px' },
         '당근': { img: 'ca.png', color: 'linear-gradient(145deg, #ff9a9e, #fecfef)', text: '김녕 당근 🥕', badgeText: '김녕당근🥕', top: '-28px', left: '9px', walkBottom: '-1px', walkWidth: '75px' },
@@ -3859,6 +3905,7 @@ function showCarbonInfo() {
         layer.style.display = 'flex'; // 슥~ 나타나게 함
     }
 }
+
 </script>
 
 </body>
