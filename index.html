@@ -3312,68 +3312,54 @@ function renderRanking(data) {
 // [형님 전용] 앱 시작 시 모든 데이터를 미리 로딩하고 메인으로 강제 고정하는 엔진
 // [형님 전용] 앱 시작 시 데이터를 미리 로딩하고 메인으로 강제 고정하는 최종 엔진
 window.addEventListener('load', async function() {
-    // 1. 카카오톡 인앱 브라우저 탈출 안내 레이어 생성
-    // 🌟 [최종 수리] 아이폰 아이콘 및 버튼 위치 완벽 대응
-  const userAgent = navigator.userAgent.toLowerCase();
-if (userAgent.includes('kakaotalk')) {
-    const isIOS = /iphone|ipad|ipod/.test(userAgent);
-    const btnLocation = isIOS ? "우측 하단" : "우측 상단";
-    // 사장님이 말씀하신 네모 안의 플러스/더보기 아이콘 반영
-    const btnIcon = isIOS ? '<b>⎋</b> 또는 <b>···</b>' : '<b>⋮</b>';
+    const userAgent = navigator.userAgent.toLowerCase();
+    const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
 
-    const kakaoBlocker = document.createElement('div');
-    kakaoBlocker.id = 'kakao-strict-blocker';
-    // 🌟 z-index를 최고치(2147483647)로 줘서 그 어떤 팝업도 위로 못 오게 차단
-    kakaoBlocker.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:#e6f7f6; z-index:2147483647; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:30px; text-align:center;';
+    // 1. [철벽 방어] 카카오톡 인앱 브라우저면 입장 불가
+    if (userAgent.includes('kakaotalk')) {
+        const isIOS = /iphone|ipad|ipod/.test(userAgent);
+        const btnLocation = isIOS ? "우측 하단" : "우측 상단";
+        const btnIcon = isIOS ? '<b>⎋</b> 또는 <b>···</b>' : '<b>⋮</b>';
 
-    kakaoBlocker.innerHTML = `
-        <div style="animation: luxurySlideUp 0.5s ease-out;">
-            <img src="https://gnpay.my/log2.png" style="width: 100px; margin-bottom: 30px; filter: drop-shadow(0 10px 20px rgba(1,178,173,0.2));">
-            
-            <h2 style="font-weight: 900; color: #1a1a1a; letter-spacing: -1.5px; margin-bottom: 20px; line-height: 1.4;">
-                안전한 이용을 위해<br><span style="color: #01b2ad;">외부 브라우저</span>가 필요합니다
-            </h2>
+        const kakaoBlocker = document.createElement('div');
+        kakaoBlocker.id = 'kakao-strict-blocker';
+        kakaoBlocker.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:#e6f7f6; z-index:2147483647; display:flex; align-items:center; justify-content:center; padding:30px; text-align:center;';
+        kakaoBlocker.innerHTML = `
+            <div style="animation: luxurySlideUp 0.5s ease-out;">
+                <img src="https://gnpay.my/log2.png" style="width: 100px; margin-bottom: 30px;">
+                <h2 style="font-weight:900; color:#1a1a1a; font-size:1.4rem; margin-bottom:20px;">외부 브라우저로 연결합니다</h2>
+                <div style="background:white; padding:25px; border-radius:25px; border:1px solid #eee; margin-bottom:30px;">
+                    <p style="font-size:1rem; line-height:1.7; color:#444;">
+                        ${btnLocation} ${btnIcon} 버튼을 누르고<br>
+                        <span style="background:#ffcc00; color:#000; padding:2px 10px; border-radius:8px; font-weight:800;">다른 브라우저로 열기</span><br>
+                        를 선택하여 다시 접속해주세요!
+                    </p>
+                </div>
+            </div>`;
+        document.body.appendChild(kakaoBlocker);
+        document.body.style.overflow = 'hidden';
+        return; // 카톡이면 여기서 끝! 아래 로딩은 하지도 않음
+    }
 
-            <div style="background: white; padding: 25px; border-radius: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.05); border: 1px solid rgba(1,178,173,0.1); margin-bottom: 30px;">
-                <p style="font-size: 1.05rem; color: #444; margin: 0; line-height: 1.8; word-break: keep-all;">
-                    현재 브라우저에서는 <br><b>앱 설치 및 로그인</b>이 제한됩니다.<br><br>
-                    ${btnLocation} ${btnIcon} 버튼을 누르고<br>
-                    <span style="background: #ffcc00; color: #000; padding: 3px 12px; border-radius: 8px; font-weight: 800; font-size: 1.1rem; display: inline-block; margin-top: 5px;">
-                        다른 브라우저로 열기
-                    </span><br>
-                    를 선택하여 접속해주세요!
-                </p>
-            </div>
+    // 2. [가두리 양식] 웹 브라우저 상태(사파리/크롬)면 메인화면 가려버림
+    // 🌟 사장님, 만약 유저가 앱 설치하기 싫어할까 봐 걱정되면 
+    // 아래 if(!isStandalone) 블록을 주석 처리하거나 나중에 조정하시면 됩니다.
+    if (!isStandalone && window.innerWidth <= 768) {
+        showStrictInstallBlocker(); 
+        // 앱이 아닐 때는 로딩바(스플래시) 뒤에서만 돌게 하고 가림막 유지
+    }
 
-            <div style="color: #01b2ad; font-weight: 700; font-size: 0.9rem; animation: pulse 1.5s infinite;">
-                사파리 또는 크롬으로 연결 시 바로 이용 가능합니다.
-            </div>
-        </div>
-    `;
-    
-    // 닫기 버튼 없이 바디에 바로 박아버림
-    document.body.appendChild(kakaoBlocker);
-    
-    // 🌟 [핵심] 스크롤도 못 하게 막아버림
-    document.body.style.overflow = 'hidden';
-    
-    // 이후의 다른 로직(데이터 로딩 등)이 실행되지 않도록 여기서 멈춤
-    return; 
-}
-    // 2. 스플래시 종료 핵심 함수 (내부 선언으로 충돌 방지)
+    // 3. 스플래시 종료 및 데이터 로딩 엔진
     const finishSplash = () => {
         const splashEl = document.getElementById('splash-screen');
         if (!splashEl) return;
 
-        // 모든 페이지 초기화
         document.querySelectorAll('.page').forEach(p => {
             p.classList.remove('active');
             p.style.display = 'none';
-            p.style.transform = 'none';
             p.style.opacity = '0';
         });
 
-        // 메인 페이지 강제 활성화
         const mainPage = document.getElementById('page-main');
         if (mainPage) {
             mainPage.style.display = 'block';
@@ -3381,22 +3367,8 @@ if (userAgent.includes('kakaotalk')) {
             mainPage.classList.add('active');
         }
 
-        // 탭바 및 캐릭터 상태 복구
         if (typeof syncTabBar === 'function') syncTabBar('page-main');
         
-        const savedEmail = localStorage.getItem('gnpay_remember_email');
-        if (savedEmail) {
-            const emailInput = document.getElementById('login-email');
-            const rememberChk = document.getElementById('remember-me');
-            if (emailInput) emailInput.value = savedEmail;
-            if (rememberChk) rememberChk.checked = true;
-        }
-
-        if (userData && userData.isLoggedIn && typeof updateHarryCharacter === 'function') {
-            updateHarryCharacter(getRankByPoints(userData.points));
-        }
-
-        // 스플래시 제거 애니메이션
         splashEl.classList.add('splash-fade-out');
         setTimeout(() => {
             if (splashEl.parentNode) splashEl.remove();
@@ -3404,11 +3376,8 @@ if (userAgent.includes('kakaotalk')) {
         }, 400);
     };
 
-    // 3. 실행 타이머 및 데이터 로딩 시작
     const minSplashTime = new Promise(resolve => setTimeout(resolve, 800));
-    const forceExitTimeout = setTimeout(() => {
-        finishSplash(); // 무조건 4초 뒤에는 스플래시 끎 (먹통 방지)
-    }, 4000);
+    const forceExitTimeout = setTimeout(finishSplash, 4000);
 
     const metaTheme = document.querySelector('meta[name="theme-color"]');
     if (metaTheme) metaTheme.setAttribute('content', '#e6f7f6');
@@ -3420,7 +3389,6 @@ if (userAgent.includes('kakaotalk')) {
             }
         };
 
-        // 데이터 로딩 태스크
         const tasks = [ safeLoad(loadRankingData, 'total') ];
         if (userData && userData.isLoggedIn) {
             tasks.push(safeLoad(loadActivityHistory));
@@ -3428,69 +3396,87 @@ if (userAgent.includes('kakaotalk')) {
         }
 
         await Promise.all(tasks);
-
     } catch (e) {
         console.log("초기 로딩 에러:", e);
     } finally {
         await minSplashTime;
         clearTimeout(forceExitTimeout);
-        finishSplash(); // 🌟 모든 로딩 끝나면 스플래시 끎
-await minSplashTime;
-        clearTimeout(forceExitTimeout);
-        finishSplash(); // 🌟 여기서 스플래시가 딱 꺼지면!
-
-        // [추가] 스플래시 꺼진 직후 설치 유도 팝업 등판
-        setTimeout(() => {
-            showAutoInstallPopup();
-        }, 500); 
+        finishSplash(); // 🌟 모든 데이터 로딩 끝!
     }
 });
 
-/* --- [수리] 접속하자마자 뜨는 자동 팝업 엔진 --- */
-function showAutoInstallPopup() {
-    // 1. PC 접속이면 일단 봐줌 (PC는 폰트가 크니까요)
-    if (window.innerWidth > 768) return; 
-
-    // 2. [핵심] 이미 앱(홈 화면 추가 상태)으로 접속했는지 확인
-    const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
-    
-    // 🌟 이미 앱으로 켰다면 팝업 안 띄우고 종료 (정상 이용 가능)
-    if (isStandalone) return;
-
-    // 3. 앱으로 안 들어왔으면 화면 전체를 '철벽 팝업'으로 가려버림
-    const userAgent = navigator.userAgent.toLowerCase();
-    const isIOS = /iphone|ipad|ipod/.test(userAgent);
+// [별도 정의] 닫기 버튼 없는 웹브라우저 가두리 차단막
+function showStrictInstallBlocker() {
+    const isIOS = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
     const icon = isIOS ? '📤' : '⋮';
     const location = isIOS ? '하단 중앙' : '우측 상단';
     
     const blocker = document.createElement('div');
-    blocker.id = 'strict-install-blocker';
-    // 🌟 닫기 버튼 없는 꽉 찬 배경 (z-index 9999999)
-    blocker.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:#e6f7f6; z-index:9999999; display:flex; align-items:center; justify-content:center; padding:30px; text-align:center;';
+    blocker.id = 'web-strict-blocker';
+    blocker.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:#ffffff; z-index:9999999; display:flex; align-items:center; justify-content:center; padding:30px; text-align:center;';
+    blocker.innerHTML = `
+        <div style="width:100%; max-width:320px;">
+            <img src="https://gnpay.my/log2.png" style="width:80px; margin-bottom:30px;">
+            <h2 style="font-weight:900; color:#1a1a1a; margin-bottom:20px;">김녕페이 앱 전용 모드</h2>
+            <p style="font-size:0.95rem; color:#666; line-height:1.7; margin-bottom:25px;">보안을 위해 홈 화면에 추가한 후<br>앱으로 다시 접속해 주세요.</p>
+            <div style="background:#f8f9fa; padding:20px; border-radius:24px; border:1px solid #eee;">
+                ${location} <span style="background:#fff; padding:2px 8px; border-radius:8px; border:1px solid #ddd;">${icon}</span> 버튼 클릭!<br>
+                <b style="color:#01b2ad; font-size:1.1rem;">'홈 화면에 추가' ➕</b>
+            </div>
+        </div>`;
+    document.body.appendChild(blocker);
+    document.body.style.overflow = 'hidden';
+}
+
+/* --- [수리] 접속하자마자 뜨는 자동 팝업 엔진 --- */
+function showAutoInstallPopup() {
+    // 1. PC 접속이면 일단 허용 (모바일 가두리가 목적이므로)
+    if (window.innerWidth > 768) return; 
+
+    // 2. 홈 화면에 추가된 '앱' 상태인지 확인
+    const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+    
+    // 🌟 앱으로 들어왔다면 차단막 없이 통과!
+    if (isStandalone) return;
+
+    // 3. 일반 브라우저(Safari, Chrome 등) 접속 시 차단막 생성
+    const userAgent = navigator.userAgent.toLowerCase();
+    const isIOS = /iphone|ipad|ipod/.test(userAgent);
+    
+    // 아이폰 사파리는 '공유' 아이콘, 안드로이드는 '점 세개' 아이콘
+    const icon = isIOS ? '📤' : '⋮';
+    const location = isIOS ? '하단 중앙' : '우측 상단';
+    
+    const blocker = document.createElement('div');
+    blocker.id = 'app-only-blocker';
+    // 🌟 z-index를 최대로 높이고 '닫기' 버튼을 아예 만들지 않습니다.
+    blocker.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:#ffffff; z-index:2147483647; display:flex; align-items:center; justify-content:center; padding:30px; text-align:center;';
     
     blocker.innerHTML = `
-        <div style="animation: luxurySlideUp 0.5s ease-out;">
-            <img src="https://gnpay.my/log2.png" style="width:90px; margin-bottom:25px;">
-            <h2 style="font-weight:900; color:#1a1a1a; letter-spacing:-1.5px; margin-bottom:15px; font-size:1.5rem;">김녕페이 전용 앱이<br>필요합니다</h2>
+        <div style="animation: luxurySlideUp 0.5s ease-out; width:100%; max-width:320px;">
+            <img src="https://gnpay.my/log2.png" style="width:80px; margin-bottom:30px;">
+            <h2 style="font-weight:900; color:#1a1a1a; letter-spacing:-1.2px; margin-bottom:20px; line-height:1.4; font-size:1.4rem;">
+                김녕페이 앱 설치가<br>필요합니다
+            </h2>
             <p style="font-size:0.95rem; color:#666; line-height:1.7; margin-bottom:30px; word-break:keep-all;">
-                더욱 안전하고 쾌적한 포인트 사용을 위해<br><b>홈 화면에 추가</b> 후 앱으로 접속해 주세요.
+                포인트 보안과 쾌적한 이용을 위해<br><b>전용 앱 환경</b>에서만 서비스가 제공됩니다.
             </p>
             
-            <div style="background:white; padding:20px; border-radius:24px; box-shadow:0 10px 30px rgba(1,178,173,0.1); border:1px solid #01b2ad; margin-bottom:35px;">
-                <p style="margin:0; font-size:1rem; font-weight:800; color:#01b2ad;">
-                    ${location} <span style="background:#f0f0f0; padding:2px 8px; border-radius:8px; color:#333;">${icon}</span> 버튼 클릭!<br>
-                    <span style="color:#333; font-size:1.1rem;">'홈 화면에 추가' ➕</span>
+            <div style="background:#f8f9fa; padding:25px 20px; border-radius:24px; border:1px solid #eee; margin-bottom:30px;">
+                <p style="margin:0; font-size:1rem; font-weight:700; color:#444; line-height:1.8;">
+                    ${location} <span style="background:#fff; padding:2px 8px; border-radius:8px; border:1px solid #ddd;">${icon}</span> 버튼 클릭!<br>
+                    <span style="color:#01b2ad; font-size:1.1rem; font-weight:900;">'홈 화면에 추가' ➕</span>
                 </p>
             </div>
             
-            <div style="color:#adb5bd; font-size:0.8rem; font-weight:600;">
-                * 한 번만 설치하면 주소 입력 없이<br>바로 이용 가능합니다.
-            </div>
+            <p style="color:#adb5bd; font-size:0.8rem; font-weight:600;">
+                한 번만 추가하면 다음부터는<br>앱처럼 바로 접속됩니다.
+            </p>
         </div>
     `;
     
     document.body.appendChild(blocker);
-    document.body.style.overflow = 'hidden'; // 🌟 스크롤도 완전 봉쇄
+    document.body.style.overflow = 'hidden'; // 🌟 뒷화면 스크롤 완전 방지
 }
 
 // 팝업 닫기 및 '오늘 하루 보지 않기' 저장
