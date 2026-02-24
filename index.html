@@ -1154,22 +1154,24 @@ html, body {
 
 /* 1. 메인 페이지만 민트색 배경을 해제하고 GIF가 들어갈 자리 확보 */
 #page-main {
-    background-color: transparent !important; /* 강제 민트색 해제 */
-    background-size: cover !important;
-    background-position: center !important;
-    background-attachment: fixed !important;
-    transition: background-image 1.5s ease-in-out; /* 물때 바뀔 때 스르륵~ */
     position: relative;
     z-index: 1;
+    height: 100vh !important;
+    width: 100vw !important;
+    background-repeat: no-repeat !important;
+    background-attachment: fixed !important;
 }
 
-/* 2. 배경 시인성 확보: 바다 GIF 위에 살짝 어두운 틴트막 씌우기 (글자 보호) */
-#page-main::before {
+/* 2. 민트색으로 바다 가리기 (반투명 막) */
+#page-main::after {
     content: "";
     position: absolute;
     top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0, 0, 0, 0.15); /* 사진이 밝으면 이 숫자를 0.25 정도로 올리세요 */
-    z-index: -1;
+    /* 민트색 농도를 0.6으로 높여서 바다를 은은하게 가립니다 */
+    background-color: rgba(230, 247, 246, 0.6) !important;
+    backdrop-filter: blur(8px); /* 살짝 흐리게 가리기 */
+    -webkit-backdrop-filter: blur(8px);
+    z-index: -1; 
     pointer-events: none;
 }
 
@@ -2176,7 +2178,7 @@ html, body {
 </body>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script>
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbxd2ACzL1WPJiurY-Lm48qO0OlWIm7jAAT6b_WYYz0H0xX1AB1uyGYohyNzh9fAi1M6/exec";
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbyBUJI77SDLTHEM1I7Glq4xzMQLBxQqMq0Po51Vjhk8q1YA0079DlHruHmCMMy4N_SoKA/exec";
     let currentRankMode = 'today';
     let totalRankingData = [];
     function updateTab(element) {
@@ -4267,11 +4269,14 @@ const gnpayOceanGifs = {
 };
 
 // 2. 형님의 실제 GAS 배포 주소
-const TIDE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxd2ACzL1WPJiurY-Lm48qO0OlWIm7jAAT6b_WYYz0H0xX1AB1uyGYohyNzh9fAi1M6/exec';
+const TIDE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyBUJI77SDLTHEM1I7Glq4xzMQLBxQqMq0Po51Vjhk8q1YA0079DlHruHmCMMy4N_SoKA/exec';
 
 async function syncGimnyeongTide() {
     const mainPage = document.getElementById('page-main');
-    const defaultGif = gnpayOceanGifs.mid; // 실패 시 기본 중물 GIF
+    const defaultGif = gnpayOceanGifs.mid;
+
+    // 🚩 [프로모드 필살기] 바다 GIF 위에 '민트색 셀로판지(농도 0.7)'를 직접 코팅하는 마법의 코드
+    const mintShield = 'linear-gradient(rgba(230, 247, 246, 0.7), rgba(230, 247, 246, 0.7))';
 
     try {
         const response = await fetch(TIDE_SCRIPT_URL, {
@@ -4283,11 +4288,12 @@ async function syncGimnyeongTide() {
         if (!response || response.result === 'error' || !Array.isArray(response)) {
             throw new Error("Invalid Tide Data");
         }
-
+        
         const now = new Date();
         const currentTime = now.getHours() * 60 + now.getMinutes(); 
         let tideState = 'mid'; 
 
+        // 시간 계산 로직
         response.forEach(item => {
             const [h, m] = item.time.split(':').map(Number);
             const tideTime = h * 60 + m;
@@ -4297,14 +4303,17 @@ async function syncGimnyeongTide() {
         });
 
         if (mainPage) {
-            mainPage.style.backgroundImage = `url('${gnpayOceanGifs[tideState]}')`;
+            // 🚩 민트 코팅 + 바다 사진을 한 번에 주입하고, 위아래 100% 꽉 채움 강제 고정!
+            mainPage.style.setProperty('background-image', `${mintShield}, url('${gnpayOceanGifs[tideState]}')`, 'important');
+            mainPage.style.setProperty('background-size', '100% 100%, 100% 100%', 'important');
         }
         console.log(`🌊 배경 적용 완료: ${tideState}`);
 
     } catch (e) {
         console.log("⚠️ 물때 연동 실패, 기본 배경(mid) 강제 로드");
         if (mainPage) {
-            mainPage.style.backgroundImage = `url('${defaultGif}')`;
+            mainPage.style.setProperty('background-image', `${mintShield}, url('${defaultGif}')`, 'important');
+            mainPage.style.setProperty('background-size', '100% 100%, 100% 100%', 'important');
         }
     }
 }
