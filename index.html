@@ -941,7 +941,12 @@ html, body {
     backdrop-filter: blur(25px) saturate(180%) !important;
     -webkit-backdrop-filter: blur(25px) saturate(180%) !important;
     border: 1px solid rgba(255, 255, 255, 0.6) !important;
-    margin: 0 20px 20px !important;
+    
+    /* [🚨 수리 핵심] */
+    box-sizing: border-box !important; /* 패딩이 너비를 키우지 않게 고정 */
+    width: auto !important;           /* 너비를 100% 대신 auto로 두어 마진 내부에 가둠 */
+    margin: 0 20px 20px 20px !important; /* 좌우 마진 20px 유지 */
+    
     padding: 15px 20px !important;
     display: flex !important;
     align-items: center !important;
@@ -949,9 +954,6 @@ html, body {
     min-height: 100px;
     cursor: pointer;
     transition: all 0.2s ease;
-
-
-    /* [🚨 수리 포인트] 위에서 물려받은 숨쉬기 애니메이션을 강제로 꺼버립니다 */
     animation: none !important; 
 }
 #white-qr-card::after {
@@ -1046,15 +1048,22 @@ html, body {
 @keyframes shineGradient {
     to { background-position: 200% center; }
 }
-
+/* 로딩 화면 디자인 */
+  #loading-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(255,255,255,0.9); /* 흰색 배경 */
+    display: flex; justify-content: center; align-items: center;
+    z-index: 9999; font-weight: bold;
+  }
 </style>
 </head>
 <body>
 
     <div id="loading-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.9); z-index: 10000; display: none; justify-content: center; align-items: center; flex-direction: column;">
-        <div class="spinner-border text-info" role="status"></div>
-        <div class="mt-3 fw-bold" style="color:var(--primary)">처리 중입니다...</div>
-    </div>
+    <div class="spinner-border text-info" role="status"></div>
+    
+    <div id="loading-text" class="mt-3 fw-bold" style="color:var(--primary)">데이터를 처리 중입니다...</div>
+</div>
 <div id="splash-screen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #e6f7f6; z-index: 20000; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; overflow: hidden;">
     
     <style>
@@ -1099,6 +1108,46 @@ html, body {
             border-radius: 35%;
             animation: waveMove 5s infinite linear;
         }
+@keyframes arrowBounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-10px);
+    }
+    60% {
+        transform: translateY(-5px);
+    }
+}
+
+/* 화살표 아이콘에 애니메이션 직접 주입 */
+.bi-chevron-double-up {
+    display: inline-block !important; /* 이게 없으면 안 움직일 수 있음 */
+    animation: arrowBounce 1.5s infinite !important;
+}
+
+/* 가이드 슬라이더 스크롤바 제거 */
+.guide-slider-container::-webkit-scrollbar {
+    display: none;
+}
+/* 🚩 QR카드랑 대시보드 카드가 우측으로 튀어나가는 현상 방지 */
+.dashboard-card, .live-dashboard-card, #white-qr-card, .premium-card {
+    /* 1. 이동 중에도 위치 값을 절대적으로 고정 */
+    transform: translate3d(0, 0, 0) !important;
+    
+    /* 2. 그래픽 카드(GPU)를 써서 부드럽게 고정 (잔상 제거) */
+    will-change: transform, opacity;
+    -webkit-font-smoothing: antialiased;
+    
+    /* 3. 부모 애니메이션의 잔상을 무시하도록 설정 */
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+
+/* 4. 카드 내부의 텍스트나 아이콘이 흔들리는 것도 방지 */
+.dashboard-card *, .live-dashboard-card * {
+    -webkit-transform: translate3d(0,0,0);
+}
     </style>
     
     <div class="ocean-wave"></div>
@@ -1117,9 +1166,13 @@ html, body {
         내 손안의 탄소중립 실천 포인트
     </div>
 
-    <div style="position: absolute; bottom: 60px; color: #888; font-size: 0.75rem; font-weight: 600; letter-spacing: 1px; z-index: 10;">
-        with 구좌마을여행사협동조합
-    </div>
+    <div style="position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%); z-index: 10; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+    <div style="color: #01b2ad; font-size: 0.7rem; font-weight: 800; letter-spacing: 2px; opacity: 0.8;">WITH</div>
+    
+    <img src="https://gnpay.my/gujwa.png" 
+         style="height: 35px; width: auto; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.15));" 
+         onerror="this.style.display='none'">
+</div>
 </div>
     <div id="qr-focus-layer" onclick="this.style.display='none'" class="qr-glass-effect" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center;">
         <div class="bg-white p-4 rounded-5 text-center shadow-lg qr-slide-up" style="width:85%; max-width:350px; border: 1px solid rgba(255,255,255,0.3); position: relative;" onclick="event.stopPropagation()">
@@ -1236,7 +1289,7 @@ html, body {
     <i class="bi bi-chevron-right qr-arrow"></i>
 </div>
        <div class="menu-grid-iphone">
-    <div class="menu-item-iphone" onclick="openSubmit('우리 마을 플로깅 (자유)', 2000, '...')">
+    <div class="menu-item-iphone" onclick="openSubmit('우리 마을 플로깅 (자유)', 2000, '관리자가 판단하여 2000p혹은 랜덤으로 포인트 지급')">
         <div class="icon-circle" style="color: #01b2ad;">
             <i class="bi bi-tree-fill"></i>
         </div>
@@ -1289,53 +1342,107 @@ html, body {
 
     <div class="guide-slider-container" id="guide-slider-scroll">
         <div class="guide-slider">
-            <div class="guide-card active-focus">
-                <div class="guide-step-badge">STEP 01</div>
-                <div class="guide-icon-circle" style="width:75px; height:75px; border-radius:22px; background:#e6f7f6; color:var(--primary); display:flex; align-items:center; justify-content:center; font-size:2rem; margin-bottom:20px;">
-                    <i class="bi bi-tree-fill"></i>
-                </div>
-                <h4 style="font-weight:900; letter-spacing:-1px; margin-bottom:12px;">에코 포인트 적립</h4>
-                <div class="step-desc" style="color:#666; font-size:0.95rem; line-height:1.7;">
-                    김녕 성세기 해변 정화 후<br>
-                    <strong>활동 사진</strong>을 인증하면<br>
-                    에코 포인트가 즉시 지급됩니다.
-                </div>
-            </div>
-
-            <div class="guide-card">
-                <div class="guide-step-badge">STEP 02</div>
-                <div class="guide-icon-circle" style="width:75px; height:75px; border-radius:22px; background:#fff9e6; color:#d4a017; display:flex; align-items:center; justify-content:center; font-size:2rem; margin-bottom:20px;">
-                    <i class="bi bi-bag-heart-fill"></i>
-                </div>
-                <h4 style="font-weight:900; letter-spacing:-1px; margin-bottom:12px;">마을 가맹점 사용</h4>
-                <div class="step-desc" style="color:#666; font-size:0.95rem; line-height:1.7;">
-                    적립된 포인트는 김녕 마을의<br>
-                    <strong>카페, 식당, 체험처</strong>에서<br>
-                    현금처럼 자유롭게 사용하세요.
-                </div>
-            </div>
-
-            <div class="guide-card">
-                <div class="guide-step-badge">STEP 03</div>
-                <div class="guide-icon-circle" style="width:75px; height:75px; border-radius:22px; background:#eefbff; color:#0099cc; display:flex; align-items:center; justify-content:center; font-size:2rem; margin-bottom:20px;">
-                    <i class="bi bi-qr-code-scan"></i>
-                </div>
-                <h4 style="font-weight:900; letter-spacing:-1px; margin-bottom:12px;">스마트 체크인</h4>
-                <div class="step-desc" style="color:#666; font-size:0.95rem; line-height:1.7;">
-                    마이페이지 <strong>나의 QR</strong>로<br>
-                    가맹점 입장과 본인 확인을<br>
-                    누구보다 빠르게 해결하세요.
-                </div>
-            </div>
+    <div class="guide-card active-focus" style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+        <div class="guide-step-badge" style="background: #1a1a1a; color: #fff; padding: 4px 18px; border-radius: 50px; font-size: 0.7rem; font-weight: 900; letter-spacing: 1px; margin-bottom: 25px;">QUEST</div>
+        <div class="guide-icon-circle" style="width: 100px; height: 100px; background: linear-gradient(145deg, #fff5f5, #ffe0e0); border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 1px solid rgba(255, 77, 77, 0.2); box-shadow: 0 10px 20px rgba(255, 77, 77, 0.15); margin-bottom: 25px;">
+            <i class="bi bi-flag-fill" style="font-size: 2.8rem; color: #ff4d4d; filter: drop-shadow(0 4px 6px rgba(255, 77, 77, 0.2));"></i>
+        </div>
+        <h4 style="font-weight: 900; font-size: 1.4rem; letter-spacing: -1.2px; margin-bottom: 12px; color: #1a1a1a;">마을 공통 퀘스트</h4>
+        <div class="step-desc" style="color: #666; font-size: 0.95rem; line-height: 1.8; word-break: keep-all; padding: 0 10px;">
+            김녕마을 수호자들을 위한 <strong>특별 임무</strong>입니다.<br>
+            주기적으로 바뀌는 퀘스트를 완료하면<br>
+            자유활동보다 <span style="color:#ff4d4d; font-weight:800; border-bottom:2px solid #ffe0e0;">더 많은 포인트</span>를 얻습니다.
         </div>
     </div>
 
-  <div class="text-center mt-2">
-    <div class="badge rounded-pill bg-light text-dark px-3 py-2" style="font-size: 0.75rem; opacity: 0.7; border: 1px solid #eee;">
-        <i class="bi bi-arrow-up-down me-1"></i> 위아래로 밀어서 다음 단계 확인
+    <div class="guide-card" style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+        <div class="guide-step-badge" style="background: #1a1a1a; color: #fff; padding: 4px 18px; border-radius: 50px; font-size: 0.7rem; font-weight: 900; letter-spacing: 1px; margin-bottom: 25px;">FREE</div>
+        <div class="guide-icon-circle" style="width: 100px; height: 100px; background: linear-gradient(145deg, #f0fbfb, #d1efee); border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 1px solid rgba(1, 178, 173, 0.2); box-shadow: 0 10px 20px rgba(1, 178, 173, 0.15); margin-bottom: 25px;">
+            <i class="bi bi-person-walking" style="font-size: 2.8rem; color: #01b2ad; filter: drop-shadow(0 4px 6px rgba(1, 178, 173, 0.2));"></i>
+        </div>
+        <h4 style="font-weight: 900; font-size: 1.4rem; letter-spacing: -1.2px; margin-bottom: 12px; color: #1a1a1a;">나만의 자유 활동</h4>
+        <div class="step-desc" style="color: #666; font-size: 0.95rem; line-height: 1.8; word-break: keep-all; padding: 0 10px;">
+            탄소중립을 위한 나만의 노력을 인증하세요.<br>
+            사진을 신청하면 관리자의 확인을 거쳐<br>
+            <span style="color:#01b2ad; font-weight:800; border-bottom:2px solid #d1efee;">랜덤 에코 포인트</span>가 지급됩니다.
+        </div>
+    </div>
+
+    <div class="guide-card" style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+        <div class="guide-step-badge" style="background: #1a1a1a; color: #fff; padding: 4px 18px; border-radius: 50px; font-size: 0.7rem; font-weight: 900; letter-spacing: 1px; margin-bottom: 25px;">SCAN</div>
+        <div class="guide-icon-circle" style="width: 100px; height: 100px; background: linear-gradient(145deg, #f0f5ff, #e0ebff); border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 1px solid rgba(0, 123, 255, 0.2); box-shadow: 0 10px 20px rgba(0, 123, 255, 0.15); margin-bottom: 25px;">
+            <i class="bi bi-qr-code-scan" style="font-size: 2.8rem; color: #007bff; filter: drop-shadow(0 4px 6px rgba(0, 123, 255, 0.2));"></i>
+        </div>
+        <h4 style="font-weight: 900; font-size: 1.4rem; letter-spacing: -1.2px; margin-bottom: 12px; color: #1a1a1a;">만능 QR 스캐너</h4>
+        <div class="step-desc" style="color: #666; font-size: 0.95rem; line-height: 1.8; word-break: keep-all; padding: 0 10px;">
+            하단 <strong>스캔 버튼</strong> 하나로 다 해결하세요.<br>
+            퀘스트 장소의 <span style="font-weight:700; color:#007bff;">방문 인증</span>은 물론,<br>
+            가맹점 <span style="font-weight:700; color:#007bff;">포인트 사용</span>까지 한 번에 가능합니다.
+        </div>
+    </div>
+
+    <div class="guide-card" style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+        <div class="guide-step-badge" style="background: #1a1a1a; color: #fff; padding: 4px 18px; border-radius: 50px; font-size: 0.7rem; font-weight: 900; letter-spacing: 1px; margin-bottom: 25px;">USE</div>
+        <div class="guide-icon-circle" style="width: 100px; height: 100px; background: linear-gradient(145deg, #fffcf0, #fff4cc); border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 1px solid rgba(255, 193, 7, 0.2); box-shadow: 0 10px 20px rgba(255, 193, 7, 0.15); margin-bottom: 25px;">
+            <i class="bi bi-shop" style="font-size: 2.8rem; color: #ffc107; filter: drop-shadow(0 4px 6px rgba(255, 193, 7, 0.2));"></i>
+        </div>
+        <h4 style="font-weight: 900; font-size: 1.4rem; letter-spacing: -1.2px; margin-bottom: 12px; color: #1a1a1a;">마을 가맹점 사용</h4>
+        <div class="step-desc" style="color: #666; font-size: 0.95rem; line-height: 1.8; word-break: keep-all; padding: 0 10px;">
+            모은 포인트는 김녕마을 곳곳의<br>
+            <strong>식당, 카페, 체험처</strong>에서 쓰세요.<br>
+            당신의 실천이 <span style="color:#d4a017; font-weight:800; border-bottom:2px solid #ffec99;">마을 경제의 에너지</span>가 됩니다.
+        </div>
+    </div>
+
+    <div class="guide-card" style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+        <div class="guide-step-badge" style="background: #1a1a1a; color: #fff; padding: 4px 18px; border-radius: 50px; font-size: 0.7rem; font-weight: 900; letter-spacing: 1px; margin-bottom: 25px;">RANK</div>
+        <div class="guide-icon-circle" style="width: 100px; height: 100px; background: linear-gradient(145deg, #f5f0ff, #eee5ff); border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 1px solid rgba(111, 66, 193, 0.2); box-shadow: 0 10px 20px rgba(111, 66, 193, 0.15); margin-bottom: 25px;">
+            <i class="bi bi-trophy-fill" style="font-size: 2.8rem; color: #6f42c1; filter: drop-shadow(0 4px 6px rgba(111, 66, 193, 0.2));"></i>
+        </div>
+        <h4 style="font-weight: 900; font-size: 1.4rem; letter-spacing: -1.2px; margin-bottom: 12px; color: #1a1a1a;">수호자 랭킹 시스템</h4>
+        <div class="step-desc" style="color: #666; font-size: 0.95rem; line-height: 1.8; word-break: keep-all; padding: 0 10px;">
+            누적 점수에 따라 <strong>수호자 등급</strong>이 상승합니다.<br>
+            최고 등급 <span style="color:#6f42c1; font-weight:800; border-bottom:2px solid #eee5ff;">'전설의 해녀'</span>가 되어<br>
+            김녕마을의 진정한 주인이 되어보세요!
+        </div>
+    </div>
+
+    <div class="guide-card" style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+    <div class="guide-step-badge" style="background: #1a1a1a; color: #fff; padding: 4px 18px; border-radius: 50px; font-size: 0.7rem; font-weight: 900; letter-spacing: 1px; margin-bottom: 25px;">IMPACT</div>
+    <div class="guide-icon-circle" style="width: 100px; height: 100px; background: linear-gradient(145deg, #e9fce9, #c3f2c3); border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 1px solid rgba(40, 167, 69, 0.2); box-shadow: 0 10px 20px rgba(40, 167, 69, 0.15); margin-bottom: 25px;">
+        <i class="bi bi-tree-fill" style="font-size: 3rem; color: #28a745; filter: drop-shadow(0 4px 6px rgba(40, 167, 69, 0.2));"></i>
+    </div>
+    <h4 style="font-weight: 900; font-size: 1.4rem; letter-spacing: -1.2px; margin-bottom: 12px; color: #1a1a1a;">실시간 탄소 리포트</h4>
+    <div class="step-desc" style="color: #666; font-size: 0.95rem; line-height: 1.8; word-break: keep-all; padding: 0 10px;">
+        나의 활동이 줄인 <strong>탄소량(kg)</strong>과<br>
+        실제로 심어준 <strong>소나무 그루 수</strong>를 확인하세요.<br>
+        환경을 지킨 당신의 가치를 <span style="color:#28a745; font-weight:800; border-bottom:2px solid #d3f9d3;">데이터 리포트</span>로 증명합니다.
     </div>
 </div>
-</div>
+<div class="guide-card" style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+    <div class="guide-step-badge" style="background: #1a1a1a; color: #fff; padding: 4px 18px; border-radius: 50px; font-size: 0.7rem; font-weight: 900; letter-spacing: 1px; margin-bottom: 25px;">WITH</div>
+    
+    <div class="guide-icon-circle" style="width: 100px; height: 100px; background: #fff; border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 1px solid rgba(0, 0, 0, 0.05); box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08); margin-bottom: 25px; overflow: hidden; padding: 15px;">
+        <img src="https://gnpay.my/gujwa.png" style="width: 100%; height: auto; object-fit: contain;" onerror="this.src='https://cdn-icons-png.flaticon.com/512/1251/1251930.png'">
+    </div>
+
+    <h4 style="font-weight: 900; font-size: 1.4rem; letter-spacing: -1.2px; margin-bottom: 12px; color: #1a1a1a;">지속 가능한 김녕마을</h4>
+    <div class="step-desc" style="color: #666; font-size: 0.95rem; line-height: 1.8; word-break: keep-all; padding: 0 10px;">
+        김녕페이 탄소중립 실천 프로젝트는<br>
+        <strong>구좌마을여행사협동조합</strong>과 함께합니다.<br>
+        마을과 환경을 살리는 여정에 동참해 주세요.
+   </div>
+            </div>
+
+        </div></div> <div id="guide-footer" style="padding: 20px 20px 40px; background: linear-gradient(to top, #f4fbfb 80%, transparent); text-align: center; z-index: 100;">
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 6px;">
+            <i class="bi bi-chevron-double-up" style="color: #01b2ad; font-size: 1.4rem; animation: bounceAni 1.5s infinite;"></i>
+            
+            <div class="badge rounded-pill bg-white text-dark shadow-sm" style="padding: 8px 16px; font-size: 0.8rem; font-weight: 800; border: 1px solid rgba(0,0,0,0.05); color: #555 !important;">
+                <i class="bi bi-arrow-up-down me-1" style="color: #01b2ad;"></i> 위아래로 밀어서 다음 단계 확인
+            </div>
+        </div>
+    </div></div>
 <div id="page-mypage" class="page"> 
     <div class="top-nav" style="display: flex; justify-content: space-between; align-items: flex-start; padding: 20px 20px 5px 26px;">
         <div onclick="showPage('page-main')" style="cursor: pointer;">
@@ -1694,10 +1801,59 @@ html, body {
 </div>
 
     <div id="page-activities" class="page">
+<div id="quest-splash" style="
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
+    background: #01b2ad !important; /* 기본색 */
+    z-index: 50000; display: none; align-items: center; justify-content: center; 
+    overflow: hidden; opacity: 0; pointer-events: none; transition: opacity 0.5s ease;
+">
+    <div style="position: absolute; width: 150%; height: 150%; background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%); animation: aurora 8s infinite alternate; top: -25%; left: -25%;"></div>
+    <div class="ocean-wave" style="position: absolute; bottom: -20%; left: -50%; width: 200%; height: 100%; background: rgba(255,255,255,0.1); border-radius: 40%; animation: waveMove 10s infinite linear; opacity: 0.5;"></div>
+    <div class="ocean-wave" style="position: absolute; bottom: -15%; left: -45%; width: 200%; height: 100%; background: rgba(255,255,255,0.1); border-radius: 35%; animation: waveMove 7s infinite linear; opacity: 0.3;"></div>
+
+    <div id="splash-content" style="
+        position: relative; z-index: 10; text-align: center; color: white; 
+        transform: translateY(30px); opacity: 0; transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+        padding: 40px 30px; border-radius: 40px; border: 1px solid rgba(255,255,255,0.3);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1); width: 85%; max-width: 320px;
+    ">
+        <div style="margin-bottom: 25px;">
+            <div style="width: 100px; height: 100px; background: white; border-radius: 30px; display: flex; align-items: center; justify-content: center; margin: 0 auto; box-shadow: 0 10px 20px rgba(0,0,0,0.1); animation: logoUp 0.8s ease-out;">
+                <i class="bi bi-lightning-charge-fill" style="font-size: 3.5rem; color: #01b2ad;"></i>
+            </div>
+        </div>
+
+        <div style="display: inline-block; background: #1a1a1a; color: #fff; padding: 4px 15px; border-radius: 50px; font-size: 0.75rem; font-weight: 900; letter-spacing: 1.5px; margin-bottom: 15px;">FEBRUARY SPECIAL</div>
+        
+        <h2 style="font-weight: 900; letter-spacing: -1.5px; font-size: 1.8rem; margin-bottom: 10px; line-height: 1.2;">
+            2월 한정<br><span style="color: #fff; text-decoration: underline; text-underline-offset: 5px;">신규 퀘스트</span> 오픈
+        </h2>
+        
+        <p style="font-size: 0.95rem; opacity: 0.9; font-weight: 500; line-height: 1.5;">
+            김녕 해변을 깨끗하게 지키고<br><strong>보너스 포인트</strong>를 획득하세요!
+        </p>
+
+        <div style="margin-top: 25px; font-size: 0.7rem; font-weight: 800; color: rgba(255,255,255,0.6); letter-spacing: 2px;">GIMNYEONG PAY 2.0</div>
+    </div>
+</div>
+
+<style>
+/* 디자인을 살려주는 애니메이션 엔진 */
+@keyframes aurora {
+    from { box-shadow: 0 0 15px rgba(1, 178, 173, 0.1); }
+    to { box-shadow: 0 0 40px rgba(1, 178, 173, 0.4); }
+}
+@keyframes waveMove {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+</style>
+
     <div class="top-nav">
-        <div onclick="showPage('page-main')" style="cursor: pointer;">
-            <img src="https://gnpay.my/log.png" style="width: 85px; margin-bottom: 8px;">
-            <div style="color:var(--primary); font-weight:900; font-size:1.4rem; letter-spacing:-0.5px; margin-bottom: 5px; margin-left: 10px;">진행중 퀘스트</div>
+        <div onclick="showPage('page-main')" style="cursor: pointer; display: flex; align-items: center; gap: 8px;">
+            <img src="https://gnpay.my/log.png" style="width: 42px; height: auto;">
+            <div style="color:var(--primary); font-weight:900; font-size:1.3rem; letter-spacing:-1px;">진행중 퀘스트</div>
         </div>
         <div class="fs-2 text-secondary" style="cursor:pointer; padding: 10px;" onclick="showPage('page-main')">
             <i class="bi bi-x-lg" style="font-size: 1.5rem; opacity: 0.6;"></i>
@@ -1708,24 +1864,25 @@ html, body {
         <h1 class="fw-bolder mt-2" style="font-size: calc(1.375rem + 1.5vw); line-height: 1.2;">지금 참여하고<br><strong>포인트를 쌓아보세요</strong></h1>
     </div>
 
-    <div id="activity-list-container" style="padding-left: 20px; padding-right: 20px;">
-        <div class="small text-muted mb-4" style="padding-left: 15px; opacity: 0.8; font-size: 0.85rem;">
-            현재 참여 가능한 김녕 마을 정화 퀘스트입니다.
+    <div id="activity-list-container" style="padding: 0 20px;">
+        <div class="small text-muted mb-4" style="padding-left: 15px; opacity: 0.8;">현재 참여 가능한 김녕 마을 정화 퀘스트입니다.</div>
+
+        <div class="dashboard-card" onclick="openSubmit('김녕 성세기해변 플로깅', 3000, '성세기해변 플로깅 인증하시면 3000p 지급!')" 
+             style="background: #ffffff !important; border-radius: 28px !important; padding: 22px 24px !important; display: flex !important; align-items: center !important; border: 1px solid #f1f3f5 !important; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.04) !important; margin-bottom: 16px !important; cursor: pointer;">
+            
+            <div class="reward-unit-pro" style="min-width: 60px; height: 60px; background: var(--primary-grad); border-radius: 18px; display: flex; flex-direction: column; align-items: center; justify-content: center; margin-right: 18px; color: white; box-shadow: 0 6px 15px rgba(1, 178, 173, 0.2);">
+                <span style="font-size: 0.65rem; font-weight: 800; opacity: 0.9;">GET</span>
+                <span style="font-size: 1.15rem; font-weight: 900;">3.0k</span>
+            </div>
+
+            <div style="flex: 1; text-align: left;">
+                <div style="font-size: 1.15rem; color: #1c1c1e; font-weight: 850; letter-spacing: -0.8px;">김녕 성세기해변 플로깅</div>
+                <div style="font-size: 0.85rem; color: var(--primary); font-weight: 700; margin-top: 2px;">+3,000 포인트 적립</div>
+            </div>
+            <i class="bi bi-chevron-right" style="color: #d1d1d6; font-size: 1.3rem;"></i>
         </div>
-        
-<div class="dashboard-card mb-3" onclick="openSubmit('김녕 성세기해변 플로깅', 2000, '...')" 
-     style="padding: 22px; align-items: center; border-left: 5px solid var(--primary); margin: 0 0 15px 0; width: 100%;
-            animation: breathe 2s infinite ease-in-out; /* 엔진 점화 */">
-    <div style="flex: 1;">
-        <div class="fw-bold" style="font-size: 1.1rem;">김녕 성세기해변 플로깅</div>
-        <div class="text-success small fw-bold" style="margin-top: 4px;">+3,000 포인트 적립</div>
     </div>
-    <i class="bi bi-chevron-right fs-4" style="color: #ccc;"></i>
 </div>
-
-        </div>
-</div>
-
     <div id="page-submit-act" class="page">
     <div class="top-nav">
         <div onclick="showPage('page-main')" style="cursor: pointer;">
@@ -1749,7 +1906,7 @@ html, body {
         <div class="p-1">
             <textarea id="act-content" class="form-control custom-input" rows="4" placeholder="오늘 어떤 정화 활동을 하셨나요?" style="border-radius: 20px; border: 1px solid #eee; margin-bottom: 15px;"></textarea>
             
-            <div class="mb-2 small fw-bold text-muted" style="margin-left: 10px;">사진 첨부 (최대 3장)</div>
+            <div class="mb-2 small fw-bold text-muted" style="margin-left: 10px;">사진 첨부 (최대 1장)</div>
             <input type="file" id="act-files" class="form-control custom-input" accept="image/*" multiple onchange="previewImages()" style="border-radius: 20px; border: 1px solid #eee; margin-bottom: 15px;">
             
             <div id="image-preview" class="d-flex gap-2 mb-4 overflow-auto pb-2" style="padding-left: 5px;"></div>
@@ -1774,33 +1931,80 @@ html, body {
         <h1 class="fw-bolder mt-2" style="font-size: calc(1.375rem + 1.5vw); line-height: 1.2;">어디서나 자유롭게<br><strong>포인트를 사용하세요</strong></h1>
     </div>
 
-    <div style="padding-left: 20px; padding-right: 20px;">
-        <div class="small text-muted mb-4" style="padding-left: 15px; opacity: 0.8; font-size: 0.85rem;">
-            김녕페이 포인트를 현금처럼 사용할 수 있는 가맹점입니다.
-        </div>
+    <div style="padding: 0 20px; display: flex; flex-direction: column; gap: 14px;">
+    
+    <style>
+        .pro-partner-card {
+            background: #ffffff !important;
+            border-radius: 26px !important;
+            padding: 20px 22px !important;
+            display: flex;
+            align-items: center;
+            /* 엣지 있는 얇은 보더와 깊이감 있는 그림자 */
+            border: 1px solid rgba(0,0,0,0.03) !important;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.02) !important;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+        }
         
-      <div class="dashboard-card mb-3" 
-     style="padding: 22px; flex-direction: column; align-items: flex-start; border-left: 5px solid var(--primary); margin: 0 0 15px 0; width: 100%;
-            animation: breathe 2s infinite ease-in-out; /* 엔진 점화 */">
-    <div class="fw-bold" style="font-size: 1.1rem;">김녕수산문화복합센터</div>
-    <div class="small text-muted mt-1">📍 각종 체험 활동 · 2층 해녀삼춘커피</div>
-</div>
+        /* 현업 감성: 클릭 시 아주 미세하게 들어가는 햅틱 반응 느낌 */
+        .pro-partner-card:active {
+            transform: translateY(2px) scale(0.98);
+            background: #fafafa !important;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.01) !important;
+        }
 
-<div class="dashboard-card mb-3" 
-     style="padding: 22px; flex-direction: column; align-items: flex-start; border-left: 5px solid var(--primary); margin: 0 0 15px 0; width: 100%;
-            animation: breathe 2s infinite ease-in-out; /* 엔진 점화 */">
-    <div class="fw-bold" style="font-size: 1.1rem;">김녕어울림센터</div>
-    <div class="small text-muted mt-1">📍 각종 체험 활동 · 1층 삼춘카페 등</div>
-</div>
-<div class="dashboard-card mb-3" 
-     style="padding: 22px; flex-direction: column; align-items: flex-start; border-left: 5px solid var(--primary); margin: 0 0 15px 0; width: 100%;
-            animation: breathe 2s infinite ease-in-out;">
-    <div class="fw-bold" style="font-size: 1.1rem;">카페, 청굴물</div>
-    <div class="small text-muted mt-1">📍 각종 음료 및 디저트 · 각종 굿즈</div>
-</div>
+        .pro-icon-wrapper {
+            width: 54px; height: 54px; border-radius: 18px; 
+            display: flex; align-items: center; justify-content: center;
+            margin-right: 18px; flex-shrink: 0;
+            font-size: 1.5rem;
+            /* 아이콘 뒤에 은은한 광택 효과 */
+            box-shadow: inset 0 -4px 10px rgba(0,0,0,0.02);
+        }
+
+        .pro-benefit-badge {
+            font-size: 0.75rem; font-weight: 800; padding: 6px 14px; border-radius: 14px;
+            white-space: nowrap; letter-spacing: -0.5px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+    </style>
+
+    <div class="pro-partner-card">
+        <div class="pro-icon-wrapper" style="background: #f0fbfb; color: #01b2ad;">
+            <i class="bi bi-shop-window"></i>
+        </div>
+        <div style="flex: 1; text-align: left;">
+            <div style="font-size: 1.1rem; color: #111; font-weight: 800; letter-spacing: -0.8px;">김녕수산문화복합센터</div>
+            <div style="font-size: 0.85rem; color: #8a8a8e; margin-top: 3px; font-weight: 500;">📍 체험활동 · 2층 해녀삼춘커피</div>
+        </div>
+        <div class="pro-benefit-badge" style="background: var(--primary-grad); color: white;">사용·적립</div>
+    </div>
+
+    <div class="pro-partner-card">
+        <div class="pro-icon-wrapper" style="background: #fff9f0; color: #ff9800;">
+            <i class="bi bi-house-heart-fill"></i>
+        </div>
+        <div style="flex: 1; text-align: left;">
+            <div style="font-size: 1.1rem; color: #111; font-weight: 800; letter-spacing: -0.8px;">김녕어울림센터</div>
+            <div style="font-size: 0.85rem; color: #8a8a8e; margin-top: 3px; font-weight: 500;">📍 삼춘카페 · 마을 프로그램</div>
+        </div>
+        <div class="pro-benefit-badge" style="background: #ff9800; color: white;">사용·적립</div>
+    </div>
+
+    <div class="pro-partner-card">
+        <div class="pro-icon-wrapper" style="background: #f0faff; color: #00d2ff;">
+            <i class="bi bi-cup-hot-fill"></i>
+        </div>
+        <div style="flex: 1; text-align: left;">
+            <div style="font-size: 1.1rem; color: #111; font-weight: 800; letter-spacing: -0.8px;">카페, 청굴물</div>
+            <div style="font-size: 0.85rem; color: #8a8a8e; margin-top: 3px; font-weight: 500;">📍 각종 음료 · 디저트 · 굿즈</div>
+        </div>
+        <div class="pro-benefit-badge" style="background: #00d2ff; color: white;">사용·적립</div>
     </div>
 </div>
-
+</div>
     <div class="floating-tab-bar">
         <div class="tab-item active" onclick="showPage('page-main'); updateTab(this)">
             <i class="bi bi-house-door-fill"></i>
@@ -1926,7 +2130,7 @@ html, body {
 </body>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script>
-        const GAS_URL = "https://script.google.com/macros/s/AKfycby6C0tEYO3LYB2LrTEQwW2W5kzA5JiTgs1UVserc_w8g7vsfcvGM-5Qlt7QPv9Zc5-oDg/exec";
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbyGq16-Z3srcpFUm769thQS8h_CSEtzIVSZj9vw7za5VA0my3kHDNxSkloYAdA8Ha9m/exec";
     let currentRankMode = 'today';
     let totalRankingData = [];
     function updateTab(element) {
@@ -1972,55 +2176,55 @@ function showPage(pageId) {
     const targetPage = document.getElementById(pageId);
     const currentPage = document.querySelector('.page.active');
 
-    // 1. 타겟이 없거나 이미 그 페이지면 즉시 중단
     if (!targetPage || currentPage === targetPage) return;
 
-    // [보완] 마이페이지 진입 시 로그인 상태에 따라 내부 화면 미리 세팅
-    if (pageId === 'page-mypage') {
-        syncMypageState(); 
+    // 🌟 [수리 1] 등장 전에 미리 그려서 슬라이드 도중 연산을 차단
+    if (pageId === 'page-main' || pageId === 'page-mypage') {
+        updateUI(); 
     }
+    
+    if (pageId === 'page-mypage') { syncMypageState(); }
+    if (pageId === 'page-activities') { triggerQuestSplash(); }
 
-    // 캐릭터 산책로(Harry) 숨김 제어
     const walkPath = document.querySelector('.walk-path');
     if (walkPath) {
         const isAuthPage = ['page-login', 'page-signup'].includes(pageId);
-        walkPath.style.display = isAuthPage ? 'none' : 'block';
+        walkPath.style.display = (isAuthPage || pageId === 'page-activities') ? 'none' : 'block';
     }
 
-    // 2. 방향 계산 (페이지 이동 애니메이션용)
     const order = ['page-login', 'page-signup', 'page-main', 'page-history', 'page-guide', 'page-mypage', 'page-activities', 'page-ranking'];
     const curIdx = currentPage ? order.indexOf(currentPage.id) : -1;
     const nextIdx = order.indexOf(pageId);
 
-    // 3. 입력창 잠금 (전환 도중 터치 방지)
-    document.querySelectorAll('input, select, textarea').forEach(el => el.disabled = true);
+    // 🌟 모든 페이지의 transform을 초기화해서 잔상 제거
+    document.querySelectorAll('.page').forEach(p => {
+        if(p !== targetPage && p !== currentPage) p.style.display = 'none';
+    });
 
-    // 4. [기존 페이지 처리] 애니메이션과 함께 사라짐
     if (currentPage) {
         currentPage.classList.remove('active');
         currentPage.style.transition = 'transform 0.35s ease-out, opacity 0.35s ease-out';
         currentPage.style.transform = nextIdx > curIdx ? 'translateX(-100%)' : 'translateX(100%)';
         currentPage.style.opacity = '0';
         
-        const prevPage = currentPage;
         setTimeout(() => {
-            if (!prevPage.classList.contains('active')) {
-                prevPage.style.display = 'none';
-                prevPage.style.transform = 'none';
+            if (!currentPage.classList.contains('active')) {
+                currentPage.style.display = 'none';
+                currentPage.style.transform = 'none';
             }
         }, 350);
     }
 
-    // 5. [타겟 페이지 등장] 애니메이션 준비
+    // 🌟 [수리 2] 타겟 페이지 초기화 (0.4s와 칼각 맞춤)
     targetPage.style.display = 'block';
     targetPage.style.transition = 'none'; 
-    
     const startX = nextIdx > curIdx ? '100%' : '-100%';
     targetPage.style.transform = `translateX(${startX})`;
     targetPage.style.opacity = '0';
     
-    void targetPage.offsetWidth; // 브라우저 리플로우 강제 (애니메이션 준비)
+    void targetPage.offsetWidth; // 강제 리플로우
 
+    // 🌟 [수리 3] 애니메이션 엔진 최적화
     requestAnimationFrame(() => {
         targetPage.style.transition = 'transform 0.4s cubic-bezier(0.1, 0.9, 0.2, 1), opacity 0.3s ease';
         targetPage.classList.add('active');
@@ -2028,35 +2232,25 @@ function showPage(pageId) {
         targetPage.style.opacity = '1';
     });
 
-    // 6. 마무리 (UI 업데이트 및 입력창 잠금 해제)
+    // 🌟 [수리 4] 600ms로 아주 넉넉하게 잡아서 애니메이션 도중 클릭/연산 완전 차단
     setTimeout(() => {
         targetPage.querySelectorAll('input, select, textarea').forEach(el => el.disabled = false);
-        if (pageId === 'page-main' || pageId === 'page-mypage') updateUI();
-    }, 400);
+    }, 600); 
 
-    // 7. [핵심 수리] 하단바(Tab Bar) 강제 복구 및 제어
     const tabBar = document.querySelector('.floating-tab-bar');
     if (tabBar) {
         const isAuthPage = ['page-login', 'page-signup'].includes(pageId);
-        
-        if (isAuthPage) {
-            tabBar.style.display = 'none'; // 로그인/가입 페이지는 숨김
+        if (isAuthPage || pageId === 'page-activities') {
+            tabBar.style.display = 'none';
         } else {
-            // 🌟 랭킹 페이지 등에서 X 누르고 올 때 무조건 다시 살려냄
             tabBar.style.display = 'flex';
             tabBar.style.opacity = '1';
-            // 아래로 숨겨졌던 위치를 강제로 원위치(0)로 고정
             tabBar.style.setProperty('transform', 'translateX(-50%) translateY(0)', 'important');
-            tabBar.style.pointerEvents = 'auto'; 
         }
-        
-        // 하단바 아이콘 불 켜기 동기화
         if (typeof syncTabBar === "function") syncTabBar(pageId);
     }
-    
     window.scrollTo({ top: 0, behavior: 'instant' });
 }
-
 function syncMypageState() {
     // [수정] localStorage의 엉뚱한 키 대신, 현재 로드된 userData 객체의 상태를 확인합니다.
     const isLogined = userData && userData.isLoggedIn; 
@@ -2216,7 +2410,7 @@ function updateUI() {
         // 🔥 [추가] 동료들이 기차놀이 하며 따라오는 캐릭터 로직 호출
         updateHarryCharacter(currentRankKey);
 
-        authArea.innerHTML = `<span class="auth-link" style="color:var(--primary); font-weight:800;" onclick="showPage('page-mypage')">${userData.name}님</span><span style="color:#eee; font-size:0.7rem;">|</span><span class="auth-link" onclick="logout()">로그아웃</span>`;
+        authArea.innerHTML = `<span class="auth-link" style="color:var(--primary); font-weight:800; cursor:pointer;" onclick="showPage('page-mypage'); updateMypageGauge();">${userData.name}님</span><span style="color:#eee; font-size:0.7rem;">|</span><span class="auth-link" onclick="logout()">로그아웃</span>`;
         
         // 🌟 [최종 완성] 탄소 와꾸 정렬 (점 제거 + 소나무 우측 하단 고정)
         const currentPoints = Number(userData.points || 0);
@@ -2592,18 +2786,68 @@ async function previewImages() {
         loading.style.display = 'none'; // 압축 끝났으니 로딩바 끄기
     }
 }
-        async function submitActivity() {
-            const content = document.getElementById('act-content').value;
-            if(!content || selectedImages.length === 0) return alert("활동 내용과 사진을 등록해주세요.");
-            loading.style.display='flex';
-            try {
-                const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ type: 'submitActivity', email: userData.email, title: currentAct.title, content: content, images: selectedImages, pointAmount: currentAct.amount }) }).then(r => r.json());
-                if(res.result === 'success') { alert("신청이 완료되었습니다!"); showPage('page-main'); }
-                else { alert("오류: " + res.message); }
-            } catch(e) { alert("서버 통신 오류"); }
-            loading.style.display='none';
-        }
+async function submitActivity() {
+    const contentField = document.getElementById('act-content');
+    const content = contentField.value;
+    
+    if(!content || selectedImages.length === 0) return alert("활동 내용과 사진을 등록해주세요.");
+    
+    // [🔥 수리 포인트 1] 형님 HTML 구조에 맞게 ID로 정확히 타격
+    const overlay = document.getElementById('loading-overlay');
+    // loading-overlay 안의 "랭킹..." 문구가 들어있는 div를 찾습니다.
+    const loadingMsg = overlay ? overlay.querySelector('.mt-3') : null;
 
+    if(loadingMsg) loadingMsg.innerText = "활동 신청서를 제출하는 중입니다...";
+    if(overlay) overlay.style.display = 'flex'; // loading.style.display 대신 overlay 사용
+    
+    try {
+        const res = await fetch(GAS_URL, { 
+            method: 'POST', 
+            body: JSON.stringify({ 
+                type: 'submitActivity', 
+                email: userData.email, 
+                title: currentAct.title, 
+                content: content, 
+                images: selectedImages, 
+                pointAmount: currentAct.amount 
+            }) 
+        }).then(r => r.json());
+
+       if(res.result === 'success') { 
+            alert("신청이 완료되었습니다!"); 
+            
+            // 1. [텍스트 초기화] 형님 ID 'act-content' 확인 완료
+            contentField.value = ''; 
+            
+            // 2. [데이터 초기화] 전역 변수 비우기
+            selectedImages = []; 
+            
+            // 3. [미리보기 UI 초기화] 형님 ID 'image-preview' (단수형) 확인 완료
+            const previewContainer = document.getElementById('image-preview'); 
+            if(previewContainer) {
+                previewContainer.innerHTML = ''; 
+            }
+
+            // 4. [파일 선택기 초기화] 🔥 형님 ID 'act-files' (복수형)로 수정 완료!
+            const fileInput = document.getElementById('act-files'); 
+            if(fileInput) {
+                fileInput.value = '';
+            }
+
+            // 로딩 문구 원복 및 페이지 이동
+            if(loadingMsg) loadingMsg.innerText = "데이터를 불러오는 중입니다...";
+            showPage('page-main'); 
+        }
+        else { 
+            alert("오류: " + res.message); 
+        }
+    } catch(e) { 
+        alert("서버 통신 오류"); 
+    }
+    
+    // [🔥 수리 포인트 3] 오버레이 닫기
+    if(overlay) overlay.style.display = 'none';
+}
    // [최종] 내역 조회 함수: 서버에서 장부와 신청내역을 동시에 가져옴
 async function loadActivityHistory() {
     showPage('page-history');
@@ -3373,12 +3617,15 @@ document.addEventListener('touchend', e => {
 }, {passive: true});
 // 1. 탭 전환 (활동 기록 방식 계승)
 function switchRankTab(type) {
-    // 🌟 [핵심 보완] 현재 모드를 전역 변수에 저장합니다.
-    // 이 한 줄이 있어야 5초마다 자동 갱신될 때도 이 모드를 유지합니다.
     currentRankMode = type; 
-
     const todayTab = document.getElementById('tab-rank-today');
     const totalTab = document.getElementById('tab-rank-total');
+    const listContainer = document.getElementById('ranking-list');
+
+    // 🌟 탭 누르는 순간 리스트 비우고 '로딩 문구' 박기
+    if (listContainer) {
+        listContainer.innerHTML = '<div class="text-center text-muted mt-5 small">랭킹 데이터를 불러오는 중입니다...</div>';
+    }
 
     if (type === 'today') {
         todayTab.className = 'flex-fill text-center py-2 active-tab';
@@ -3392,9 +3639,17 @@ function switchRankTab(type) {
 }
 
 // 2. 랭킹 데이터 로드 (서버 연동용 프레임)
-async function loadRankingData(mode) {
-    const listContainer = document.getElementById('ranking-list');
+async function loadRankingData(mode, showLoading = false) {
     const rankingPage = document.getElementById('page-ranking');
+    const loadingOverlay = document.getElementById('loading-overlay');
+    const listContainer = document.getElementById('ranking-list');
+
+    // 1. 버튼 눌렀을 때만 로딩 뚜껑 덮기
+    if (showLoading && loadingOverlay) loadingOverlay.style.display = 'flex';
+    // 2. 랭킹 페이지 안에서 탭 누를 때만 로딩 문구 박기
+    if (showLoading && listContainer) {
+        listContainer.innerHTML = '<div class="text-center text-muted mt-5 small">데이터를 동기화 중입니다...</div>';
+    }
 
     try {
         const res = await fetch(GAS_URL, {
@@ -3403,25 +3658,23 @@ async function loadRankingData(mode) {
         }).then(r => r.json());
 
         if (res.result === 'success' && res.data) {
-            // 1. 현재 화면 렌더링용 데이터 저장
-            window.lastRankingData = res.data; 
-
-            // 🌟 [추가] 메인 카드를 위한 전용 창고에 '전체 데이터' 따로 저장
-            // 이 줄이 있어야 랭킹 탭에서 '오늘'을 봐도 메인 순위가 안 깨집니다.
+            // [중요] 모드별로 데이터 주머니를 분리해서 저장 (혼선 방지)
             if (mode === 'total') {
-                totalRankingData = res.data;
+                totalRankingData = res.data; 
+            } else {
+                window.todayRankingData = res.data;
             }
 
-            // 2. 랭킹 페이지가 활성 상태일 때만 리스트 그림 (깜빡임 방지)
-            if (rankingPage && rankingPage.classList.contains('active')) {
+            // [핵심] 현재 사용자가 보고 있는 탭과 가져온 데이터가 일치할 때만 화면 갱신
+            if (rankingPage && rankingPage.classList.contains('active') && currentRankMode === mode) {
                 renderRanking(res.data);
             }
-            
-            // 3. 메인 대시보드 및 전체 UI 갱신
-            updateUI(); 
+            updateUI(); // 메인 카드용
         }
     } catch (e) { 
-        console.log("Ranking 로딩 스킵"); 
+        console.log("랭킹 동기화 중..."); 
+    } finally {
+        if (loadingOverlay) loadingOverlay.style.display = 'none';
     }
 }
 // 3. 랭킹 렌더링 (디자인 핵심)
@@ -3432,12 +3685,12 @@ function renderRanking(data) {
 
     if (!listContainer) return;
 
-    // 1. 전체 리스트 HTML 빌드
+    // 1. 전체 리스트 빌드
     let html = '';
     data.forEach((user, idx) => {
         const isTop3 = idx < 3;
         const medal = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : (idx + 1);
-        const isMe = userData && userData.isLoggedIn && user.name === userData.name;
+        const isMe = userData && userData.isLoggedIn && String(user.name).trim() === String(userData.name).trim();
 
         html += `
             <div class="dashboard-card mb-3" style="padding:15px 20px; border-left: 5px solid ${isTop3 ? 'var(--primary)' : '#eee'}; background: ${isMe ? '#f0fbfb' : 'white'};">
@@ -3449,7 +3702,7 @@ function renderRanking(data) {
                     </div>
                     <div class="text-end">
                         <div class="fw-900" style="color:var(--primary); font-size:1.1rem;">
-                            ${user.points.toLocaleString()}<span style="font-size:0.75rem; margin-left:2px;">P</span>
+                            ${Number(user.points).toLocaleString()}<span style="font-size:0.75rem; margin-left:2px;">P</span>
                         </div>
                     </div>
                 </div>
@@ -3457,10 +3710,17 @@ function renderRanking(data) {
     });
     listContainer.innerHTML = html;
 
-    // 2. 내 순위 바 빌드 (리스트와 별개로 처리)
+    // 2. 내 순위 바 빌드 (가독성을 위해 데이터 매칭 로직 보강)
     if (userData && userData.isLoggedIn && barContainer) {
-        const myIdx = data.findIndex(u => u.name === userData.name);
-        const myInfo = myIdx !== -1 ? data[myIdx] : { name: userData.name, points: userData.points, rank: getRankByPoints(userData.points) };
+        // 현재 명단(오늘 또는 전체)에서 내 이름 찾기
+        const myIdx = data.findIndex(u => String(u.name).trim() === String(userData.name).trim());
+        
+        // 명단에 있으면 그 데이터 쓰고, 없으면 기본값(0점 또는 순위외) 처리
+        const myInfo = myIdx !== -1 ? data[myIdx] : { 
+            name: userData.name, 
+            points: (currentRankMode === 'total' ? userData.points : 0), 
+            rank: getRankByPoints(userData.points) 
+        };
         const myRankNum = myIdx !== -1 ? (myIdx + 1) + "위" : "순위 외";
 
         barContainer.innerHTML = `
@@ -3476,11 +3736,11 @@ function renderRanking(data) {
                 </div>
                 <div class="text-end">
                     <div class="fw-900" style="font-size:1.3rem;">${Number(myInfo.points).toLocaleString()}P</div>
-                    <div style="font-size:0.6rem; opacity:0.8; font-weight:800;">MY RANKING</div>
+                    <div style="font-size:0.6rem; opacity:0.8; font-weight:800;">${currentRankMode === 'today' ? 'TODAY' : 'TOTAL'} RANKING</div>
                 </div>
             </div>`;
             
-        // [🔥 추가] 메인 대시보드 카드에 순위 연동을 위해 데이터를 전역 저장하고 UI를 갱신합니다.
+        // 메인 대시보드 동기화용
         window.lastRankingData = data; 
         updateUI(); 
     }
@@ -3905,7 +4165,50 @@ function showCarbonInfo() {
         layer.style.display = 'flex'; // 슥~ 나타나게 함
     }
 }
+// 퀘스트 진입 스플래시 엔진
+function triggerQuestSplash() {
+    const splash = document.getElementById('quest-splash');
+    const content = document.getElementById('splash-content');
+    const tabBar = document.querySelector('.floating-tab-bar');
+    const walkPath = document.querySelector('.walk-path'); // 🌟 캐릭터 산책로 타겟팅
+    
+    if(!splash || !content) return;
 
+    // 1. 스플래시 가동 및 주변 정리
+    splash.style.display = 'flex';
+    splash.style.opacity = '1';
+    splash.style.pointerEvents = 'auto';
+    
+    // 🌟 이미 showPage에서 숨겼겠지만, 확실히 한 번 더 숨겨서 쐐기 박기
+    if (tabBar) tabBar.style.setProperty('display', 'none', 'important');
+    if (walkPath) walkPath.style.setProperty('display', 'none', 'important');
+
+    // 2. 내부 콘텐츠(잎사귀, 텍스트) 슥 올라오기
+    setTimeout(() => {
+        content.style.opacity = '1';
+        content.style.transform = 'translateY(0)';
+    }, 100);
+
+    // 3. 2초 뒤에 스플래시 퇴장 및 모든 UI 복구
+    setTimeout(() => {
+        splash.style.opacity = '0';
+        splash.style.transform = 'scale(1.1)'; // 살짝 커지면서 사라지는 고급 효과
+        
+        setTimeout(() => {
+            splash.style.display = 'none';
+            splash.style.pointerEvents = 'none';
+            splash.style.transform = 'scale(1)'; // 다음 실행을 위해 스케일 초기화
+            
+            // 🌟 탭바와 캐릭터 산책로를 다시 사이좋게 등장시킴
+            if (tabBar) {
+                tabBar.style.setProperty('display', 'flex', 'important');
+            }
+            if (walkPath) {
+                walkPath.style.setProperty('display', 'block', 'important');
+            }
+        }, 500);
+    }, 2000);
+}
 </script>
 
 </body>
