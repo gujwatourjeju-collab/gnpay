@@ -504,11 +504,12 @@ button[style*="background: #f8f9fa"]:active {
 /* 핀테크 스타일 메뉴 아이템 */
 /* 1. 그리드 설정: 1줄에 4개(1fr 1fr 1fr 1fr) */
 .menu-grid-iphone {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr); /* 4열 유지 */
-    gap: 12px;
-    padding: 10px 18px;
-    margin-top: 12px;
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important; /* 4열 */
+    grid-template-rows: repeat(2, 90px) !important; /* 2행, 각 90px */
+    gap: 12px !important;
+    padding: 15px !important;
+    align-items: stretch;
 }
 
 /* 2. 아이템: 기존 쫀득한 트랜지션에 그림자 변화 추가 */
@@ -516,9 +517,8 @@ button[style*="background: #f8f9fa"]:active {
     display: flex;
     flex-direction: column;
     align-items: center;
-    cursor: pointer;
-    position: relative;
-    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    justify-content: center;
+    text-align: center;
 }
 
  @keyframes jellyPopMain {
@@ -1148,53 +1148,62 @@ html, body {
 .dashboard-card *, .live-dashboard-card * {
     -webkit-transform: translate3d(0,0,0);
 }
-/* ==================================================================== */
-/* 🌊 김녕페이 2.0 : 실시간 바다 물때 배경 & 글래스모피즘 통합 엔진 */
-/* ==================================================================== */
-
-/* 1. 메인 페이지만 민트색 배경을 해제하고 GIF가 들어갈 자리 확보 */
 #page-main {
-    position: relative;
-    z-index: 1;
-    height: 100vh !important;
-    width: 100vw !important;
-    background-repeat: no-repeat !important;
-    background-attachment: fixed !important;
+        /* 배경 GIF 로직을 CSS에서 아예 차단하고 민트색 그라데이션 고정 */
+        background: linear-gradient(180deg, #e6f7f6 0%, #ffffff 100%) !important;
+        background-image: none !important; 
+        background-size: cover !important;
+        min-height: 100vh;
+        transition: none !important;
+    }
+
+    /* 이용안내 아이콘 제거 (형님 요청) */
+    .info-icon-wrapper, #btn-info {
+        display: none !important;
+    }
+
+    /* 추후 2x2 위젯이 들어갈 그리드 구조 미리 정비 */
+    .menu-grid-iphone {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 15px;
+        padding: 20px;
+    }
+    /* 파도 박스 컨테이너 */
+#wave-lv {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    /* 수위는 JS에서 height로 조절 */
+    background: #01b2ad; 
+    overflow: hidden;
+    transition: height 1.5s ease;
 }
 
-/* 2. 민트색으로 바다 가리기 (반투명 막) */
-#page-main::after {
+/* 🚩 진짜 파도 굴곡을 만드는 마법의 레이어 */
+#wave-lv::before,
+#wave-lv::after {
     content: "";
     position: absolute;
-    top: 0; left: 0; width: 100%; height: 100%;
-    /* 민트색 농도를 0.6으로 높여서 바다를 은은하게 가립니다 */
-    background-color: rgba(230, 247, 246, 0.6) !important;
-    backdrop-filter: blur(8px); /* 살짝 흐리게 가리기 */
-    -webkit-backdrop-filter: blur(8px);
-    z-index: -1; 
-    pointer-events: none;
+    width: 200%;
+    height: 200%;
+    top: -150%; /* 물 위쪽으로 타원을 올려서 굴곡 생성 */
+    left: -50%;
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: 40%; /* 이 숫자가 굴곡을 만듦 */
+    animation: waveRotate 7s linear infinite;
 }
 
-/* 3. 메인 페이지 안의 일반 카드들을 '투명 유리'로 강제 전환 */
-#page-main .dashboard-card, 
-#page-main #white-qr-card {
-    background: rgba(255, 255, 255, 0.35) !important; /* 바다가 뒤에서 비치도록 투명도 세팅 */
-    backdrop-filter: blur(15px) saturate(180%) !important;
-    -webkit-backdrop-filter: blur(15px) saturate(180%) !important;
-    border: 1px solid rgba(255, 255, 255, 0.5) !important;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
+#wave-lv::after {
+    border-radius: 35%;
+    background: rgba(230, 247, 246, 0.3);
+    animation: waveRotate 10s linear infinite;
 }
 
-/* 4. 최상단 라이브 대시보드는 바다가 비치는 '다크 글래스'로 고급스럽게 변경 */
-#page-main .live-dashboard-card {
-    background: rgba(20, 35, 45, 0.45) !important; /* 기존 0.9(불투명)에서 0.45로 깎아냄 */
-    backdrop-filter: blur(20px) saturate(150%) !important;
-    -webkit-backdrop-filter: blur(20px) saturate(150%) !important;
-}
-
-/* 5. 금액 등 주요 텍스트에 은은한 빛기둥 추가 (배경에 묻히지 않게) */
-#page-main .amount-text {
-    text-shadow: 0 4px 15px rgba(255, 255, 255, 0.6); 
+@keyframes waveRotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
     </style>
     
@@ -1336,41 +1345,72 @@ html, body {
 
     <i class="bi bi-chevron-right qr-arrow"></i>
 </div>
-       <div class="menu-grid-iphone">
-    <div class="menu-item-iphone" onclick="openSubmit('우리 마을 플로깅 (자유)', 2000, '관리자가 판단하여 2000p혹은 랜덤으로 포인트 지급')">
-        <div class="icon-circle" style="color: #01b2ad;">
-            <i class="bi bi-tree-fill"></i>
+      <div class="menu-grid-iphone">
+    <div id="tide-widget-2x2" class="dashboard-card" onclick="openTidePopup()" style="grid-column: span 2; grid-row: span 2; position: relative; overflow: hidden; height: 180px; display: flex; flex-direction: column; justify-content: flex-end; padding: 18px; background: rgba(255,255,255,0.6) !important; backdrop-filter: blur(10px); border-radius: 25px; margin: 0; border: 1px solid rgba(255,255,255,0.4); cursor: pointer;">
+        
+        <div id="wave-lv" style="position: absolute; bottom: 0; left: 0; width: 100%; height: 50%; background: #01b2ad; transition: height 1.5s ease; z-index: 1;">
+            <style>
+                /* 파도 상단의 굴곡을 만드는 가상 요소 */
+                #wave-lv::before {
+                    content: "";
+                    position: absolute;
+                    width: 200%;
+                    height: 200%;
+                    top: -160%; /* 수위 위로 타원을 올려 굴곡 생성 */
+                    left: -50%;
+                    background: rgba(230, 247, 246, 0.8); /* 배경색과 섞여 굴곡처럼 보임 */
+                    border-radius: 38%;
+                    animation: waveRotate 8s linear infinite;
+                }
+                #wave-lv::after {
+                    content: "";
+                    position: absolute;
+                    width: 210%;
+                    height: 210%;
+                    top: -170%;
+                    left: -55%;
+                    background: rgba(255, 255, 255, 0.4);
+                    border-radius: 40%;
+                    animation: waveRotate 12s linear infinite;
+                }
+                @keyframes waveRotate {
+                    from { transform: rotate(0deg); }
+                    to { transform: rotate(360deg); }
+                }
+            </style>
         </div>
+
+        <div style="position: relative; z-index: 2;">
+            <div style="font-size: 0.7rem; font-weight: 800; color: #007d7a; letter-spacing: 0.5px;">LIVE GIMNYEONG</div>
+            <div id="tide-lvl-text" style="font-size: 1.15rem; font-weight: 900; color: #1a1a1a; margin-top: 2px;">바다 읽는 중..</div>
+            <div id="tide-desc-text" style="font-size: 0.72rem; color: #444; font-weight: 600;">잠시만 기다려주세요</div>
+        </div>
+    </div>
+
+    <div class="menu-item-iphone" onclick="openSubmit('우리 마을 플로깅 (자유)', 2000, '관리자 판단 후 지급')">
+        <div class="icon-circle" style="color: #01b2ad;"><i class="bi bi-tree-fill"></i></div>
         <div class="menu-title-iphone">자유활동</div>
     </div>
 
     <div class="menu-item-iphone" onclick="showPage('page-partners')">
-        <div class="icon-circle" style="color: #ff9800;">
-            <i class="bi bi-bag-heart-fill"></i>
-        </div>
+        <div class="icon-circle" style="color: #ff9800;"><i class="bi bi-bag-heart-fill"></i></div>
         <div class="menu-title-iphone">가맹점</div>
     </div>
-<div class="menu-item-iphone" onclick="showPage('page-activities')">
-    <div class="icon-circle" style="color: #00d2ff;">
-        <div id="activity-badge-count" class="badge-iphone" style="display: none;">0</div>
-        <i class="bi bi-lightning-charge-fill"></i>
-    </div>
-    <div class="menu-title-iphone">퀘스트</div>
-</div>
-<div class="menu-item-iphone" onclick="showPage('page-ranking'); loadRankingData('today');">
-    <div class="icon-circle" style="color: #ffc107;"> <i class="bi bi-trophy-fill"></i>
-    </div>
-    <div class="menu-title-iphone">수호자 랭킹</div>
-</div>
 
-    <div class="menu-item-iphone" onclick="showPage('page-guide')">
-        <div class="icon-circle" style="color: #673ab7;">
-            <i class="bi bi-info-circle-fill"></i>
+    <div class="menu-item-iphone" onclick="showPage('page-activities')">
+        <div class="icon-circle" style="color: #00d2ff;">
+            <div id="activity-badge-count" class="badge-iphone" style="display: none;">0</div>
+            <i class="bi bi-lightning-charge-fill"></i>
         </div>
-        <div class="menu-title-iphone">이용안내</div>
+        <div class="menu-title-iphone">퀘스트</div>
+    </div>
+
+    <div class="menu-item-iphone" onclick="showPage('page-ranking'); loadRankingData('today');">
+        <div class="icon-circle" style="color: #ffc107;"><i class="bi bi-trophy-fill"></i></div>
+        <div class="menu-title-iphone">수호자 랭킹</div>
     </div>
 </div>
-    </div> 
+    </div>
     
     <div id="page-guide" class="page">
     <div class="top-nav">
@@ -2175,10 +2215,35 @@ html, body {
         <button style="width: 100% !important; padding: 18px !important; border-radius: 20px !important; font-size: 1.1rem !important; font-weight: 800 !important; border: none !important; background: linear-gradient(135deg, #01b2ad, #00d2ff) !important; color: white !important; cursor: pointer !important; box-shadow: 0 10px 20px rgba(1, 178, 173, 0.2) !important;" onclick="document.getElementById('eco-report-layer').style.display='none'">확인 완료</button>
     </div>
 </div>
+<div id="tide-popup" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index: 100000; align-items:center; justify-content:center; backdrop-filter: blur(5px);" onclick="closeTidePopup()">
+    <div style="width: 88%; max-width: 350px; background: white; border-radius: 30px; padding: 25px; max-height: 80vh; overflow-y: auto; position: relative; box-shadow: 0 25px 50px rgba(0,0,0,0.3); animation: luxurySlideUp 0.4s ease-out;" onclick="event.stopPropagation()">
+        
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-900 mb-0" style="color: var(--primary);">오늘의 김녕 물때</h5>
+            <i class="bi bi-x-lg text-muted" onclick="closeTidePopup()" style="cursor:pointer; font-size:1.5rem;"></i>
+        </div>
+
+        <div class="dashboard-card mb-4" style="background: var(--primary-grad); color: white; border: none; padding: 20px; border-radius: 20px; width: 100%; margin: 0;">
+            <div class="small opacity-75" style="font-weight:700;">현재 김녕 바다 수위</div>
+            <div id="popup-tide-status" class="fw-900 my-1" style="font-size:1.8rem;">데이터 로딩 중..</div>
+            <div id="popup-tide-desc" class="small fw-bold">바다 상황을 분석하고 있습니다.</div>
+        </div>
+
+        <div class="fw-bold mb-2" style="font-size: 0.9rem; color: #666;">전체 물때 시간표</div>
+        <div id="tide-timeline-container" style="background: #f8f9fa; border-radius: 20px; padding: 10px;">
+            </div>
+
+        <div class="mt-4 p-3" style="background: rgba(1, 178, 173, 0.05); border-radius: 15px; font-size: 0.8rem; color: #555; line-height:1.5;">
+            <i class="bi bi-info-circle-fill me-1"></i> 물때 정보는 국립해양조사원 데이터를 기반으로 실시간 제공됩니다. 기상 상황에 따라 차이가 있을 수 있습니다.
+        </div>
+        
+    </div>
+</div>
+</div>
 </body>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script>
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbyBUJI77SDLTHEM1I7Glq4xzMQLBxQqMq0Po51Vjhk8q1YA0079DlHruHmCMMy4N_SoKA/exec";
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbxv0cru4OvkwL-HnUA6AwiAEND3Lwqtty6Q9lGXmknH9dk65DUc987Fx0RH3gxoiMVj/exec";
     let currentRankMode = 'today';
     let totalRankingData = [];
     function updateTab(element) {
@@ -4261,22 +4326,15 @@ function triggerQuestSplash() {
 // 🌊 김녕 물때 실시간 배경 연동 엔진 (최종본)
 // ==========================================
 
-// 1. 형님이 지정하신 GIF 경로 매칭 (S=간조, M=중물, L=만조)
-const gnpayOceanGifs = {
-    low: 'https://gnpay.my/s.gif',    // 간조 (Small tide)
-    mid: 'https://gnpay.my/m.gif',    // 중물 (Middle tide)
-    high: 'https://gnpay.my/l.gif'    // 만조 (Large tide)
-};
 
 // 2. 형님의 실제 GAS 배포 주소
-const TIDE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyBUJI77SDLTHEM1I7Glq4xzMQLBxQqMq0Po51Vjhk8q1YA0079DlHruHmCMMy4N_SoKA/exec';
+// 1. 설정 변수
+const TIDE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxv0cru4OvkwL-HnUA6AwiAEND3Lwqtty6Q9lGXmknH9dk65DUc987Fx0RH3gxoiMVj/exec';
 
 async function syncGimnyeongTide() {
-    const mainPage = document.getElementById('page-main');
-    const defaultGif = gnpayOceanGifs.mid;
-
-    // 🚩 [프로모드 필살기] 바다 GIF 위에 '민트색 셀로판지(농도 0.7)'를 직접 코팅하는 마법의 코드
-    const mintShield = 'linear-gradient(rgba(230, 247, 246, 0.7), rgba(230, 247, 246, 0.7))';
+    const waveElement = document.getElementById('wave-lv');
+    const tideTitle = document.getElementById('tide-lvl-text');
+    const tideDesc = document.getElementById('tide-desc-text');
 
     try {
         const response = await fetch(TIDE_SCRIPT_URL, {
@@ -4284,47 +4342,188 @@ async function syncGimnyeongTide() {
             body: JSON.stringify({ type: 'getTide' })
         }).then(r => r.json());
 
-        // 데이터 응답이 비정상일 때
         if (!response || response.result === 'error' || !Array.isArray(response)) {
-            throw new Error("Invalid Tide Data");
+            throw new Error("Invalid Data");
         }
-        
-        const now = new Date();
-        const currentTime = now.getHours() * 60 + now.getMinutes(); 
-        let tideState = 'mid'; 
 
-        // 시간 계산 로직
+        const now = new Date();
+        const currentTime = now.getHours() * 60 + now.getMinutes();
+        
+        // 기본값: 평온한 중물 (Lv.3)
+        let level = 3; 
+        let status = "평온한 중물 ✨";
+        let desc = "산책하기 딱 좋은 높이예요";
+
+        // 🚩 5단계 수위 결정 로직
         response.forEach(item => {
             const [h, m] = item.time.split(':').map(Number);
             const tideTime = h * 60 + m;
-            if (Math.abs(currentTime - tideTime) <= 100) {
-                tideState = (item.type === 'high') ? 'high' : 'low';
+            const diff = currentTime - tideTime; // 현재시간과 물때시간 차이
+
+            // 물때 시간 기준 ±60분 이내 (피크 상태)
+            if (Math.abs(diff) <= 60) {
+                if (item.type === 'high') { 
+                    level = 5; status = "지금은 만조 🌊"; desc = "물이 가득! 서핑하기 좋아요"; 
+                } else { 
+                    level = 1; status = "지금은 간조 🐚"; desc = "바닥이 보여요! 해루질 적기"; 
+                }
+            } 
+            // 물때 시간으로 향하는 중 (±60분 ~ 180분 사이)
+            else if (Math.abs(diff) <= 180) {
+                if (item.type === 'high') {
+                    level = 4; status = "물이 드는 중"; desc = "점점 차오르고 있어요";
+                } else {
+                    level = 2; status = "물이 나는 중"; desc = "점점 빠지고 있어요";
+                }
             }
         });
 
-        if (mainPage) {
-            // 🚩 민트 코팅 + 바다 사진을 한 번에 주입하고, 위아래 100% 꽉 채움 강제 고정!
-            mainPage.style.setProperty('background-image', `${mintShield}, url('${gnpayOceanGifs[tideState]}')`, 'important');
-            mainPage.style.setProperty('background-size', '100% 100%, 100% 100%', 'important');
+        // 🚩 5단계 시각화 적용 (height 값으로 조절)
+        const levelHeights = {
+            1: '15%', // 간조
+            2: '35%', // 날물
+            3: '55%', // 중물
+            4: '75%', // 들물
+            5: '95%'  // 만조
+        };
+
+        if (waveElement) {
+            waveElement.style.height = levelHeights[level];
+            // 수위에 따라 파도 색상 살짝 변경 (만조일수록 진하게)
+            waveElement.style.background = level >= 4 
+                ? 'linear-gradient(to top, #007bff, #00d2ff)' 
+                : 'linear-gradient(to top, #01b2ad, #00d2ff)';
         }
-        console.log(`🌊 배경 적용 완료: ${tideState}`);
+        
+        if (tideTitle) tideTitle.innerText = status;
+        if (tideDesc) tideDesc.innerText = desc;
+
+        console.log(`🌊 물때 엔진 작동 중: Level ${level}`);
 
     } catch (e) {
-        console.log("⚠️ 물때 연동 실패, 기본 배경(mid) 강제 로드");
-        if (mainPage) {
-            mainPage.style.setProperty('background-image', `${mintShield}, url('${defaultGif}')`, 'important');
-            mainPage.style.setProperty('background-size', '100% 100%, 100% 100%', 'important');
-        }
+        console.error("⚠️ 연동 에러:", e);
+        if (tideTitle) tideTitle.innerText = "바다와 연결 중..";
     }
 }
 
-// 앱 실행 시 즉시 작동
+// 초기 실행 및 10분마다 갱신
 syncGimnyeongTide();
+setInterval(syncGimnyeongTide, 600000);
 
-// 10분마다 자동으로 한 번씩 체크 (유저가 앱을 계속 켜둘 경우 대비)
-setInterval(syncGimnyeongTide, 1000 * 60 * 10);
+// 팝업 열기
+async function openTidePopup() {
+    const popup = document.getElementById('tide-popup');
+    if (popup) popup.style.display = 'flex';
+    
+    const container = document.getElementById('tide-timeline-container');
+    container.innerHTML = '<div class="text-center p-3 small">김녕 바다 신호 수신 중...</div>';
+
+    try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10초 지나면 강제 종료
+
+        const response = await fetch(TIDE_SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify({ type: 'getTide' }),
+            signal: controller.signal
+        }).then(r => r.json());
+
+        clearTimeout(timeoutId);
+
+        if (response && response.length > 0) {
+            let html = '';
+            const now = new Date();
+            const nowMin = now.getHours() * 60 + now.getMinutes();
+            const tideName = response[0].tideName;
+            
+            // 상단 텍스트 업데이트
+            document.querySelector('#tide-popup h5').innerText = `오늘의 김녕 물때 (${tideName})`;
+
+            let currentLvl = response[0].level;
+
+            response.forEach((item, idx) => {
+                const [h, m] = item.time.split(':').map(Number);
+                const itemMin = h * 60 + m;
+                
+                html += `
+                    <div class="d-flex justify-content-between p-3 border-bottom" style="border-bottom:1px dashed #eee !important;">
+                        <div class="fw-bold" style="font-size:0.95rem;">
+                            ${item.type === 'high' ? '🌊 만조' : '🏖️ 간조'} <span class="text-muted small">(${item.level}cm)</span>
+                        </div>
+                        <div class="fw-900">${item.time}</div>
+                    </div>`;
+
+                if (idx < response.length - 1) {
+                    const [nh, nm] = response[idx+1].time.split(':').map(Number);
+                    const nextMin = nh * 60 + nm;
+                    if (nowMin >= itemMin && nowMin <= nextMin) {
+                        const ratio = (nowMin - itemMin) / (nextMin - itemMin);
+                        currentLvl = Math.round(item.level + (response[idx+1].level - item.level) * ratio);
+                    }
+                }
+            });
+
+            container.innerHTML = html;
+            document.getElementById('popup-tide-status').innerText = currentLvl + "cm";
+            document.getElementById('popup-tide-desc').innerText = `현재 김녕 예상 수위 (${tideName})`;
+        } else {
+            throw new Error("Empty Data");
+        }
+    } catch (e) {
+        container.innerHTML = '<div class="p-3 text-center text-danger">데이터를 가져오지 못했습니다.<br><small>잠시 후 다시 시도해 주세요.</small></div>';
+    }
+}
+
+// 팝업 닫기
+function closeTidePopup() {
+    const popup = document.getElementById('tide-popup');
+    if (popup) popup.style.display = 'none';
+}
+
+// 🚩 시간표 예쁘게 포장해서 그리기
+async function renderTideTimeline() {
+    const container = document.getElementById('tide-timeline-container');
+    const pStatus = document.getElementById('popup-tide-status');
+    const pDesc = document.getElementById('popup-tide-desc');
+    
+    try {
+        const response = await fetch(TIDE_SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify({ type: 'getTide' })
+        }).then(r => r.json());
+
+        // 현재 위젯 멘트 그대로 가져오기 (싱크 맞춤)
+        pStatus.innerText = document.getElementById('tide-lvl-text').innerText;
+        pDesc.innerText = document.getElementById('tide-desc-text').innerText;
+
+        // 타임라인 생성
+        let html = '';
+        response.forEach(item => {
+            const isHigh = item.type === 'high';
+            const icon = isHigh ? 'bi-arrow-up-circle-fill' : 'bi-arrow-down-circle-fill';
+            const color = isHigh ? '#007bff' : '#ff9800';
+            const typeText = isHigh ? '만조(밀물)' : '간조(썰물)';
+
+            html += `
+                <div class="d-flex align-items-center justify-content-between p-3 border-bottom-dashed">
+                    <div class="d-flex align-items-center gap-3">
+                        <i class="bi ${icon}" style="color: ${color}; font-size: 1.2rem;"></i>
+                        <div>
+                            <div class="fw-bold" style="font-size: 0.9rem;">${typeText}</div>
+                            <div class="text-muted" style="font-size: 0.75rem;">김녕항 기준 수위</div>
+                        </div>
+                    </div>
+                    <div class="fw-900" style="font-size: 1.1rem; color: #333;">${item.time}</div>
+                </div>
+            `;
+        });
+        container.innerHTML = html || '<div class="p-3 text-center">오늘의 물때 정보가 없습니다.</div>';
+
+    } catch (e) {
+        container.innerHTML = '<div class="p-3 text-center">데이터를 불러오지 못했습니다.</div>';
+    }
+}
 </script>
-
 </body>
 </html>
 
