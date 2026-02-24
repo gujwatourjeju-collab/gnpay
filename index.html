@@ -1148,6 +1148,52 @@ html, body {
 .dashboard-card *, .live-dashboard-card * {
     -webkit-transform: translate3d(0,0,0);
 }
+/* ==================================================================== */
+/* 🌊 김녕페이 2.0 : 실시간 바다 물때 배경 & 글래스모피즘 통합 엔진 */
+/* ==================================================================== */
+
+/* 1. 메인 페이지만 민트색 배경을 해제하고 GIF가 들어갈 자리 확보 */
+#page-main {
+    background-color: transparent !important; /* 강제 민트색 해제 */
+    background-size: cover !important;
+    background-position: center !important;
+    background-attachment: fixed !important;
+    transition: background-image 1.5s ease-in-out; /* 물때 바뀔 때 스르륵~ */
+    position: relative;
+    z-index: 1;
+}
+
+/* 2. 배경 시인성 확보: 바다 GIF 위에 살짝 어두운 틴트막 씌우기 (글자 보호) */
+#page-main::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.15); /* 사진이 밝으면 이 숫자를 0.25 정도로 올리세요 */
+    z-index: -1;
+    pointer-events: none;
+}
+
+/* 3. 메인 페이지 안의 일반 카드들을 '투명 유리'로 강제 전환 */
+#page-main .dashboard-card, 
+#page-main #white-qr-card {
+    background: rgba(255, 255, 255, 0.35) !important; /* 바다가 뒤에서 비치도록 투명도 세팅 */
+    backdrop-filter: blur(15px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(15px) saturate(180%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.5) !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* 4. 최상단 라이브 대시보드는 바다가 비치는 '다크 글래스'로 고급스럽게 변경 */
+#page-main .live-dashboard-card {
+    background: rgba(20, 35, 45, 0.45) !important; /* 기존 0.9(불투명)에서 0.45로 깎아냄 */
+    backdrop-filter: blur(20px) saturate(150%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(150%) !important;
+}
+
+/* 5. 금액 등 주요 텍스트에 은은한 빛기둥 추가 (배경에 묻히지 않게) */
+#page-main .amount-text {
+    text-shadow: 0 4px 15px rgba(255, 255, 255, 0.6); 
+}
     </style>
     
     <div class="ocean-wave"></div>
@@ -2130,7 +2176,7 @@ html, body {
 </body>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script>
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbyGq16-Z3srcpFUm769thQS8h_CSEtzIVSZj9vw7za5VA0my3kHDNxSkloYAdA8Ha9m/exec";
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbxd2ACzL1WPJiurY-Lm48qO0OlWIm7jAAT6b_WYYz0H0xX1AB1uyGYohyNzh9fAi1M6/exec";
     let currentRankMode = 'today';
     let totalRankingData = [];
     function updateTab(element) {
@@ -4209,6 +4255,65 @@ function triggerQuestSplash() {
         }, 500);
     }, 2000);
 }
+// ==========================================
+// 🌊 김녕 물때 실시간 배경 연동 엔진 (최종본)
+// ==========================================
+
+// 1. 형님이 지정하신 GIF 경로 매칭 (S=간조, M=중물, L=만조)
+const gnpayOceanGifs = {
+    low: 'https://gnpay.my/s.gif',    // 간조 (Small tide)
+    mid: 'https://gnpay.my/m.gif',    // 중물 (Middle tide)
+    high: 'https://gnpay.my/l.gif'    // 만조 (Large tide)
+};
+
+// 2. 형님의 실제 GAS 배포 주소
+const TIDE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxd2ACzL1WPJiurY-Lm48qO0OlWIm7jAAT6b_WYYz0H0xX1AB1uyGYohyNzh9fAi1M6/exec';
+
+async function syncGimnyeongTide() {
+    const mainPage = document.getElementById('page-main');
+    const defaultGif = gnpayOceanGifs.mid; // 실패 시 기본 중물 GIF
+
+    try {
+        const response = await fetch(TIDE_SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify({ type: 'getTide' })
+        }).then(r => r.json());
+
+        // 데이터 응답이 비정상일 때
+        if (!response || response.result === 'error' || !Array.isArray(response)) {
+            throw new Error("Invalid Tide Data");
+        }
+
+        const now = new Date();
+        const currentTime = now.getHours() * 60 + now.getMinutes(); 
+        let tideState = 'mid'; 
+
+        response.forEach(item => {
+            const [h, m] = item.time.split(':').map(Number);
+            const tideTime = h * 60 + m;
+            if (Math.abs(currentTime - tideTime) <= 100) {
+                tideState = (item.type === 'high') ? 'high' : 'low';
+            }
+        });
+
+        if (mainPage) {
+            mainPage.style.backgroundImage = `url('${gnpayOceanGifs[tideState]}')`;
+        }
+        console.log(`🌊 배경 적용 완료: ${tideState}`);
+
+    } catch (e) {
+        console.log("⚠️ 물때 연동 실패, 기본 배경(mid) 강제 로드");
+        if (mainPage) {
+            mainPage.style.backgroundImage = `url('${defaultGif}')`;
+        }
+    }
+}
+
+// 앱 실행 시 즉시 작동
+syncGimnyeongTide();
+
+// 10분마다 자동으로 한 번씩 체크 (유저가 앱을 계속 켜둘 경우 대비)
+setInterval(syncGimnyeongTide, 1000 * 60 * 10);
 </script>
 
 </body>
