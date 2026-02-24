@@ -4342,34 +4342,34 @@ async function syncGimnyeongTide() {
             body: JSON.stringify({ type: 'getTide' })
         }).then(r => r.json());
 
-        if (!response || response.result === 'error' || !Array.isArray(response)) {
+        // [수정] 배열인지 먼저 확인하고, 배열이 아니면 에러로 처리
+        if (!Array.isArray(response) || response.length === 0) {
+            console.log("서버 응답 데이터:", response); // 디버깅용
             throw new Error("Invalid Data");
         }
 
         const now = new Date();
         const currentTime = now.getHours() * 60 + now.getMinutes();
         
-        // 기본값: 평온한 중물 (Lv.3)
         let level = 3; 
         let status = "평온한 중물 ✨";
         let desc = "산책하기 딱 좋은 높이예요";
 
-        // 🚩 5단계 수위 결정 로직
+        // 🚩 5단계 수위 결정 로직 (기존 로직 유지하되 안전하게)
         response.forEach(item => {
+            if (!item.time) return; // 시간 데이터 없으면 패스
+            
             const [h, m] = item.time.split(':').map(Number);
             const tideTime = h * 60 + m;
-            const diff = currentTime - tideTime; // 현재시간과 물때시간 차이
+            const diff = currentTime - tideTime;
 
-            // 물때 시간 기준 ±60분 이내 (피크 상태)
             if (Math.abs(diff) <= 60) {
                 if (item.type === 'high') { 
                     level = 5; status = "지금은 만조 🌊"; desc = "물이 가득! 서핑하기 좋아요"; 
                 } else { 
                     level = 1; status = "지금은 간조 🐚"; desc = "바닥이 보여요! 해루질 적기"; 
                 }
-            } 
-            // 물때 시간으로 향하는 중 (±60분 ~ 180분 사이)
-            else if (Math.abs(diff) <= 180) {
+            } else if (Math.abs(diff) <= 180) {
                 if (item.type === 'high') {
                     level = 4; status = "물이 드는 중"; desc = "점점 차오르고 있어요";
                 } else {
@@ -4378,18 +4378,10 @@ async function syncGimnyeongTide() {
             }
         });
 
-        // 🚩 5단계 시각화 적용 (height 값으로 조절)
-        const levelHeights = {
-            1: '15%', // 간조
-            2: '35%', // 날물
-            3: '55%', // 중물
-            4: '75%', // 들물
-            5: '95%'  // 만조
-        };
-
+        // 시각화 적용 (기존 코드와 동일)
+        const levelHeights = { 1: '15%', 2: '35%', 3: '55%', 4: '75%', 5: '95%' };
         if (waveElement) {
             waveElement.style.height = levelHeights[level];
-            // 수위에 따라 파도 색상 살짝 변경 (만조일수록 진하게)
             waveElement.style.background = level >= 4 
                 ? 'linear-gradient(to top, #007bff, #00d2ff)' 
                 : 'linear-gradient(to top, #01b2ad, #00d2ff)';
@@ -4398,14 +4390,11 @@ async function syncGimnyeongTide() {
         if (tideTitle) tideTitle.innerText = status;
         if (tideDesc) tideDesc.innerText = desc;
 
-        console.log(`🌊 물때 엔진 작동 중: Level ${level}`);
-
     } catch (e) {
         console.error("⚠️ 연동 에러:", e);
-        if (tideTitle) tideTitle.innerText = "바다와 연결 중..";
+        if (tideTitle) tideTitle.innerText = "바다 신호 찾는 중..";
     }
 }
-
 // 초기 실행 및 10분마다 갱신
 syncGimnyeongTide();
 setInterval(syncGimnyeongTide, 600000);
