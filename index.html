@@ -2244,7 +2244,7 @@ html, body {
 </body>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script>
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbwziDsHoIvhEd-7fwwv9d5sBAbBSR_rJSoECznR0-CIC-q8Lt4ewoORGtcdOy6jpGoH/exec";
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbxkQ4LbmT3Ot2RfrdXd5YMiE2y7YNKcdjxYkmnBWQ5VqMxVPqkPVKrGieLeNK7A85LU/exec";
     let currentRankMode = 'today';
     let totalRankingData = [];
     function updateTab(element) {
@@ -4330,8 +4330,12 @@ function triggerQuestSplash() {
 
 // 2. 형님의 실제 GAS 배포 주소
 // 1. 설정 변수
-const TIDE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwziDsHoIvhEd-7fwwv9d5sBAbBSR_rJSoECznR0-CIC-q8Lt4ewoORGtcdOy6jpGoH/exec';
+const TIDE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxkQ4LbmT3Ot2RfrdXd5YMiE2y7YNKcdjxYkmnBWQ5VqMxVPqkPVKrGieLeNK7A85LU/exec';
 
+// 💡 [핵심] 서버에서 가져온 물때 데이터를 저장해둘 전역 변수 (팝업 열 때 딜레이 없애기용)
+let cachedTideData = null;
+
+// 1. 메인 화면 위젯 동기화 및 데이터 캐싱
 async function syncGimnyeongTide() {
     const waveElement = document.getElementById('wave-lv');
     const tideTitle = document.getElementById('tide-lvl-text');
@@ -4343,11 +4347,11 @@ async function syncGimnyeongTide() {
             body: JSON.stringify({ type: 'getTide' })
         }).then(r => r.json());
 
-        // [수정] 배열인지 먼저 확인하고, 배열이 아니면 에러로 처리
         if (!Array.isArray(response) || response.length === 0) {
-            console.log("서버 응답 데이터:", response); // 디버깅용
             throw new Error("Invalid Data");
         }
+
+        cachedTideData = response; // 데이터를 메모리에 저장 (팝업용)
 
         const now = new Date();
         const currentTime = now.getHours() * 60 + now.getMinutes();
@@ -4356,30 +4360,39 @@ async function syncGimnyeongTide() {
         let status = "평온한 중물 ✨";
         let desc = "산책하기 딱 좋은 높이예요";
 
-        // 🚩 5단계 수위 결정 로직 (기존 로직 유지하되 안전하게)
+        // 🚩 가장 가까운 물때 추적 로직 적용
+        let closestTide = null;
+        let minDiff = 9999;
+
         response.forEach(item => {
-            if (!item.time) return; // 시간 데이터 없으면 패스
-            
+            if (!item.time) return;
             const [h, m] = item.time.split(':').map(Number);
             const tideTime = h * 60 + m;
-            const diff = currentTime - tideTime;
+            const diff = Math.abs(currentTime - tideTime);
 
-            if (Math.abs(diff) <= 60) {
-                if (item.type === 'high') { 
+            if (diff < minDiff) {
+                minDiff = diff;
+                closestTide = item;
+            }
+        });
+
+        if (closestTide) {
+            if (minDiff <= 60) {
+                if (closestTide.type === 'high') { 
                     level = 5; status = "지금은 만조 🌊"; desc = "물이 가득! 서핑하기 좋아요"; 
                 } else { 
                     level = 1; status = "지금은 간조 🐚"; desc = "바닥이 보여요! 해루질 적기"; 
                 }
-            } else if (Math.abs(diff) <= 180) {
-                if (item.type === 'high') {
-                    level = 4; status = "물이 드는 중"; desc = "점점 차오르고 있어요";
+            } else {
+                if (closestTide.type === 'high') {
+                    level = 4; status = "물이 드는 중"; desc = "만조를 향해 물이 차오르고 있어요";
                 } else {
-                    level = 2; status = "물이 나는 중"; desc = "점점 빠지고 있어요";
+                    level = 2; status = "물이 나는 중"; desc = "간조를 향해 물이 빠지고 있어요";
                 }
             }
-        });
+        }
 
-        // 시각화 적용 (기존 코드와 동일)
+        // 시각화 적용
         const levelHeights = { 1: '15%', 2: '35%', 3: '55%', 4: '75%', 5: '95%' };
         if (waveElement) {
             waveElement.style.height = levelHeights[level];
@@ -4396,123 +4409,67 @@ async function syncGimnyeongTide() {
         if (tideTitle) tideTitle.innerText = "바다 신호 찾는 중..";
     }
 }
-// 초기 실행 및 10분마다 갱신
-syncGimnyeongTide();
-setInterval(syncGimnyeongTide, 600000);
 
-// 팝업 열기
-async function openTidePopup() {
+// 2. 팝업 열기 (렌더링 기능까지 하나로 완벽 통합)
+function openTidePopup() {
     const popup = document.getElementById('tide-popup');
     if (popup) popup.style.display = 'flex';
     
     const container = document.getElementById('tide-timeline-container');
-    container.innerHTML = '<div class="text-center p-3 small">김녕 바다 신호 수신 중...</div>';
+    const pStatus = document.getElementById('popup-tide-status');
+    const pDesc = document.getElementById('popup-tide-desc');
+    const popupTitle = document.querySelector('#tide-popup h5');
 
-    try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10초 지나면 강제 종료
+    // 메인 위젯의 멘트를 팝업 상단 카드에 즉시 복사 (딜레이 0초)
+    const mainTitle = document.getElementById('tide-lvl-text');
+    const mainDesc = document.getElementById('tide-desc-text');
+    if (pStatus && mainTitle) pStatus.innerText = mainTitle.innerText;
+    if (pDesc && mainDesc) pDesc.innerText = mainDesc.innerText;
 
-        const response = await fetch(TIDE_SCRIPT_URL, {
-            method: 'POST',
-            body: JSON.stringify({ type: 'getTide' }),
-            signal: controller.signal
-        }).then(r => r.json());
-
-        clearTimeout(timeoutId);
-
-        if (response && response.length > 0) {
-            let html = '';
-            const now = new Date();
-            const nowMin = now.getHours() * 60 + now.getMinutes();
-            const tideName = response[0].tideName;
-            
-            // 상단 텍스트 업데이트
-            document.querySelector('#tide-popup h5').innerText = `오늘의 김녕 물때 (${tideName})`;
-
-            let currentLvl = response[0].level;
-
-            response.forEach((item, idx) => {
-                const [h, m] = item.time.split(':').map(Number);
-                const itemMin = h * 60 + m;
-                
-                html += `
-                    <div class="d-flex justify-content-between p-3 border-bottom" style="border-bottom:1px dashed #eee !important;">
-                        <div class="fw-bold" style="font-size:0.95rem;">
-                            ${item.type === 'high' ? '🌊 만조' : '🏖️ 간조'} <span class="text-muted small">(${item.level}cm)</span>
-                        </div>
-                        <div class="fw-900">${item.time}</div>
-                    </div>`;
-
-                if (idx < response.length - 1) {
-                    const [nh, nm] = response[idx+1].time.split(':').map(Number);
-                    const nextMin = nh * 60 + nm;
-                    if (nowMin >= itemMin && nowMin <= nextMin) {
-                        const ratio = (nowMin - itemMin) / (nextMin - itemMin);
-                        currentLvl = Math.round(item.level + (response[idx+1].level - item.level) * ratio);
-                    }
-                }
-            });
-
-            container.innerHTML = html;
-            document.getElementById('popup-tide-status').innerText = currentLvl + "cm";
-            document.getElementById('popup-tide-desc').innerText = `현재 김녕 예상 수위 (${tideName})`;
-        } else {
-            throw new Error("Empty Data");
-        }
-    } catch (e) {
-        container.innerHTML = '<div class="p-3 text-center text-danger">데이터를 가져오지 못했습니다.<br><small>잠시 후 다시 시도해 주세요.</small></div>';
+    // 만약 캐시된 데이터가 없으면 에러 메시지 띄움
+    if (!cachedTideData || cachedTideData.length === 0) {
+        if (container) container.innerHTML = '<div class="p-3 text-center text-danger">데이터를 불러오지 못했습니다.<br><small>메인 화면에서 데이터가 수신될 때까지 기다려주세요.</small></div>';
+        return;
     }
+
+    // 팝업 타이틀 업데이트
+    const tideName = cachedTideData[0].tideName || "조금";
+    if (popupTitle) popupTitle.innerText = `오늘의 김녕 물때 (${tideName})`;
+
+    // 예쁘게 디자인된 타임라인 생성
+    let html = '';
+    cachedTideData.forEach(item => {
+        const isHigh = item.type === 'high';
+        const icon = isHigh ? 'bi-arrow-up-circle-fill' : 'bi-arrow-down-circle-fill';
+        const color = isHigh ? '#007bff' : '#ff9800';
+        const typeText = isHigh ? '만조 (밀물)' : '간조 (썰물)';
+
+        html += `
+            <div class="d-flex align-items-center justify-content-between p-3 border-bottom" style="border-bottom:1px dashed #eee !important;">
+                <div class="d-flex align-items-center gap-3">
+                    <i class="bi ${icon}" style="color: ${color}; font-size: 1.2rem;"></i>
+                    <div>
+                        <div class="fw-bold" style="font-size: 0.95rem;">${typeText} <span class="text-muted small">(${item.level}cm)</span></div>
+                        <div class="text-muted" style="font-size: 0.75rem;">김녕항 기준 수위</div>
+                    </div>
+                </div>
+                <div class="fw-900" style="font-size: 1.1rem; color: #333;">${item.time}</div>
+            </div>
+        `;
+    });
+
+    if (container) container.innerHTML = html;
 }
 
-// 팝업 닫기
+// 3. 팝업 닫기
 function closeTidePopup() {
     const popup = document.getElementById('tide-popup');
     if (popup) popup.style.display = 'none';
 }
 
-// 🚩 시간표 예쁘게 포장해서 그리기
-async function renderTideTimeline() {
-    const container = document.getElementById('tide-timeline-container');
-    const pStatus = document.getElementById('popup-tide-status');
-    const pDesc = document.getElementById('popup-tide-desc');
-    
-    try {
-        const response = await fetch(TIDE_SCRIPT_URL, {
-            method: 'POST',
-            body: JSON.stringify({ type: 'getTide' })
-        }).then(r => r.json());
-
-        // 현재 위젯 멘트 그대로 가져오기 (싱크 맞춤)
-        pStatus.innerText = document.getElementById('tide-lvl-text').innerText;
-        pDesc.innerText = document.getElementById('tide-desc-text').innerText;
-
-        // 타임라인 생성
-        let html = '';
-        response.forEach(item => {
-            const isHigh = item.type === 'high';
-            const icon = isHigh ? 'bi-arrow-up-circle-fill' : 'bi-arrow-down-circle-fill';
-            const color = isHigh ? '#007bff' : '#ff9800';
-            const typeText = isHigh ? '만조(밀물)' : '간조(썰물)';
-
-            html += `
-                <div class="d-flex align-items-center justify-content-between p-3 border-bottom-dashed">
-                    <div class="d-flex align-items-center gap-3">
-                        <i class="bi ${icon}" style="color: ${color}; font-size: 1.2rem;"></i>
-                        <div>
-                            <div class="fw-bold" style="font-size: 0.9rem;">${typeText}</div>
-                            <div class="text-muted" style="font-size: 0.75rem;">김녕항 기준 수위</div>
-                        </div>
-                    </div>
-                    <div class="fw-900" style="font-size: 1.1rem; color: #333;">${item.time}</div>
-                </div>
-            `;
-        });
-        container.innerHTML = html || '<div class="p-3 text-center">오늘의 물때 정보가 없습니다.</div>';
-
-    } catch (e) {
-        container.innerHTML = '<div class="p-3 text-center">데이터를 불러오지 못했습니다.</div>';
-    }
-}
+// 초기 실행 및 10분마다 갱신
+syncGimnyeongTide();
+setInterval(syncGimnyeongTide, 600000);
 </script>
 </body>
 </html>
