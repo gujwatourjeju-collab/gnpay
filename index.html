@@ -2244,7 +2244,7 @@ html, body {
 </body>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script>
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbxBo2jg_maqwl3w-x6itJVa1jjMY93YQmKOWLTn2iB5zoqzLRlwZFWeTZhjdaV6BdvH/exec";
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbw4j81mFxtYvNA7HkShEyrcFKzLvXoQmLPlz3GhWhRzLIj3VynSSrQUFNv7TBiDlNy0/exec";
     let currentRankMode = 'today';
     let totalRankingData = [];
     function updateTab(element) {
@@ -4330,7 +4330,7 @@ function triggerQuestSplash() {
 
 // 2. 형님의 실제 GAS 배포 주소
 // 1. 설정 변수
-const TIDE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxBo2jg_maqwl3w-x6itJVa1jjMY93YQmKOWLTn2iB5zoqzLRlwZFWeTZhjdaV6BdvH/exec';
+const TIDE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw4j81mFxtYvNA7HkShEyrcFKzLvXoQmLPlz3GhWhRzLIj3VynSSrQUFNv7TBiDlNy0/exec';
 
 // 💡 [핵심] 서버에서 가져온 물때 데이터를 저장해둘 전역 변수 (팝업 열 때 딜레이 없애기용)
 let cachedTideData = null;
@@ -4342,10 +4342,13 @@ async function syncGimnyeongTide() {
     const tideDesc = document.getElementById('tide-desc-text');
 
     try {
-        const response = await fetch(TIDE_SCRIPT_URL, {
+       const response = await fetch(TIDE_SCRIPT_URL, {
             method: 'POST',
             body: JSON.stringify({ type: 'getTide' })
         }).then(r => r.json());
+
+        // 🔥 [신 명회의 정찰병 투입] 도대체 서버가 무엇을 보냈는지 로그에 낱낱이 까발립니다!
+        console.log("🔥 서버 응답의 정체:", response);
 
         if (!Array.isArray(response) || response.length === 0) {
             throw new Error("Invalid Data");
