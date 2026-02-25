@@ -2244,7 +2244,7 @@ html, body {
 </body>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script>
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbxCgFWcdez5wDc3Aa5JQRuFUErJfG7GKw3msfej8FGgdOb4uKu4U4bC9VQCHm9Bhr1H/exec";
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbx40w2-zSBtGm5f3zueZ7Op2p0qrGLe4fG4cn9nYo6Cjmf-OBqDqMlUeLn688Vj4J-W/exec";
     let currentRankMode = 'today';
     let totalRankingData = [];
     function updateTab(element) {
@@ -4330,7 +4330,7 @@ function triggerQuestSplash() {
 
 // 2. 형님의 실제 GAS 배포 주소
 // 1. 설정 변수
-const TIDE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxCgFWcdez5wDc3Aa5JQRuFUErJfG7GKw3msfej8FGgdOb4uKu4U4bC9VQCHm9Bhr1H/exec';
+const TIDE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx40w2-zSBtGm5f3zueZ7Op2p0qrGLe4fG4cn9nYo6Cjmf-OBqDqMlUeLn688Vj4J-W/exec';
 
 // 💡 [핵심] 서버에서 가져온 물때 데이터를 저장해둘 전역 변수 (팝업 열 때 딜레이 없애기용)
 let cachedTideData = null;
@@ -4419,7 +4419,7 @@ function openTidePopup() {
     const popupTitle = document.querySelector('#tide-popup h5');
 
     if (!cachedTideData || cachedTideData.length === 0) {
-        if (container) container.innerHTML = '<div class="p-3 text-center text-danger">데이터를 불러오지 못했습니다.</div>';
+        if (container) container.innerHTML = '<div class="p-3 text-center text-danger">바다 신호 수신 대기 중...</div>';
         return;
     }
 
@@ -4428,25 +4428,19 @@ function openTidePopup() {
 
     let html = '';
     cachedTideData.forEach(item => {
-        // 🔥 [교정] 서버에서 온 type이 'high'인지 혹은 level이 유독 높은지 이중으로 확인하옵니다!
-        // 전하의 명대로 ▲가 있으면 high로 올 것이니, 여기서 확실히 갈라치겠나이다.
-        const isHigh = (item.type === 'high');
-        const icon = isHigh ? 'bi-arrow-up-circle-fill' : 'bi-arrow-down-circle-fill';
-        const color = isHigh ? '#007bff' : '#ff9800'; // 만조는 청색(🌊), 간조는 황색(🐚)
-        const typeText = isHigh ? '만조 (밀물)' : '간조 (썰물)';
-
+        const isHigh = item.type === 'high';
+        const color = isHigh ? '#007bff' : '#ff9800'; // 파랑(▲) vs 주황(▼)
+        
+        // 🎯 전하의 명대로 뭉텅이(시간 + 수위 + 기호)를 그대로 진상하옵니다!
         html += `
-            <div class="d-flex align-items-center justify-content-between p-3 border-bottom" style="border-bottom:1px dashed #eee !important;">
+            <div class="d-flex align-items-center justify-content-between p-3 border-bottom">
                 <div class="d-flex align-items-center gap-3">
-                    <i class="bi ${icon}" style="color: ${color}; font-size: 1.4rem;"></i>
-                    <div>
-                        <div class="fw-bold" style="font-size: 0.95rem; color: ${isHigh ? '#007bff' : '#e67e22'};">
-                            ${typeText} <span class="text-muted small">(${item.level}cm)</span>
-                        </div>
-                        <div class="text-muted" style="font-size: 0.75rem;">김녕항 기준 수위</div>
+                    <div class="fw-bold" style="font-size: 1.2rem; color: ${color};">
+                        ${item.symbol} (${item.level}cm)
                     </div>
+                    <div class="text-muted" style="font-size: 0.8rem;">김녕항 수위</div>
                 </div>
-                <div class="fw-900" style="font-size: 1.1rem; color: #333;">${item.time}</div>
+                <div class="fw-bold" style="font-size: 1.1rem;">${item.time}</div>
             </div>
         `;
     });
