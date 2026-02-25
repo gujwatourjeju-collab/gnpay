@@ -2244,7 +2244,7 @@ html, body {
 </body>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script>
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbwxg7FRqD2h1Y2XFYPIOKtWXFK4zNKkhwPLGVh03-RnCFLY9la3TpRXnt4mY6ScYA2B/exec";
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbycvcFhyszaP0kzmd-MhsW3v4k1XWSsNYSEW4A_vWm-2G0sRTJySWpMBXZiFTBeHifY/exec";
     let currentRankMode = 'today';
     let totalRankingData = [];
     function updateTab(element) {
@@ -4330,7 +4330,7 @@ function triggerQuestSplash() {
 
 // 2. 형님의 실제 GAS 배포 주소
 // 1. 설정 변수
-const TIDE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwxg7FRqD2h1Y2XFYPIOKtWXFK4zNKkhwPLGVh03-RnCFLY9la3TpRXnt4mY6ScYA2B/exec';
+const TIDE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbycvcFhyszaP0kzmd-MhsW3v4k1XWSsNYSEW4A_vWm-2G0sRTJySWpMBXZiFTBeHifY/exec';
 
 // 💡 [핵심] 서버에서 가져온 물때 데이터를 저장해둘 전역 변수 (팝업 열 때 딜레이 없애기용)
 let cachedTideData = null;
@@ -4416,40 +4416,33 @@ function openTidePopup() {
     if (popup) popup.style.display = 'flex';
     
     const container = document.getElementById('tide-timeline-container');
-    const pStatus = document.getElementById('popup-tide-status');
-    const pDesc = document.getElementById('popup-tide-desc');
     const popupTitle = document.querySelector('#tide-popup h5');
 
-    // 메인 위젯의 멘트를 팝업 상단 카드에 즉시 복사 (딜레이 0초)
-    const mainTitle = document.getElementById('tide-lvl-text');
-    const mainDesc = document.getElementById('tide-desc-text');
-    if (pStatus && mainTitle) pStatus.innerText = mainTitle.innerText;
-    if (pDesc && mainDesc) pDesc.innerText = mainDesc.innerText;
-
-    // 만약 캐시된 데이터가 없으면 에러 메시지 띄움
     if (!cachedTideData || cachedTideData.length === 0) {
-        if (container) container.innerHTML = '<div class="p-3 text-center text-danger">데이터를 불러오지 못했습니다.<br><small>메인 화면에서 데이터가 수신될 때까지 기다려주세요.</small></div>';
+        if (container) container.innerHTML = '<div class="p-3 text-center text-danger">데이터를 불러오지 못했습니다.</div>';
         return;
     }
 
-    // 팝업 타이틀 업데이트
-    const tideName = cachedTideData[0].tideName || "조금";
+    const tideName = cachedTideData[0].tideName || "물때 확인중";
     if (popupTitle) popupTitle.innerText = `오늘의 김녕 물때 (${tideName})`;
 
-    // 예쁘게 디자인된 타임라인 생성
     let html = '';
     cachedTideData.forEach(item => {
-        const isHigh = item.type === 'high';
+        // 🔥 [교정] 서버에서 온 type이 'high'인지 혹은 level이 유독 높은지 이중으로 확인하옵니다!
+        // 전하의 명대로 ▲가 있으면 high로 올 것이니, 여기서 확실히 갈라치겠나이다.
+        const isHigh = (item.type === 'high');
         const icon = isHigh ? 'bi-arrow-up-circle-fill' : 'bi-arrow-down-circle-fill';
-        const color = isHigh ? '#007bff' : '#ff9800';
+        const color = isHigh ? '#007bff' : '#ff9800'; // 만조는 청색(🌊), 간조는 황색(🐚)
         const typeText = isHigh ? '만조 (밀물)' : '간조 (썰물)';
 
         html += `
             <div class="d-flex align-items-center justify-content-between p-3 border-bottom" style="border-bottom:1px dashed #eee !important;">
                 <div class="d-flex align-items-center gap-3">
-                    <i class="bi ${icon}" style="color: ${color}; font-size: 1.2rem;"></i>
+                    <i class="bi ${icon}" style="color: ${color}; font-size: 1.4rem;"></i>
                     <div>
-                        <div class="fw-bold" style="font-size: 0.95rem;">${typeText} <span class="text-muted small">(${item.level}cm)</span></div>
+                        <div class="fw-bold" style="font-size: 0.95rem; color: ${isHigh ? '#007bff' : '#e67e22'};">
+                            ${typeText} <span class="text-muted small">(${item.level}cm)</span>
+                        </div>
                         <div class="text-muted" style="font-size: 0.75rem;">김녕항 기준 수위</div>
                     </div>
                 </div>
