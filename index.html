@@ -531,58 +531,66 @@ button[style*="background: #f8f9fa"]:active {
     animation: jellyPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 /* 3. 아이콘 박스: 배경 없이 아이콘만 강조하거나 아주 연한 원형 */
+/* 1. 공통 유리 박스 (전하의 62px 황금 비율 사수) */
 .icon-circle {
-    /* 전하의 62px 황금 비율 사수 */
     width: 62px !important;
     height: 62px !important;
-    border-radius: 20px !important; 
-    
+    border-radius: 20px !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     position: relative !important;
-    margin-bottom: 8px !important;
-
-    /* [수정] 그림자를 더 얇고 넓게 퍼뜨려 고급스러움을 더함 */
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.03), 0 2px 6px rgba(0, 0, 0, 0.02) !important;
     
-    /* [수정] 테두리를 더 가늘고 투명하게 (세련미의 핵심) */
-    border: 1px solid rgba(255, 255, 255, 0.4) !important; 
+    /* 🌟 글자와의 간격 확보 (위로 붙는 현상 방지) */
+    margin-bottom: 8px !important; 
     
-    /* [수정] 배경을 살짝 더 투명하게 해서 캐릭터가 돋보이게 함 */
-    background: rgba(255, 255, 255, 0.35) !important;
-    backdrop-filter: blur(10px) !important; /* 블러를 진하게 해서 쫀득함 강화 */
+    backdrop-filter: blur(15px) !important;
+    -webkit-backdrop-filter: blur(15px) !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.7) !important;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.05) !important;
 }
-
+/* 2. 안쪽 2D 그림 (90% 확대 유지 및 그림자 최적화) */
 .icon-circle img {
-    /* 전하의 90% 크기 사수 (안쪽 그림 확대 유지) */
-    width: 90% !important; 
+    width: 90% !important;
     height: 90% !important;
     object-fit: contain !important;
-    
-    /* [수정] 캐릭터가 유리판 위에 '착' 붙어있게 그림자 거리를 좁힘 */
-    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.12)) !important;
-    
-    /* [수정] 위치를 정중앙으로 다시 정렬 (어색함 해소) */
-    transform: translateY(0); 
 }
-.menu-item-iphone:active img {
-    transform: scale(0.9); /* 눌렀을 때 쏙 들어가는 효과 */
+/* [자유활동] - 연녹색 */
+.menu-item-iphone:nth-child(2) .icon-circle { 
+    background: rgba(230, 245, 235, 0.95) !important; 
 }
-.menu-item-iphone:nth-child(1) .icon-circle { background: rgba(240, 251, 251, 0.8) !important; }
-/* 가맹점: 연오렌지 */
-.menu-item-iphone:nth-child(2) .icon-circle { background: rgba(255, 249, 240, 0.8) !important; }
-/* 퀘스트: 연하늘 */
-.menu-item-iphone:nth-child(3) .icon-circle { background: rgba(240, 250, 255, 0.8) !important; }
-/* 수호자랭킹: 연보라 */
-.menu-item-iphone:nth-child(4) .icon-circle { background: rgba(245, 240, 255, 0.8) !important; }
 
+/* [가맹점] - 3번째 자식 */
+.menu-item-iphone:nth-child(3) .icon-circle { 
+    background: rgba(255, 240, 225, 0.95) !important; 
+}
+
+/* [퀘스트] - 4번째 자식 */
+.menu-item-iphone:nth-child(4) .icon-circle { 
+    background: rgba(230, 240, 255, 0.95) !important; 
+}
+
+/* [수호자 랭킹] - 5번째 자식 */
+.menu-item-iphone:nth-child(5) .icon-circle { 
+    background: rgba(255, 250, 220, 0.95) !important; 
+}
+/* 4. 클릭 시 쫀득한 반응 */
+.menu-item-iphone:active .icon-circle {
+    transform: scale(0.94);
+    background: rgba(255, 255, 255, 0.95) !important;
+}
+
+/* 4. 인터랙션: 눌렀을 때의 쫀득한 반응 */
+.menu-item-iphone:active .icon-circle {
+    transform: scale(0.9) !important;
+    background: rgba(255, 255, 255, 1) !important; /* 누를 땐 하얗게 반짝 */
+}
     /* 4. 앱 이름 스타일 */
 .menu-title-iphone {
+    margin-top: 0 !important;
     font-size: 0.78rem !important;
     font-weight: 800 !important;
     color: #333 !important;
-    letter-spacing: -0.5px !important;
 }
     /* 빨간 배지: 아이콘 오른쪽 상단에 딱! */
 .badge-iphone {
