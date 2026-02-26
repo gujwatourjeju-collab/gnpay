@@ -4388,7 +4388,7 @@ async function syncGimnyeongTide() {
         const idx = response.indexOf(currentData);
         const nextTide = response.slice(idx + 1).find(item => item.type === 'high' || item.type === 'low');
 
-        // 🎯 [수리 포인트 1] 뱃지는 상단에 콤팩트하게 배치
+        // 🎯 [수리 포인트 1] 뱃지 및 예상 수위 텍스트 업데이트
         if (tideTitle) {
             tideTitle.innerHTML = `
                 <div style="margin-top: 5px; margin-bottom: 10px;">
@@ -4404,7 +4404,7 @@ async function syncGimnyeongTide() {
             `;
         }
 
-        // 🎯 [수리 포인트 3] 상태 메시지의 '겸손화' (예상 수위와 같은 0.75rem 크기 + 회색조)
+        // 🎯 [수리 포인트 2] 상태 메시지 (물이 차오르는/빠지는 중) 업데이트
         if (tideDesc) {
             const isFalling = nextTide?.type === 'low';
             const statusMsg = isFalling ? "물이 빠지는 중" : "물이 차오르는 중";
@@ -4418,12 +4418,18 @@ async function syncGimnyeongTide() {
             `;
         }
 
+        // 🎯 [수리 포인트 3] 파도 애니메이션 및 🌟눈금 복구🌟
         if (waveElement) {
             waveElement.style.background = 'rgba(1, 178, 173, 0.75)';
             runWaveAnimation(waveElement, response[idx-1] || response[0], nextTide || response[0], currentData);
+            
+            // 🌟 사라졌던 눈금(Scale) 함수를 여기서 호출하여 다시 그려냅니다.
+            if (typeof createTideScale === "function") {
+                createTideScale(waveElement);
+            }
         }
 
-    } catch (e) { console.error("전하, 폰트 다이어트 중...", e); }
+    } catch (e) { console.error("전하, 위젯 정밀 수리 중...", e); }
 }
 // 🌊 파도 애니메이션만 따로 떼어 정교하게 제어합니다.
 function runWaveAnimation(waveElement, prevTide, nextTide, currentData) {
@@ -4617,6 +4623,5 @@ setInterval(syncGimnyeongTide, 600000);
 </script>
 </body>
 </html>
-
 
 
