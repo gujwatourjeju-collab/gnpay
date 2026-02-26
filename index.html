@@ -540,14 +540,18 @@ button[style*="background: #f8f9fa"]:active {
     align-items: center !important;
     justify-content: center !important;
     position: relative !important;
-    
-    /* 🌟 글자와의 간격 확보 (위로 붙는 현상 방지) */
-    margin-bottom: 8px !important; 
+    margin-bottom: 8px !important;
     
     backdrop-filter: blur(15px) !important;
     -webkit-backdrop-filter: blur(15px) !important;
     border: 1.5px solid rgba(255, 255, 255, 0.7) !important;
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.05) !important;
+
+    /* 🌟 핵심: 김녕 민트색(#01b2ad) 아우라 주입 */
+    /* 기존 그림자보다 더 넓고 부드럽게 퍼지는 민트색 광채입니다. */
+    box-shadow: 0 8px 20px rgba(1, 178, 173, 0.15), 
+                0 4px 10px rgba(1, 178, 173, 0.1) !important;
+    
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
 }
 /* 2. 안쪽 2D 그림 (90% 확대 유지 및 그림자 최적화) */
 .icon-circle img {
@@ -555,25 +559,10 @@ button[style*="background: #f8f9fa"]:active {
     height: 90% !important;
     object-fit: contain !important;
 }
-/* [자유활동] - 연녹색 */
-.menu-item-iphone:nth-child(2) .icon-circle { 
-    background: rgba(230, 245, 235, 0.95) !important; 
-}
-
-/* [가맹점] - 3번째 자식 */
-.menu-item-iphone:nth-child(3) .icon-circle { 
-    background: rgba(255, 240, 225, 0.95) !important; 
-}
-
-/* [퀘스트] - 4번째 자식 */
-.menu-item-iphone:nth-child(4) .icon-circle { 
-    background: rgba(230, 240, 255, 0.95) !important; 
-}
-
-/* [수호자 랭킹] - 5번째 자식 */
-.menu-item-iphone:nth-child(5) .icon-circle { 
-    background: rgba(255, 250, 220, 0.95) !important; 
-}
+.menu-item-iphone:nth-child(2) .icon-circle { background: rgba(230, 245, 235, 0.95) !important; }
+.menu-item-iphone:nth-child(3) .icon-circle { background: rgba(255, 240, 225, 0.95) !important; }
+.menu-item-iphone:nth-child(4) .icon-circle { background: rgba(230, 240, 255, 0.95) !important; }
+.menu-item-iphone:nth-child(5) .icon-circle { background: rgba(255, 250, 220, 0.95) !important; }
 /* 4. 클릭 시 쫀득한 반응 */
 .menu-item-iphone:active .icon-circle {
     transform: scale(0.94);
@@ -581,9 +570,11 @@ button[style*="background: #f8f9fa"]:active {
 }
 
 /* 4. 인터랙션: 눌렀을 때의 쫀득한 반응 */
+/* 2. 클릭 시 아우라가 더 진해지는 반응 */
 .menu-item-iphone:active .icon-circle {
     transform: scale(0.9) !important;
-    background: rgba(255, 255, 255, 1) !important; /* 누를 땐 하얗게 반짝 */
+    /* 누를 때 민트색 빛이 더 강하게 뿜어져 나옵니다. */
+    box-shadow: 0 0 25px rgba(1, 178, 173, 0.4) !important; 
 }
     /* 4. 앱 이름 스타일 */
 .menu-title-iphone {
