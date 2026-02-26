@@ -2282,7 +2282,7 @@ html, body {
 </body>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script>
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbzvy6aANe-jVCtowK6viCb-K8tD00Zay_iCzialbhQ5mCPiemzjOfbJayaQ1yXcoL31/exec";
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbwDvlcz-8aBW0Myvr5tQNbkN_bMrnq_3wyV4ZTaQOZeeApjmLGay2bnNu8T0-_SLDhG/exec";
     let currentRankMode = 'today';
     let totalRankingData = [];
     function updateTab(element) {
@@ -3224,16 +3224,89 @@ async function submitEditInfo() {
     }
     loading.style.display = 'none';
 }
-        async function handleScan() {
-            if (!userData.isLoggedIn) return showPage('page-login');
-            document.getElementById('scanner-modal').style.display = 'block';
-            html5QrCode = new Html5Qrcode("reader");
-            html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, async (text) => {
-                closeScanner();
-                processAddPoints(100, "현장 QR 인증");
-            });
+        // 1. QR 스캔 시작 함수 (기존 handleScan을 이 내용으로 덮어쓰기 하소서)
+async function handleScan() {
+    if (!userData.isLoggedIn) return showPage('page-login');
+    document.getElementById('scanner-modal').style.display = 'block';
+    
+    // 중복 생성 방지 로직 추가
+    if (!html5QrCode) {
+        html5QrCode = new Html5Qrcode("reader");
+    }
+    
+    html5QrCode.start(
+        { facingMode: "environment" }, 
+        { fps: 10, qrbox: 250 }, 
+        async (text) => {
+            closeScanner();
+            // 전하, 여기서 바로 점수를 주는 게 아니라 '판별기'로 보냅니다!
+            await handleScannerResult(text);
         }
-        function closeScanner() { if(html5QrCode) html5QrCode.stop(); document.getElementById('scanner-modal').style.display='none'; }
+    ).catch(err => {
+        alert("카메라를 실행할 수 없사옵니다.");
+    });
+}
+
+// 2. QR 내용 판별기 (새로 추가)
+async function handleScannerResult(decodedText) {
+    if (!decodedText) return;
+
+    const parts = decodedText.split(':');
+    const category = parts[0]; // EVENT 또는 PAY
+    const actionKey = parts[1]; // 예: WELCOME_1000 또는 김녕카페
+    const fixedAmount = parts[2] ? parseInt(parts[2]) : null;
+
+    // [결제 모드] PAY로 시작하고 금액이 적혀있지 않으면 금액 입력창 오픈
+    if (category === 'PAY' && !fixedAmount) {
+        const userAmount = prompt(`[${actionKey}] 결제하실 금액을 입력하소서.`, "0");
+        if (userAmount && parseInt(userAmount) > 0) {
+            await processQRRequest(`PAY:${actionKey}:${userAmount}`);
+        }
+        return;
+    }
+
+    // [이벤트/정찰제 모드] 그 외에는 바로 서버로 전송
+    await processQRRequest(decodedText);
+}
+
+// 3. 서버 통신 엔진 (새로 추가)
+async function processQRRequest(qrData) {
+    // 전하의 코드에 있는 로딩 오버레이 가동
+    const overlay = document.getElementById('loading-overlay');
+    if (overlay) overlay.style.display = 'flex';
+    
+    try {
+        const response = await fetch(GAS_URL, {
+            method: 'POST',
+            body: JSON.stringify({
+                type: 'processQR',
+                email: userData.email,
+                qrData: qrData
+            })
+        }).then(r => r.json());
+
+        if (response.result === 'success') {
+            alert("🎊 " + response.message);
+            // 포인트 실시간 갱신 및 메인 이동
+            await syncPointsRealtime();
+            showPage('page-main');
+        } else {
+            alert("⚠️ 실패: " + response.message);
+        }
+    } catch (e) {
+        alert("통신 에러가 발생했나이다.");
+    } finally {
+        if (overlay) overlay.style.display = 'none';
+    }
+}
+     function closeScanner() { 
+    if(html5QrCode) {
+        html5QrCode.stop().then(() => {
+            console.log("카메라가 안전하게 종료되었나이다.");
+        }).catch(err => console.error("종료 에러:", err));
+    } 
+    document.getElementById('scanner-modal').style.display = 'none'; 
+}
         
 async function processAddPoints(amount, action) {
     loading.style.display = 'flex';
@@ -4380,7 +4453,7 @@ function triggerQuestSplash() {
 
 // 2. 형님의 실제 GAS 배포 주소
 // 1. 설정 변수
-const TIDE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzvy6aANe-jVCtowK6viCb-K8tD00Zay_iCzialbhQ5mCPiemzjOfbJayaQ1yXcoL31/exec';
+const TIDE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwDvlcz-8aBW0Myvr5tQNbkN_bMrnq_3wyV4ZTaQOZeeApjmLGay2bnNu8T0-_SLDhG/exec';
 
 // 💡 [핵심] 서버에서 가져온 물때 데이터를 저장해둘 전역 변수 (팝업 열 때 딜레이 없애기용)
 let cachedTideData = null;
