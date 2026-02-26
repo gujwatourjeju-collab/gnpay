@@ -1078,7 +1078,31 @@ html, body {
 </style>
 </head>
 <body>
-
+  <div id="guide-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:transparent; z-index:30000; overflow:hidden; pointer-events:auto;">
+    
+    <div id="guide-hole" style="
+    position:absolute; 
+    width:120px; 
+    height:120px; 
+    border-radius:15px; 
+    /* 0.95는 거의 100%에 가까운 어둠이옵니다. */
+    box-shadow:0 0 0 9999px rgba(0,0,0,0.95); 
+    transition: all 0.4s ease; 
+    z-index:30001; 
+    pointer-events:none; 
+    background:transparent !important;
+"></div>
+    <div id="guide-box" style="position:absolute; width:85%; left:50%; transform:translateX(-50%); z-index:30002; text-align:center; color:white;">
+        <div id="guide-icon-box" style="font-size:3rem; margin-bottom:15px; animation: bounceAni 1s infinite;"></div>
+        <h4 id="guide-title" class="fw-900" style="font-size:1.4rem; letter-spacing:-1px;"></h4>
+        <p id="guide-desc" style="opacity:0.9; font-size:0.95rem; line-height:1.6; word-break:keep-all;"></p>
+        
+        <div class="d-flex justify-content-center gap-2 mt-4">
+            <button class="btn rounded-pill px-3" style="background:rgba(255,255,255,0.2); color:white; font-size:0.8rem;" onclick="closeOnboarding()">그만보기</button>
+            <button id="guide-next-btn" class="btn rounded-pill px-4 fw-bold" style="background:var(--primary); color:white;" onclick="nextGuideStep()">다음</button>
+        </div>
+    </div>
+</div>
     <div id="loading-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.9); z-index: 10000; display: none; justify-content: center; align-items: center; flex-direction: column;">
     <div class="spinner-border text-info" role="status"></div>
     
@@ -4745,6 +4769,127 @@ function closeTidePopup() {
 // 초기 실행 및 10분마다 갱신
 syncGimnyeongTide();
 setInterval(syncGimnyeongTide, 600000);
+
+let currentStep = 0;
+const guideSteps = [
+    { target: '#welcome-message', icon: '🌲', title: '탄소 저감량', desc: '실천으로 구한 지구의 무게입니다.<br>소나무 몇 그루를 심었는지 확인해 보세요.' },
+    { target: '#main-u-points', icon: '💎', title: '에코 포인트', desc: '현재 사용 가능한 자산입니다.<br>가맹점에서 현금처럼 쓰실 수 있습니다.' },
+    { target: '#main-card-char-img', icon: '🐬', title: '등급별 캐릭터', desc: '포인트가 쌓일수록 캐릭터가 진화합니다.<br>전설의 해녀를 향해 달려보세요!' },
+    { target: '#tide-widget-2x2', icon: '🌊', title: '예상 수위 위젯', desc: '김녕 바다의 실시간 물때 정보입니다.<br>안전한 활동을 위해 수위를 체크하세요.' },
+    { target: '.menu-item-iphone:nth-child(4)', icon: '🎯', title: '퀘스트 참여', desc: '마을 곳곳의 특별 임무를 수행하고<br>대량의 포인트를 획득하는 지름길입니다.' },
+    { target: '.menu-item-iphone:nth-child(2)', icon: '🏃', title: '자유 활동', desc: '일상 속 탄소중립 실천을 사진으로 인증하세요.<br>관리자 확인 후 포인트가 지급됩니다.' },
+    { target: '.tab-scan-btn', icon: '✨', title: '만능 스캔 버튼', desc: '핵심 기능입니다! 방문 인증부터 결제까지<br>이 버튼 하나로 모두 가능합니다.' },
+    // 마지막 환영 단계 추가
+    { 
+    target: 'finish', 
+    icon: '🎉', 
+    title: '준비 완료!', 
+    desc: `이제 모든 준비가 끝났습니다.<br>즐거운 여행 되세요!<br><br>
+           <label style="font-size:0.8rem; opacity:0.8; cursor:pointer;">
+               <input type="checkbox" id="hide-guide-today" style="vertical-align:middle;"> 오늘 하루 보지 않기
+           </label>` 
+}
+];
+
+function startOnboarding() {
+    if (!userData.isLoggedIn) return; // 로그인 안됐으면 패스
+    currentStep = 0;
+    document.getElementById('guide-overlay').style.display = 'block';
+    updateGuideStep();
+}
+
+function updateGuideStep() {
+    const step = guideSteps[currentStep];
+    const hole = document.getElementById('guide-hole');
+    const box = document.getElementById('guide-box');
+    const nextBtn = document.getElementById('guide-next-btn');
+
+    if (step.target === 'finish') {
+        hole.style.width = '0px';
+        hole.style.height = '0px';
+        hole.style.top = '-100px'; 
+        
+        box.style.top = '50%';
+        box.style.bottom = 'auto';
+        box.style.transform = 'translate(-50%, -50%)';
+        
+        nextBtn.innerText = '시작하기';
+    } else {
+        const targetEl = document.querySelector(step.target);
+        if (targetEl && hole) {
+            const rect = targetEl.getBoundingClientRect();
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+
+            // --- [수정 포인트] 첫 번째 단계(#welcome-message) 너비 조임 로직 ---
+            let finalWidth = rect.width;
+            
+            if (step.target === '#welcome-message') {
+                // 부모 요소가 가로 전체를 차지해도 조명은 최대 280px 내외로 제한
+                // 유저 화면 너비에 따라 유동적으로 맞추려면 Math.min 사용
+                finalWidth = Math.min(rect.width, 300); 
+            }
+
+            // 조명 위치 및 크기 정밀 조절
+            hole.style.width = (finalWidth + 20) + 'px';
+            hole.style.height = (rect.height + 15) + 'px';
+            hole.style.top = (rect.top + scrollTop - 7.5) + 'px';
+            hole.style.left = (rect.left - 10) + 'px';
+            hole.style.borderRadius = '15px';
+            // ----------------------------------------------------------
+
+            box.style.transform = 'translateX(-50%)';
+            if (rect.top > window.innerHeight / 2) {
+                box.style.top = 'auto';
+                box.style.bottom = (window.innerHeight - rect.top + 50) + 'px';
+            } else {
+                box.style.bottom = 'auto';
+                box.style.top = (rect.bottom + 60) + 'px';
+            }
+        }
+        nextBtn.innerText = `다음 (${currentStep + 1}/${guideSteps.length})`;
+    }
+
+    document.getElementById('guide-icon-box').innerText = step.icon;
+    document.getElementById('guide-title').innerText = step.title;
+    document.getElementById('guide-desc').innerHTML = step.desc;
+}
+
+function nextGuideStep() {
+    if (currentStep < guideSteps.length - 1) {
+        currentStep++;
+        updateGuideStep();
+    } else {
+        // 마지막 '시작하기' 버튼 클릭 시 종료
+        closeOnboarding();
+    }
+}
+
+function closeOnboarding() {
+    // 체크박스가 있는지 확인하고 체크되어 있으면 날짜 저장
+    const hideCheck = document.getElementById('hide-guide-today');
+    if (hideCheck && hideCheck.checked) {
+        localStorage.setItem('gnpay_onboarding_hide', new Date().toDateString());
+    }
+
+    document.getElementById('guide-overlay').style.display = 'none';
+}
+const guideWatcher = setInterval(() => {
+    const splash = document.getElementById('splash-screen');
+    
+    // 🌟 [감시 조건] 스플래시 엘리먼트가 아예 삭제되었거나, display가 none이 되었을 때
+    if (!splash || splash.style.display === 'none' || splash.classList.contains('splash-fade-out')) {
+        
+        console.log("전하, 스플래시가 퇴근했나이다. 가이드를 점화합니다!");
+        
+        // 0.5초만 더 기다렸다가 (화면이 완전히 그려진 뒤) 가이드 시작
+        setTimeout(() => {
+            startOnboarding();
+        }, 500);
+
+        // 점화했으니 감시병은 퇴근시킨다 (중요!)
+        clearInterval(guideWatcher);
+    }
+}, 300); // 0.3초마다 슬쩍슬쩍 확인
 </script>
 </body>
 </html>
