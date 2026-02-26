@@ -2282,7 +2282,7 @@ html, body {
 </body>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script>
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbwDvlcz-8aBW0Myvr5tQNbkN_bMrnq_3wyV4ZTaQOZeeApjmLGay2bnNu8T0-_SLDhG/exec";
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbyznzTfu0czyPekA5anBs0eK8ePCWiBSMO7mIM_x4Ea03Yf0M14Q7sJoNNWQjYWNfAW/exec";
     let currentRankMode = 'today';
     let totalRankingData = [];
     function updateTab(element) {
@@ -3243,7 +3243,7 @@ async function handleScan() {
             await handleScannerResult(text);
         }
     ).catch(err => {
-        alert("카메라를 실행할 수 없사옵니다.");
+        alert("카메라를 실행할 수 없습니다.");
     });
 }
 
@@ -3258,7 +3258,7 @@ async function handleScannerResult(decodedText) {
 
     // [결제 모드] PAY로 시작하고 금액이 적혀있지 않으면 금액 입력창 오픈
     if (category === 'PAY' && !fixedAmount) {
-        const userAmount = prompt(`[${actionKey}] 결제하실 금액을 입력하소서.`, "0");
+        const userAmount = prompt(`[${actionKey}] 결제하실 금액을 입력하십시오.`, "0");
         if (userAmount && parseInt(userAmount) > 0) {
             await processQRRequest(`PAY:${actionKey}:${userAmount}`);
         }
@@ -3294,7 +3294,7 @@ async function processQRRequest(qrData) {
             alert("⚠️ 실패: " + response.message);
         }
     } catch (e) {
-        alert("통신 에러가 발생했나이다.");
+        alert("통신 에러가 발생했습니다.");
     } finally {
         if (overlay) overlay.style.display = 'none';
     }
@@ -3302,7 +3302,7 @@ async function processQRRequest(qrData) {
      function closeScanner() { 
     if(html5QrCode) {
         html5QrCode.stop().then(() => {
-            console.log("카메라가 안전하게 종료되었나이다.");
+            console.log("카메라가 안전하게 종료되었습니다.");
         }).catch(err => console.error("종료 에러:", err));
     } 
     document.getElementById('scanner-modal').style.display = 'none'; 
@@ -4453,7 +4453,7 @@ function triggerQuestSplash() {
 
 // 2. 형님의 실제 GAS 배포 주소
 // 1. 설정 변수
-const TIDE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwDvlcz-8aBW0Myvr5tQNbkN_bMrnq_3wyV4ZTaQOZeeApjmLGay2bnNu8T0-_SLDhG/exec';
+const TIDE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyznzTfu0czyPekA5anBs0eK8ePCWiBSMO7mIM_x4Ea03Yf0M14Q7sJoNNWQjYWNfAW/exec';
 
 // 💡 [핵심] 서버에서 가져온 물때 데이터를 저장해둘 전역 변수 (팝업 열 때 딜레이 없애기용)
 let cachedTideData = null;
