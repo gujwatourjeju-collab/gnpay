@@ -2282,7 +2282,7 @@ html, body {
 </body>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script>
-        const GAS_URL = "https://script.google.com/macros/s/AKfycby8WJqZtcIgEGZmNEbYyXuIHZKKN7Dqfc9Hy3EdDRCbnTUPF-q7u9ZKhTWf2LSnRqe1/exec";
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbzvy6aANe-jVCtowK6viCb-K8tD00Zay_iCzialbhQ5mCPiemzjOfbJayaQ1yXcoL31/exec";
     let currentRankMode = 'today';
     let totalRankingData = [];
     function updateTab(element) {
@@ -4380,7 +4380,7 @@ function triggerQuestSplash() {
 
 // 2. 형님의 실제 GAS 배포 주소
 // 1. 설정 변수
-const TIDE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby8WJqZtcIgEGZmNEbYyXuIHZKKN7Dqfc9Hy3EdDRCbnTUPF-q7u9ZKhTWf2LSnRqe1/exec';
+const TIDE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzvy6aANe-jVCtowK6viCb-K8tD00Zay_iCzialbhQ5mCPiemzjOfbJayaQ1yXcoL31/exec';
 
 // 💡 [핵심] 서버에서 가져온 물때 데이터를 저장해둘 전역 변수 (팝업 열 때 딜레이 없애기용)
 let cachedTideData = null;
@@ -4403,19 +4403,39 @@ async function syncGimnyeongTide() {
         if (!Array.isArray(response) || response.length === 0) return;
         cachedTideData = response; 
 
-        const currentData = response.find(item => item.isCurrent);
+        let currentData = response.find(item => item.isCurrent);
         if (!currentData) return;
 
         const idx = response.indexOf(currentData);
-        const nextTide = response.slice(idx + 1).find(item => item.type === 'high' || item.type === 'low');
+        // 다음 물때 찾기
+        let nextTide = response.slice(idx + 1).find(item => item.type === 'high' || item.type === 'low');
 
-        // 🎯 [수리 포인트 1] 뱃지 및 예상 수위 텍스트 업데이트
+        // 🛡️ [안전장치: 관성 엔진] 오늘의 마지막 물때가 지났을 경우
+        if (!nextTide && idx > 0) {
+            const lastRealTide = response[idx - 1]; // 방금 지난 마지막 물때 정보
+            const now = new Date();
+            const lastTimeParts = lastRealTide.time.split(':');
+            const lastTimeDate = new Date();
+            lastTimeDate.setHours(lastTimeParts[0], lastTimeParts[1], 0);
+
+            // 마지막 물때로부터 몇 분이나 지났는지 계산
+            const diffMin = Math.max(0, (now - lastTimeDate) / (1000 * 60));
+            
+            // 🌊 관성 수위 예측: 1분에 약 0.3cm씩 반대 방향으로 흐른다고 가정 (안전 범위 20~250cm)
+            const driftDir = lastRealTide.type === 'high' ? -0.3 : 0.3; 
+            let predictedLevel = lastRealTide.level + (diffMin * driftDir);
+            currentData.level = Math.round(Math.max(20, Math.min(250, predictedLevel)));
+
+            // 가상의 다음 상태 설정 (UI 표현용)
+            nextTide = { type: lastRealTide.type === 'high' ? 'low' : 'high' };
+        }
+
+        // 🎯 [수리 포인트 1] 뱃지 및 예상 수위 업데이트
         if (tideTitle) {
             tideTitle.innerHTML = `
                 <div style="margin-top: 5px; margin-bottom: 10px;">
                     ${currentData.tideName ? `<span style="display:inline-block; background:var(--primary-grad); color:white; padding:2px 10px; border-radius:8px; font-size:0.75rem; font-weight:900; box-shadow: 0 4px 10px rgba(1, 178, 173, 0.2);">${currentData.tideName}</span>` : ""}
                 </div>
-                
                 <div style="display: flex; flex-direction: column; gap: 0px;">
                     <div style="font-size: 0.75rem; font-weight: 800; color: #666; letter-spacing: -0.2px;">예상 수위</div>
                     <div style="font-size: 2.4rem; font-weight: 900; color: #000; letter-spacing: -1.5px; line-height: 1;">
@@ -4425,7 +4445,7 @@ async function syncGimnyeongTide() {
             `;
         }
 
-        // 🎯 [수리 포인트 2] 상태 메시지 (물이 차오르는/빠지는 중) 업데이트
+        // 🎯 [수리 포인트 2] 상태 메시지 (관성 모드 반영)
         if (tideDesc) {
             const isFalling = nextTide?.type === 'low';
             const statusMsg = isFalling ? "물이 빠지는 중" : "물이 차오르는 중";
@@ -4439,18 +4459,18 @@ async function syncGimnyeongTide() {
             `;
         }
 
-        // 🎯 [수리 포인트 3] 파도 애니메이션 및 🌟눈금 복구🌟
+        // 🎯 [수리 포인트 3] 파도 애니메이션 및 눈금 복구
         if (waveElement) {
             waveElement.style.background = 'rgba(1, 178, 173, 0.75)';
+            // 관성 모드일 때도 부드럽게 애니메이션 실행
             runWaveAnimation(waveElement, response[idx-1] || response[0], nextTide || response[0], currentData);
             
-            // 🌟 사라졌던 눈금(Scale) 함수를 여기서 호출하여 다시 그려냅니다.
             if (typeof createTideScale === "function") {
                 createTideScale(waveElement);
             }
         }
 
-    } catch (e) { console.error("전하, 위젯 정밀 수리 중...", e); }
+    } catch (e) { console.error("전하, 관성 엔진 가동 중 오류...", e); }
 }
 // 🌊 파도 애니메이션만 따로 떼어 정교하게 제어합니다.
 function runWaveAnimation(waveElement, prevTide, nextTide, currentData) {
