@@ -4792,7 +4792,16 @@ const guideSteps = [
 ];
 
 function startOnboarding() {
-    if (!userData.isLoggedIn) return; // 로그인 안됐으면 패스
+    if (!userData || !userData.isLoggedIn) return;
+
+    // 키값 뒤에 사용자 이름을 붙여서 구분 (예: gnpay_hide_민병제)
+    const userKey = 'gnpay_hide_' + (userData.name || 'guest');
+    const hideDate = localStorage.getItem(userKey);
+    
+    if (hideDate === new Date().toDateString()) {
+        return; 
+    }
+
     currentStep = 0;
     document.getElementById('guide-overlay').style.display = 'block';
     updateGuideStep();
@@ -4865,10 +4874,12 @@ function nextGuideStep() {
 }
 
 function closeOnboarding() {
-    // 체크박스가 있는지 확인하고 체크되어 있으면 날짜 저장
     const hideCheck = document.getElementById('hide-guide-today');
+    
     if (hideCheck && hideCheck.checked) {
-        localStorage.setItem('gnpay_onboarding_hide', new Date().toDateString());
+        // 저장할 때도 똑같이 사용자 이름을 붙여서 저장
+        const userKey = 'gnpay_hide_' + (userData.name || 'guest');
+        localStorage.setItem(userKey, new Date().toDateString());
     }
 
     document.getElementById('guide-overlay').style.display = 'none';
