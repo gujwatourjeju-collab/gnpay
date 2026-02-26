@@ -954,16 +954,18 @@ html, body {
 /* QR 퀵패스 카드만 정밀 타격해서 디자인 변경 */
 /* 1. 유리 질감 + 입체감 부여 */
 #white-qr-card {
-    background: rgba(255, 255, 255, 0.45) !important;
+    /* 1. [수정] 흰색을 버리고 은은한 민트색 아우라 주입 */
+    background: rgba(224, 251, 249, 0.65) !important; 
+    
+    /* 2. [수정] 테두리도 아주 미세하게 민트색 선을 그어줍니다 */
+    border: 1.5px solid rgba(1, 178, 173, 0.2) !important;
+
+    /* --- 아래는 전하가 이미 가지고 계신 코드들 (그대로 유지) --- */
     backdrop-filter: blur(25px) saturate(180%) !important;
     -webkit-backdrop-filter: blur(25px) saturate(180%) !important;
-    border: 1px solid rgba(255, 255, 255, 0.6) !important;
-    
-    /* [🚨 수리 핵심] */
-    box-sizing: border-box !important; /* 패딩이 너비를 키우지 않게 고정 */
-    width: auto !important;           /* 너비를 100% 대신 auto로 두어 마진 내부에 가둠 */
-    margin: 0 20px 20px 20px !important; /* 좌우 마진 20px 유지 */
-    
+    box-sizing: border-box !important;
+    width: auto !important;
+    margin: 0 20px 20px 20px !important;
     padding: 15px 20px !important;
     display: flex !important;
     align-items: center !important;
@@ -989,16 +991,17 @@ html, body {
 
 /* 2. [핵심] QR 미리보기 박스 - 60px에서 85px로 대폭 확대 */
 .qr-preview-box {
-    width: 85px !important; /* 시원하게 키움 */
+    /* 전하가 보내주신 85px짜리 그 늠름한 코드 그대로 쓰시면 됩니다! */
+    width: 85px !important;
     height: 85px !important;
-    background: white !important;
-    padding: 6px !important; /* 테두리 여백은 줄여서 QR 실면적 확보 */
+    background: white !important; /* 얘는 하얘야 QR이 잘 찍힙니다 */
+    padding: 6px !important;
     border-radius: 18px !important;
     box-shadow: 0 8px 20px rgba(1, 178, 173, 0.15);
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0; /* 찌그러짐 방지 */
+    flex-shrink: 0;
 }
 
 /* 3. 텍스트 영역 여백 조정 */
@@ -1754,6 +1757,12 @@ html, body {
              placeholder="비밀번호 (영문+숫자 혼합)" 
              style="padding-left: 45px;">
             </div>
+            <div style="position: relative; margin-bottom: 5px;">
+    <i class="bi bi-shield-check" style="position: absolute; left: 16px; top: 16px; color: #adb5bd;"></i>
+    <input type="password" id="reg-pw-confirm" class="form-control custom-input" 
+           placeholder="비밀번호 한 번 더 입력" 
+           style="padding-left: 45px;">
+</div>
                <div style="position: relative; margin-bottom: 12px;">
                 <i class="bi bi-phone" style="position: absolute; left: 16px; top: 16px; color: #adb5bd;"></i>
                 <input type="tel" id="reg-phone" class="form-control custom-input" placeholder="전화번호 (숫자만 연속해서 입력)" style="padding-left: 45px;">
@@ -3323,22 +3332,34 @@ function forceShowPage(pageId) {
     }
 }  
 function checkAndSignup() {
-    // 1. 입력 요소들 가져오기
+    // 1. 입력 요소들 가져오기 (비밀번호 확인 칸 추가)
     const name = document.getElementById('reg-name').value.trim();
     const email = document.getElementById('reg-email').value.trim();
     const pw = document.getElementById('reg-pw').value.trim();
+    const pwConfirm = document.getElementById('reg-pw-confirm').value.trim(); // 🌟 추가된 상식
     const phone = document.getElementById('reg-phone').value.trim();
     const gender = document.getElementById('reg-gender').value;
     const region = document.getElementById('reg-region').value;
     const agree = document.getElementById('reg-agree').checked;
 
-    // 2. 빈칸 및 유효성 체크 (형님, 여기가 핵심입니다)
+    // 2. 빈칸 및 유효성 체크
     if (!name) return alert("이름을 입력해주세요.");
     if (!gender) return alert("성별을 선택해주세요.");
     if (!email) return alert("이메일을 입력해주세요.");
     if (email.indexOf('@') === -1) return alert("올바른 이메일 형식이 아닙니다.");
+    
+    // 🔐 비밀번호 검문소
     if (!pw) return alert("비밀번호를 입력해주세요.");
     if (pw.length < 4) return alert("비밀번호는 최소 4자리 이상이어야 합니다.");
+    
+    // 🌟 [핵심 보완] 비밀번호 일치 여부 확인
+    if (!pwConfirm) return alert("비밀번호 확인을 입력해주세요.");
+    if (pw !== pwConfirm) {
+        alert("비밀번호가 서로 일치하지 않습니다. 다시 확인해주세요.");
+        document.getElementById('reg-pw-confirm').focus();
+        return;
+    }
+
     if (!phone) return alert("전화번호를 입력해주세요.");
     if (!region) return alert("거주 지역을 선택해주세요.");
     if (!agree) return alert("개인정보 제공에 동의해주세요.");
@@ -4460,15 +4481,26 @@ function runWaveAnimation(waveElement, prevTide, nextTide, currentData) {
 
 // 📏 눈금자 생성 함수
 function createTideScale(waveElement) {
-    if (document.getElementById('tide-scale') || !waveElement?.parentElement) return;
+    // 기존 눈금이 있다면 제거하고 새로 그려서 갱신 (중복 방지)
+    const existingScale = document.getElementById('tide-scale');
+    if (existingScale) existingScale.remove(); 
+    
+    if (!waveElement?.parentElement) return;
+
     const scale = document.createElement('div');
     scale.id = 'tide-scale';
-    scale.style = "position:absolute; right:15px; top:15%; bottom:15%; display:flex; flex-direction:column; justify-content:space-between; z-index:10; pointer-events:none;";
-    for(let i=0; i<6; i++) {
+    
+    // 🎨 [여백 미학] top/bottom 여백을 20%로 늘려 눈금이 위아래로 더 여유 있게 배치
+    scale.style = "position:absolute; right:15px; top:20%; bottom:20%; display:flex; flex-direction:column; justify-content:space-between; z-index:10; pointer-events:none;";
+    
+    // 📏 [개수 조정] 6개 -> 5개로 줄여서 밀도를 낮춤 (i < 5)
+    for(let i=0; i<5; i++) {
         const notch = document.createElement('div');
-        notch.style = "width:12px; height:2px; background:rgba(255,255,255,0.9); box-shadow:0px 0px 4px rgba(0,0,0,0.4); border-radius:2px;";
+        // 눈금 두께를 1.5px로 살짝 줄여 더 섬세하게 표현
+        notch.style = "width:12px; height:1.5px; background:rgba(255,255,255,0.8); box-shadow:0px 0px 4px rgba(0,0,0,0.2); border-radius:2px;";
         scale.appendChild(notch);
     }
+    
     waveElement.parentElement.appendChild(scale);
 }
 
