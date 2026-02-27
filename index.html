@@ -2306,7 +2306,7 @@ html, body {
 </body>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script>
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbyznzTfu0czyPekA5anBs0eK8ePCWiBSMO7mIM_x4Ea03Yf0M14Q7sJoNNWQjYWNfAW/exec";
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbwNC7R9jO0VRrdJnIPN0x6bMnbQgXe2yr-2St6rqzcstLYiFeT4mMDGpq-Bgg8gqv0M/exec";
     let currentRankMode = 'today';
     let totalRankingData = [];
     function updateTab(element) {
@@ -4477,7 +4477,7 @@ function triggerQuestSplash() {
 
 // 2. 형님의 실제 GAS 배포 주소
 // 1. 설정 변수
-const TIDE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyznzTfu0czyPekA5anBs0eK8ePCWiBSMO7mIM_x4Ea03Yf0M14Q7sJoNNWQjYWNfAW/exec';
+const TIDE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwNC7R9jO0VRrdJnIPN0x6bMnbQgXe2yr-2St6rqzcstLYiFeT4mMDGpq-Bgg8gqv0M/exec';
 
 // 💡 [핵심] 서버에서 가져온 물때 데이터를 저장해둘 전역 변수 (팝업 열 때 딜레이 없애기용)
 let cachedTideData = null;
@@ -4711,7 +4711,7 @@ function openTidePopup() {
                 ${currentData.tideName || "2물"}
             </div>
             
-            <div style="font-size: 0.7rem; color: #888; font-weight: 800; letter-spacing: 1px; margin-bottom: 2px;">현재 예상 수위</div>
+            <div style="font-size: 0.7rem; color: #888; font-weight: 800; letter-spacing: 1px; margin-bottom: 2px;">CURRENT TIDE LEVEL</div>
             
             <div style="display: flex; flex-direction: column; gap: 0;">
                 <div style="font-size: 3.2rem; font-weight: 900; color: #000; display: flex; align-items: baseline; line-height: 1; letter-spacing: -2px;">
@@ -4734,21 +4734,36 @@ function openTidePopup() {
     // 6. [리스트]
     let listHTML = '<div style="max-height: 230px; overflow-y: auto;">';
     cachedTideData.forEach(item => {
-        const isCurrent = item.isCurrent;
-        const color = item.type === 'low' ? '#FF4B4B' : '#007AFF';
-        const currentStyle = isCurrent ? `background: white; border: 2px solid var(--primary); box-shadow: 0 4px 15px rgba(1, 178, 173, 0.15);` : `background: #f8f9fa; border: 1px solid #f1f3f5;`;
-        listHTML += `
-            <div style="display: flex; align-items: center; justify-content: space-between; padding: 15px 18px; border-radius: 20px; margin-bottom: 8px; ${currentStyle}">
-                <div style="display: flex; align-items: center; gap: 12px;">
-                    <div style="color: ${isCurrent ? 'var(--primary)' : color}; font-size: 1.1rem; font-weight: 900;">${isCurrent ? '📍' : (item.type === 'low' ? '▼' : '▲')}</div>
-                    <div>
-                        <div style="font-size: 1.1rem; font-weight: 800; color: #1a1a1a; letter-spacing: -0.5px;">${item.level}cm</div>
-                        <div style="font-size: 0.7rem; color: #999; font-weight: 600;">${isCurrent ? '현재 예상 수위' : (item.type === 'low' ? '간조 시각' : '만조 시각')}</div>
+    const isCurrent = item.isCurrent;
+    const isNextDay = item.isNextDay; // ✅ 추가
+    const color = item.type === 'low' ? '#FF4B4B' : '#007AFF';
+    const currentStyle = isCurrent 
+        ? `background: white; border: 2px solid var(--primary); box-shadow: 0 4px 15px rgba(1, 178, 173, 0.15);` 
+        : isNextDay 
+            ? `background: #f0f0f0; border: 1px dashed #ccc;` // ✅ 내일 항목 회색 점선
+            : `background: #f8f9fa; border: 1px solid #f1f3f5;`;
+    
+    // ✅ 내일 뱃지 HTML
+    const nextDayBadge = isNextDay 
+        ? `<span style="font-size:0.65rem; background:#ddd; color:#666; padding:1px 6px; border-radius:6px; font-weight:800; margin-left:6px;">내일</span>` 
+        : '';
+
+    listHTML += `
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 15px 18px; border-radius: 20px; margin-bottom: 8px; ${currentStyle}">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="color: ${isCurrent ? 'var(--primary)' : color}; font-size: 1.1rem; font-weight: 900;">${isCurrent ? '📍' : (item.type === 'low' ? '▼' : '▲')}</div>
+                <div>
+                    <div style="font-size: 1.1rem; font-weight: 800; color: ${isNextDay ? '#aaa' : '#1a1a1a'}; letter-spacing: -0.5px;">
+                        ${item.level}cm ${nextDayBadge}
+                    </div>
+                    <div style="font-size: 0.7rem; color: #999; font-weight: 600;">
+                        ${isCurrent ? '현재 예상 수위' : (item.type === 'low' ? '간조 시각' : '만조 시각')}
                     </div>
                 </div>
-                <div style="font-size: 1rem; font-weight: 700; color: #444;">${item.time}</div>
-            </div>`;
-    });
+            </div>
+            <div style="font-size: 1rem; font-weight: 700; color: ${isNextDay ? '#aaa' : '#444'};">${item.time}</div>
+        </div>`;
+});
     listHTML += '</div>';
 
     content.innerHTML = topElementsHTML + headerHTML + mainCardHTML + listHTML;
@@ -4904,6 +4919,5 @@ const guideWatcher = setInterval(() => {
 </script>
 </body>
 </html>
-
 
 
