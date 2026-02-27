@@ -559,10 +559,10 @@ button[style*="background: #f8f9fa"]:active {
     height: 90% !important;
     object-fit: contain !important;
 }
-.menu-item-iphone:nth-child(2) .icon-circle { background: rgba(230, 245, 235, 0.95) !important; }
-.menu-item-iphone:nth-child(3) .icon-circle { background: rgba(255, 240, 225, 0.95) !important; }
-.menu-item-iphone:nth-child(4) .icon-circle { background: rgba(230, 240, 255, 0.95) !important; }
-.menu-item-iphone:nth-child(5) .icon-circle { background: rgba(255, 250, 220, 0.95) !important; }
+.menu-item-iphone:nth-child(2) .icon-circle { background: rgba(255, 255, 255, 0.95) !important; }
+.menu-item-iphone:nth-child(3) .icon-circle { background: rgba(255, 255, 255, 0.95) !important; }
+.menu-item-iphone:nth-child(4) .icon-circle { background: rgba(255, 255, 255, 0.95) !important; }
+.menu-item-iphone:nth-child(5) .icon-circle { background: rgba(255, 255, 255, 0.95) !important; }
 /* 4. 클릭 시 쫀득한 반응 */
 .menu-item-iphone:active .icon-circle {
     transform: scale(0.94);
@@ -1446,25 +1446,33 @@ html, body {
 </div></div>
 
     <div class="menu-item-iphone" onclick="openSubmit('자유활동', 2000)">
-        <div class="icon-circle"><img src="https://gnpay.my/free.png"></div>
-        <div class="menu-title-iphone">자유활동</div>
+    <div class="icon-circle" style="background: rgba(1, 178, 173, 0.1) !important;">
+        <i class="bi bi-person-walking" style="font-size: 1.8rem; color: var(--primary);"></i>
     </div>
-    <div class="menu-item-iphone" onclick="showPage('page-partners')">
-        <div class="icon-circle"><img src="https://gnpay.my/store.png"></div>
-        <div class="menu-title-iphone">가맹점</div>
-    </div>
+    <div class="menu-title-iphone">자유활동</div>
+</div>
 
-    <div class="menu-item-iphone" onclick="showPage('page-activities')">
-        <div class="icon-circle" style="position:relative;">
-            <div id="activity-badge-count" class="badge-iphone">1</div>
-            <img src="https://gnpay.my/quest.png">
-        </div>
-        <div class="menu-title-iphone">퀘스트</div>
+<div class="menu-item-iphone" onclick="showPage('page-partners')">
+    <div class="icon-circle" style="background: rgba(1, 178, 173, 0.1) !important;">
+        <i class="bi bi-shop" style="font-size: 1.8rem; color: var(--primary);"></i>
     </div>
-    <div class="menu-item-iphone" onclick="showPage('page-ranking')">
-        <div class="icon-circle"><img src="https://gnpay.my/rank.png"></div>
-        <div class="menu-title-iphone">수호자 랭킹</div>
+    <div class="menu-title-iphone">가맹점</div>
+</div>
+
+<div class="menu-item-iphone" onclick="showPage('page-activities')">
+    <div class="icon-circle" style="position:relative; background: rgba(1, 178, 173, 0.1) !important;">
+        <div id="activity-badge-count" class="badge-iphone">1</div>
+        <i class="bi bi-flag-fill" style="font-size: 1.8rem; color: var(--primary);"></i>
     </div>
+    <div class="menu-title-iphone">퀘스트</div>
+</div>
+
+<div class="menu-item-iphone" onclick="showPage('page-ranking')">
+    <div class="icon-circle" style="background: rgba(1, 178, 173, 0.1) !important;">
+        <i class="bi bi-trophy-fill" style="font-size: 1.8rem; color: var(--primary);"></i>
+    </div>
+    <div class="menu-title-iphone">수호자 랭킹</div>
+</div>
 </div>
 </div>
     </div>
