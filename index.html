@@ -2314,7 +2314,7 @@ html, body {
 </body>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script>
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbxydDAft9lq2fn4HfVrgQ35gziVwmD97Pgt7ZuxeIGtBf4cKq3IWAZxbjEKWsoBzWVZ/exec";
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbwpcROeCzJNkaHnqqAKJ8qwO23iduLlVR-AfbLrBwS2Y1ohp4mUT8zpadl72QZ9CVWt/exec";
     let currentRankMode = 'today';
     let totalRankingData = [];
     function updateTab(element) {
@@ -4485,7 +4485,7 @@ function triggerQuestSplash() {
 
 // 2. 형님의 실제 GAS 배포 주소
 // 1. 설정 변수
-const TIDE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxydDAft9lq2fn4HfVrgQ35gziVwmD97Pgt7ZuxeIGtBf4cKq3IWAZxbjEKWsoBzWVZ/exec';
+const TIDE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwpcROeCzJNkaHnqqAKJ8qwO23iduLlVR-AfbLrBwS2Y1ohp4mUT8zpadl72QZ9CVWt/exec';
 
 // 💡 [핵심] 서버에서 가져온 물때 데이터를 저장해둘 전역 변수 (팝업 열 때 딜레이 없애기용)
 let cachedTideData = null;
@@ -4512,30 +4512,37 @@ async function syncGimnyeongTide() {
         if (!currentData) return;
 
         const idx = response.indexOf(currentData);
-        // 다음 물때 찾기
-        let nextTide = response.slice(idx + 1).find(item => item.type === 'high' || item.type === 'low');
 
-        // 🛡️ [안전장치: 관성 엔진] 오늘의 마지막 물때가 지났을 경우
+        // ✅ mins 기준으로 다음 물때 탐색
+        const nowMins = currentData.mins;
+        let nextTide = response.slice(idx + 1).find(item => item.mins > nowMins);
+
+        // 🛡️ 다음 물때가 없을 경우 관성 엔진
         if (!nextTide && idx > 0) {
-            const lastRealTide = response[idx - 1]; // 방금 지난 마지막 물때 정보
+            const lastRealTide = response[idx - 1];
             const now = new Date();
             const lastTimeParts = lastRealTide.time.split(':');
             const lastTimeDate = new Date();
             lastTimeDate.setHours(lastTimeParts[0], lastTimeParts[1], 0);
 
-            // 마지막 물때로부터 몇 분이나 지났는지 계산
             const diffMin = Math.max(0, (now - lastTimeDate) / (1000 * 60));
-            
-            // 🌊 관성 수위 예측: 1분에 약 0.3cm씩 반대 방향으로 흐른다고 가정 (안전 범위 20~250cm)
             const driftDir = lastRealTide.type === 'high' ? -0.3 : 0.3; 
             let predictedLevel = lastRealTide.level + (diffMin * driftDir);
             currentData.level = Math.round(Math.max(20, Math.min(250, predictedLevel)));
 
-            // 가상의 다음 상태 설정 (UI 표현용)
-            nextTide = { type: lastRealTide.type === 'high' ? 'low' : 'high' };
+            nextTide = { 
+                type: lastRealTide.type === 'high' ? 'low' : 'high', 
+                mins: nowMins + 60,
+                isNextDay: true 
+            };
         }
 
-        // 🎯 [수리 포인트 1] 뱃지 및 예상 수위 업데이트
+        // ✅ mins 기준으로 prevTide 역방향 탐색
+        const prevTide = response.slice(0, idx).reverse().find(item => 
+            item.type === 'high' || item.type === 'low'
+        ) || { time: "00:00", mins: 0, type: nextTide?.type === 'high' ? 'low' : 'high', level: 0 };
+
+        // 뱃지 및 예상 수위 업데이트
         if (tideTitle) {
             tideTitle.innerHTML = `
                 <div style="margin-top: 5px; margin-bottom: 10px;">
@@ -4550,7 +4557,7 @@ async function syncGimnyeongTide() {
             `;
         }
 
-        // 🎯 [수리 포인트 2] 상태 메시지 (관성 모드 반영)
+        // 상태 메시지
         if (tideDesc) {
             const isFalling = nextTide?.type === 'low';
             const statusMsg = isFalling ? "물이 빠지는 중" : "물이 차오르는 중";
@@ -4564,11 +4571,10 @@ async function syncGimnyeongTide() {
             `;
         }
 
-        // 🎯 [수리 포인트 3] 파도 애니메이션 및 눈금 복구
+        // 파도 애니메이션
         if (waveElement) {
             waveElement.style.background = 'rgba(1, 178, 173, 0.75)';
-            // 관성 모드일 때도 부드럽게 애니메이션 실행
-            runWaveAnimation(waveElement, response[idx-1] || response[0], nextTide || response[0], currentData);
+            runWaveAnimation(waveElement, prevTide, nextTide, currentData);
             
             if (typeof createTideScale === "function") {
                 createTideScale(waveElement);
@@ -4577,29 +4583,27 @@ async function syncGimnyeongTide() {
 
     } catch (e) { console.error("전하, 관성 엔진 가동 중 오류...", e); }
 }
-// 🌊 파도 애니메이션만 따로 떼어 정교하게 제어합니다.
+
 function runWaveAnimation(waveElement, prevTide, nextTide, currentData) {
-    const getMins = (t) => {
-        const m = (t || "").match(/\d+/g);
-        return m ? parseInt(m[0]) * 60 + parseInt(m[1]) : 0;
-    };
-    const start = getMins(prevTide.time);
-    let end = getMins(nextTide.time);
-    let now = getMins(new Date().getHours() + ":" + new Date().getMinutes());
+    // ✅ GAS에서 mins 필드 내려오므로 그냥 쓰면 됨. 자정 경계 계산 불필요!
+    const start = prevTide.mins ?? 0;
+    const end = nextTide.mins ?? 0;
+    const now = currentData.mins ?? 0;
 
-    if (end < start) end += 1440; 
-    if (now < start) now += 1440;
+    if (end === start) return;
 
-    const progress = Math.min(100, Math.max(0, ((now - start) / (end - start)) * 100));
+    const progress = Math.min(100, Math.max(0, 
+        ((now - start) / (end - start)) * 100
+    ));
+
     const targetHeight = nextTide.type === 'high' ? progress : (100 - progress);
     const finalHeight = Math.max(15, Math.min(95, targetHeight));
 
-    // 리셋 연출
-    waveElement.style.transition = "none"; 
-    waveElement.style.height = (nextTide.type === 'high') ? "0%" : "100%";
+    waveElement.style.transition = "none";
+    waveElement.style.height = nextTide.type === 'high' ? "0%" : "100%";
 
     setTimeout(() => {
-        waveElement.style.transition = "height 2.5s cubic-bezier(0.4, 0, 0.2, 1)"; 
+        waveElement.style.transition = "height 2.5s cubic-bezier(0.4, 0, 0.2, 1)";
         waveElement.style.height = `${finalHeight}%`;
     }, 50);
 }
@@ -4631,8 +4635,8 @@ function createTideScale(waveElement) {
 
 // 🚀 [통합 엔진] 10초마다 서버 데이터와 연출을 동시에 갱신!
 function startTideCycle() {
-    syncGimnyeongTide(); // 즉시 실행
-    setInterval(syncGimnyeongTide, 10000); // 10초마다 서버 찌르고 연출 재반복
+    syncGimnyeongTide();
+    setInterval(syncGimnyeongTide, 600000); // 10분마다
 }
 
 startTideCycle();
@@ -4640,9 +4644,8 @@ function openTidePopup() {
     const popup = document.getElementById('tide-popup');
     if (!popup || !cachedTideData) return;
 
-    // 1. [정중앙 정렬 수리] 전하의 가두리 양식에 맞춰 전체 화면을 덮는 유리막 생성
     popup.innerHTML = '';
-    popup.className = 'qr-glass-effect'; // 보내주신 코드의 유리 효과 계승
+    popup.className = 'qr-glass-effect';
     popup.style = `
         position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
         z-index: 10002; display: flex; justify-content: center; align-items: center;
@@ -4650,30 +4653,33 @@ function openTidePopup() {
 
     const currentData = cachedTideData.find(item => item.isCurrent);
     if (!currentData) return;
-    
-    // 차기 물때 계산 (로직 유지)
-    const now = new Date();
-    const nowMins = now.getHours() * 60 + now.getMinutes();
-    let nextTide = cachedTideData.find(item => {
-        if (item.isCurrent) return false;
+
+    // ✅ mins 없을 때 안전하게 계산하는 헬퍼
+    const getMins = (item) => {
+        if (item.mins != null) return item.mins;
         const [h, m] = item.time.split(':').map(Number);
-        return (h * 60 + m) > nowMins;
-    });
+        return (item.isNextDay ? h * 60 + m + 1440 : h * 60 + m);
+    };
+
+    const nowMins = getMins(currentData);
+
+    // ✅ 현재 이후 물때 찾기
+    let nextTide = cachedTideData.find(item => !item.isCurrent && getMins(item) > nowMins);
     if (!nextTide) nextTide = cachedTideData.find(item => !item.isCurrent);
 
+    // ✅ 남은시간 계산
     let timeLeftStr = "";
     if (nextTide) {
-        const [h, m] = nextTide.time.split(':').map(Number);
-        let targetMins = h * 60 + m;
-        if (targetMins <= nowMins) targetMins += 1440;
-        const diff = targetMins - nowMins;
-        timeLeftStr = `${nextTide.type === 'high' ? '만조' : '간조'}까지 ${Math.floor(diff/60) > 0 ? Math.floor(diff/60) + '시간 ' : ''}${diff%60}분 전`;
+        const diff = getMins(nextTide) - nowMins;
+        const h = Math.floor(diff / 60);
+        const m = diff % 60;
+        const label = nextTide.type === 'high' ? '만조' : '간조';
+        timeLeftStr = `${label}까지 ${h > 0 ? h + '시간 ' : ''}${m}분 전`;
     }
 
     const levels = cachedTideData.map(d => d.level);
     const fixedHeight = ((currentData.level - Math.min(...levels)) / (Math.max(...levels) - Math.min(...levels))) * 75 + 15;
 
-    // 2. [팝업 본체] 보내주신 qr-slide-up 클래스 적용 및 정중앙 고정
     const content = document.createElement('div');
     content.className = 'bg-white p-4 rounded-5 shadow-lg qr-slide-up';
     content.style = `
@@ -4684,7 +4690,6 @@ function openTidePopup() {
     `;
     content.onclick = (e) => e.stopPropagation();
 
-    // 3. [수리] 닫기 버튼을 수호자 리포트처럼 우측 상단 고정 (위치 좆같음 해결)
     const topElementsHTML = `
         <div style="position: absolute; top: -25px; left: 20px; width: 55px; height: 55px; 
                     background: var(--primary-grad); border-radius: 18px; 
@@ -4697,7 +4702,6 @@ function openTidePopup() {
         </div>
     `;
 
-    // 4. [헤더] 수호자 리포트 타이포그래피 계승
     const headerHTML = `
         <div class="text-center mb-4">
             <h5 class="fw-900" style="color: #1a1a1a; letter-spacing: -1.5px; font-size: 1.4rem; line-height: 1.1;">
@@ -4709,8 +4713,7 @@ function openTidePopup() {
         </div>
     `;
 
-    // 5. [메인 카드] 가독성 필살기: 수위 숫자를 칠흑색(#000)으로 파도보다 위로!
-   const mainCardHTML = `
+    const mainCardHTML = `
     <div style="background: #f8faff; border-radius: 30px; padding: 25px; position: relative; margin-bottom: 25px; border: 1px solid rgba(1, 178, 173, 0.1); overflow: hidden; height: 175px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.02);">
         <div id="popup-wave-bg" style="position: absolute; bottom: 0; left: 0; width: 100%; background: linear-gradient(to top, rgba(0, 178, 173, 0.15), transparent); z-index: 1; transition: height 1.5s cubic-bezier(0.1, 0.9, 0.2, 1); height: 0%;"></div>
         
@@ -4739,39 +4742,37 @@ function openTidePopup() {
     </div>
     `;
 
-    // 6. [리스트]
     let listHTML = '<div style="max-height: 230px; overflow-y: auto;">';
     cachedTideData.forEach(item => {
-    const isCurrent = item.isCurrent;
-    const isNextDay = item.isNextDay; // ✅ 추가
-    const color = item.type === 'low' ? '#FF4B4B' : '#007AFF';
-    const currentStyle = isCurrent 
-        ? `background: white; border: 2px solid var(--primary); box-shadow: 0 4px 15px rgba(1, 178, 173, 0.15);` 
-        : isNextDay 
-            ? `background: #f0f0f0; border: 1px dashed #ccc;` // ✅ 내일 항목 회색 점선
-            : `background: #f8f9fa; border: 1px solid #f1f3f5;`;
-    
-    // ✅ 내일 뱃지 HTML
-    const nextDayBadge = isNextDay 
-        ? `<span style="font-size:0.65rem; background:#ddd; color:#666; padding:1px 6px; border-radius:6px; font-weight:800; margin-left:6px;">내일</span>` 
-        : '';
+        const isCurrent = item.isCurrent;
+        const isNextDay = item.isNextDay;
+        const color = item.type === 'low' ? '#FF4B4B' : '#007AFF';
+        const currentStyle = isCurrent 
+            ? `background: white; border: 2px solid var(--primary); box-shadow: 0 4px 15px rgba(1, 178, 173, 0.15);` 
+            : isNextDay 
+                ? `background: #f0f0f0; border: 1px dashed #ccc;`
+                : `background: #f8f9fa; border: 1px solid #f1f3f5;`;
+        
+        const nextDayBadge = isNextDay 
+            ? `<span style="font-size:0.65rem; background:#ddd; color:#666; padding:1px 6px; border-radius:6px; font-weight:800; margin-left:6px;">내일</span>` 
+            : '';
 
-    listHTML += `
-        <div style="display: flex; align-items: center; justify-content: space-between; padding: 15px 18px; border-radius: 20px; margin-bottom: 8px; ${currentStyle}">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <div style="color: ${isCurrent ? 'var(--primary)' : color}; font-size: 1.1rem; font-weight: 900;">${isCurrent ? '📍' : (item.type === 'low' ? '▼' : '▲')}</div>
-                <div>
-                    <div style="font-size: 1.1rem; font-weight: 800; color: ${isNextDay ? '#aaa' : '#1a1a1a'}; letter-spacing: -0.5px;">
-                        ${item.level}cm ${nextDayBadge}
-                    </div>
-                    <div style="font-size: 0.7rem; color: #999; font-weight: 600;">
-                        ${isCurrent ? '현재 예상 수위' : (item.type === 'low' ? '간조 시각' : '만조 시각')}
+        listHTML += `
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 15px 18px; border-radius: 20px; margin-bottom: 8px; ${currentStyle}">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="color: ${isCurrent ? 'var(--primary)' : color}; font-size: 1.1rem; font-weight: 900;">${isCurrent ? '📍' : (item.type === 'low' ? '▼' : '▲')}</div>
+                    <div>
+                        <div style="font-size: 1.1rem; font-weight: 800; color: ${isNextDay ? '#aaa' : '#1a1a1a'}; letter-spacing: -0.5px;">
+                            ${item.level}cm ${nextDayBadge}
+                        </div>
+                        <div style="font-size: 0.7rem; color: #999; font-weight: 600;">
+                            ${isCurrent ? '현재 예상 수위' : (item.type === 'low' ? '간조 시각' : '만조 시각')}
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div style="font-size: 1rem; font-weight: 700; color: ${isNextDay ? '#aaa' : '#444'};">${item.time}</div>
-        </div>`;
-});
+                <div style="font-size: 1rem; font-weight: 700; color: ${isNextDay ? '#aaa' : '#444'};">${item.time}</div>
+            </div>`;
+    });
     listHTML += '</div>';
 
     content.innerHTML = topElementsHTML + headerHTML + mainCardHTML + listHTML;
@@ -4783,7 +4784,7 @@ function openTidePopup() {
         if (wave) wave.style.height = fixedHeight + "%";
     }, 50);
 }
-// 닫기 함수도 명확히 정의
+
 function closeTidePopup() {
     const popup = document.getElementById('tide-popup');
     if (popup) popup.style.display = 'none';
@@ -4927,5 +4928,4 @@ const guideWatcher = setInterval(() => {
 </script>
 </body>
 </html>
-
 
