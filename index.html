@@ -2314,7 +2314,7 @@ html, body {
 </body>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script>
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbwpcROeCzJNkaHnqqAKJ8qwO23iduLlVR-AfbLrBwS2Y1ohp4mUT8zpadl72QZ9CVWt/exec";
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbzLib7jN_RKsU09jQrkYoAdAnAJI2U7lG8ZQp2hkqt_NIlrqWVasaC-f1iUG9Bxa7rx/exec";
     let currentRankMode = 'today';
     let totalRankingData = [];
     function updateTab(element) {
@@ -4485,7 +4485,7 @@ function triggerQuestSplash() {
 
 // 2. 형님의 실제 GAS 배포 주소
 // 1. 설정 변수
-const TIDE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwpcROeCzJNkaHnqqAKJ8qwO23iduLlVR-AfbLrBwS2Y1ohp4mUT8zpadl72QZ9CVWt/exec';
+const TIDE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzLib7jN_RKsU09jQrkYoAdAnAJI2U7lG8ZQp2hkqt_NIlrqWVasaC-f1iUG9Bxa7rx/exec';
 
 // 💡 [핵심] 서버에서 가져온 물때 데이터를 저장해둘 전역 변수 (팝업 열 때 딜레이 없애기용)
 let cachedTideData = null;
@@ -4743,36 +4743,49 @@ function openTidePopup() {
     `;
 
     let listHTML = '<div style="max-height: 230px; overflow-y: auto;">';
-    cachedTideData.forEach(item => {
-        const isCurrent = item.isCurrent;
-        const isNextDay = item.isNextDay;
-        const color = item.type === 'low' ? '#FF4B4B' : '#007AFF';
-        const currentStyle = isCurrent 
-            ? `background: white; border: 2px solid var(--primary); box-shadow: 0 4px 15px rgba(1, 178, 173, 0.15);` 
-            : isNextDay 
-                ? `background: #f0f0f0; border: 1px dashed #ccc;`
-                : `background: #f8f9fa; border: 1px solid #f1f3f5;`;
-        
-        const nextDayBadge = isNextDay 
-            ? `<span style="font-size:0.65rem; background:#ddd; color:#666; padding:1px 6px; border-radius:6px; font-weight:800; margin-left:6px;">내일</span>` 
+cachedTideData.forEach(item => {
+    const isCurrent   = item.isCurrent;
+    const isNextDay   = item.isNextDay;
+    const isYesterday = item.isYesterday; // ✅ 추가
+
+    const color = item.type === 'low' ? '#FF4B4B' : '#007AFF';
+
+    const currentStyle = isCurrent
+        ? `background: white; border: 2px solid var(--primary); box-shadow: 0 4px 15px rgba(1, 178, 173, 0.15);`
+        : (isNextDay || isYesterday)
+            ? `background: #f0f0f0; border: 1px dashed #ccc; opacity: 0.65;`
+            : `background: #f8f9fa; border: 1px solid #f1f3f5;`;
+
+    // ✅ 어제/내일 뱃지
+    const dayBadge = isNextDay
+        ? `<span style="font-size:0.65rem; background:#ddd; color:#666; padding:1px 6px; border-radius:6px; font-weight:800; margin-left:6px;">내일</span>`
+        : isYesterday
+            ? `<span style="font-size:0.65rem; background:#eee; color:#aaa; padding:1px 6px; border-radius:6px; font-weight:800; margin-left:6px;">어제</span>`
             : '';
 
-        listHTML += `
-            <div style="display: flex; align-items: center; justify-content: space-between; padding: 15px 18px; border-radius: 20px; margin-bottom: 8px; ${currentStyle}">
-                <div style="display: flex; align-items: center; gap: 12px;">
-                    <div style="color: ${isCurrent ? 'var(--primary)' : color}; font-size: 1.1rem; font-weight: 900;">${isCurrent ? '📍' : (item.type === 'low' ? '▼' : '▲')}</div>
-                    <div>
-                        <div style="font-size: 1.1rem; font-weight: 800; color: ${isNextDay ? '#aaa' : '#1a1a1a'}; letter-spacing: -0.5px;">
-                            ${item.level}cm ${nextDayBadge}
-                        </div>
-                        <div style="font-size: 0.7rem; color: #999; font-weight: 600;">
-                            ${isCurrent ? '현재 예상 수위' : (item.type === 'low' ? '간조 시각' : '만조 시각')}
-                        </div>
-                    </div>
+    const labelText = isCurrent
+        ? '현재 예상 수위'
+        : item.type === 'low' ? '간조 시각' : '만조 시각';
+
+    const dimColor = (isNextDay || isYesterday) ? '#aaa' : '#1a1a1a';
+    const timeColor = (isNextDay || isYesterday) ? '#aaa' : '#444';
+
+    listHTML += `
+        <div style="display:flex; align-items:center; justify-content:space-between; padding:15px 18px; border-radius:20px; margin-bottom:8px; ${currentStyle}">
+            <div style="display:flex; align-items:center; gap:12px;">
+                <div style="color:${isCurrent ? 'var(--primary)' : color}; font-size:1.1rem; font-weight:900;">
+                    ${isCurrent ? '📍' : (item.type === 'low' ? '▼' : '▲')}
                 </div>
-                <div style="font-size: 1rem; font-weight: 700; color: ${isNextDay ? '#aaa' : '#444'};">${item.time}</div>
-            </div>`;
-    });
+                <div>
+                    <div style="font-size:1.1rem; font-weight:800; color:${dimColor}; letter-spacing:-0.5px;">
+                        ${item.level}cm ${dayBadge}
+                    </div>
+                    <div style="font-size:0.7rem; color:#999; font-weight:600;">${labelText}</div>
+                </div>
+            </div>
+            <div style="font-size:1rem; font-weight:700; color:${timeColor};">${item.time}</div>
+        </div>`;
+});
     listHTML += '</div>';
 
     content.innerHTML = topElementsHTML + headerHTML + mainCardHTML + listHTML;
