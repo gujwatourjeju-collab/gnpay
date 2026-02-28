@@ -1416,7 +1416,7 @@ html, body {
                 width: 100% !important; 
                 display: flex; flex-direction: column; 
                 justify-content: flex-end; 
-                align-items: flex-start; /* 🎯 이 한 줄이 내용물을 왼쪽으로 밀어줍니다 */
+                align-items: flex-start;
                 padding: 18px; 
                 background: rgba(255,255,255,0.6) !important; backdrop-filter: blur(10px); 
                 border-radius: 25px; border: 1px solid rgba(255,255,255,0.4); cursor: pointer;">
@@ -1437,14 +1437,27 @@ html, body {
             </style>
         </div>
 
-     <div style="position: relative; z-index: 2;">
-    <div id="tide-lvl-text" style="display: flex; flex-direction: column; gap: 0;">
-        <div style="font-size: 0.75rem; font-weight: 800; color: #666; opacity: 0.6;">바다 읽는 중..</div>
-    </div>
-    
-    <div id="tide-desc-text" style="margin-top: 2px;"></div>
-</div></div>
+        <!-- ✅ 위젯 우측상단 날씨 뱃지 -->
+        <div id="widget-weather-badge" style="
+            position: absolute; top: 14px; right: 14px; z-index: 10;
+            display: flex; align-items: center; gap: 5px;
+            background: rgba(255,255,255,0.55); backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,0.6);
+            border-radius: 20px; padding: 4px 10px;
+            font-size: 0.7rem; font-weight: 800; color: #444;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            opacity: 0; transition: opacity 0.4s;">
+            <span id="widget-weather-icon">🌤</span>
+            <span id="widget-wind-text">-- m/s</span>
+        </div>
 
+        <div style="position: relative; z-index: 2;">
+            <div id="tide-lvl-text" style="display: flex; flex-direction: column; gap: 0;">
+                <div style="font-size: 0.75rem; font-weight: 800; color: #666; opacity: 0.6;">바다 읽는 중..</div>
+            </div>
+            <div id="tide-desc-text" style="margin-top: 2px;"></div>
+        </div>
+    </div>
     <div class="menu-item-iphone" onclick="openSubmit('자유활동', 2000)">
     <div class="icon-circle" style="background: rgba(1, 178, 173, 0.1) !important;">
         <i class="bi bi-person-walking" style="font-size: 1.8rem; color: var(--primary);"></i>
@@ -2314,7 +2327,7 @@ html, body {
 </body>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script>
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbzLib7jN_RKsU09jQrkYoAdAnAJI2U7lG8ZQp2hkqt_NIlrqWVasaC-f1iUG9Bxa7rx/exec";
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbzvQrckzUBOoR78UxfWrYnzVHnivfyJAPx70hdZbFnfMOeFbN6X5uj85kqp5O0jDZnb/exec";
     let currentRankMode = 'today';
     let totalRankingData = [];
     function updateTab(element) {
@@ -4485,7 +4498,7 @@ function triggerQuestSplash() {
 
 // 2. 형님의 실제 GAS 배포 주소
 // 1. 설정 변수
-const TIDE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzLib7jN_RKsU09jQrkYoAdAnAJI2U7lG8ZQp2hkqt_NIlrqWVasaC-f1iUG9Bxa7rx/exec';
+const TIDE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzvQrckzUBOoR78UxfWrYnzVHnivfyJAPx70hdZbFnfMOeFbN6X5uj85kqp5O0jDZnb/exec';
 
 // 💡 [핵심] 서버에서 가져온 물때 데이터를 저장해둘 전역 변수 (팝업 열 때 딜레이 없애기용)
 let cachedTideData = null;
@@ -4636,7 +4649,9 @@ function createTideScale(waveElement) {
 // 🚀 [통합 엔진] 10초마다 서버 데이터와 연출을 동시에 갱신!
 function startTideCycle() {
     syncGimnyeongTide();
-    setInterval(syncGimnyeongTide, 600000); // 10분마다
+    syncGimnyeongWeather(); // ✅ 추가
+    setInterval(syncGimnyeongTide, 600000);
+    setInterval(syncGimnyeongWeather, 600000); // ✅ 10분마다
 }
 
 startTideCycle();
@@ -4654,7 +4669,6 @@ function openTidePopup() {
     const currentData = cachedTideData.find(item => item.isCurrent);
     if (!currentData) return;
 
-    // ✅ mins 없을 때 안전하게 계산하는 헬퍼
     const getMins = (item) => {
         if (item.mins != null) return item.mins;
         const [h, m] = item.time.split(':').map(Number);
@@ -4663,11 +4677,9 @@ function openTidePopup() {
 
     const nowMins = getMins(currentData);
 
-    // ✅ 현재 이후 물때 찾기
     let nextTide = cachedTideData.find(item => !item.isCurrent && getMins(item) > nowMins);
     if (!nextTide) nextTide = cachedTideData.find(item => !item.isCurrent);
 
-    // ✅ 남은시간 계산
     let timeLeftStr = "";
     if (nextTide) {
         const diff = getMins(nextTide) - nowMins;
@@ -4713,8 +4725,22 @@ function openTidePopup() {
         </div>
     `;
 
+    // ✅ 날씨 뱃지 (캐시된 날씨 데이터 사용)
+    const w = window.cachedWeatherData;
+    const weatherBadgeHTML = w ? `
+        <div style="position:absolute; top:15px; right:15px; z-index:10;
+            display:flex; align-items:center; gap:4px;
+            background:rgba(255,255,255,0.75); backdrop-filter:blur(8px);
+            border:1px solid rgba(255,255,255,0.9); border-radius:20px;
+            padding:4px 10px; font-size:0.7rem; font-weight:800; color:#555;
+            box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+            <span>${weatherCodeToEmoji(w.weatherCode)}</span>
+            <span>${w.windDir} ${w.windSpeed}m/s</span>
+        </div>` : '';
+
     const mainCardHTML = `
     <div style="background: #f8faff; border-radius: 30px; padding: 25px; position: relative; margin-bottom: 25px; border: 1px solid rgba(1, 178, 173, 0.1); overflow: hidden; height: 175px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.02);">
+        ${weatherBadgeHTML}
         <div id="popup-wave-bg" style="position: absolute; bottom: 0; left: 0; width: 100%; background: linear-gradient(to top, rgba(0, 178, 173, 0.15), transparent); z-index: 1; transition: height 1.5s cubic-bezier(0.1, 0.9, 0.2, 1); height: 0%;"></div>
         
         <div style="position: relative; z-index: 5;">
@@ -4743,49 +4769,48 @@ function openTidePopup() {
     `;
 
     let listHTML = '<div style="max-height: 230px; overflow-y: auto;">';
-cachedTideData.forEach(item => {
-    const isCurrent   = item.isCurrent;
-    const isNextDay   = item.isNextDay;
-    const isYesterday = item.isYesterday; // ✅ 추가
+    cachedTideData.forEach(item => {
+        const isCurrent   = item.isCurrent;
+        const isNextDay   = item.isNextDay;
+        const isYesterday = item.isYesterday;
 
-    const color = item.type === 'low' ? '#FF4B4B' : '#007AFF';
+        const color = item.type === 'low' ? '#FF4B4B' : '#007AFF';
 
-    const currentStyle = isCurrent
-        ? `background: white; border: 2px solid var(--primary); box-shadow: 0 4px 15px rgba(1, 178, 173, 0.15);`
-        : (isNextDay || isYesterday)
-            ? `background: #f0f0f0; border: 1px dashed #ccc; opacity: 0.65;`
-            : `background: #f8f9fa; border: 1px solid #f1f3f5;`;
+        const currentStyle = isCurrent
+            ? `background: white; border: 2px solid var(--primary); box-shadow: 0 4px 15px rgba(1, 178, 173, 0.15);`
+            : (isNextDay || isYesterday)
+                ? `background: #f0f0f0; border: 1px dashed #ccc; opacity: 0.65;`
+                : `background: #f8f9fa; border: 1px solid #f1f3f5;`;
 
-    // ✅ 어제/내일 뱃지
-    const dayBadge = isNextDay
-        ? `<span style="font-size:0.65rem; background:#ddd; color:#666; padding:1px 6px; border-radius:6px; font-weight:800; margin-left:6px;">내일</span>`
-        : isYesterday
-            ? `<span style="font-size:0.65rem; background:#eee; color:#aaa; padding:1px 6px; border-radius:6px; font-weight:800; margin-left:6px;">어제</span>`
-            : '';
+        const dayBadge = isNextDay
+            ? `<span style="font-size:0.65rem; background:#ddd; color:#666; padding:1px 6px; border-radius:6px; font-weight:800; margin-left:6px;">내일</span>`
+            : isYesterday
+                ? `<span style="font-size:0.65rem; background:#eee; color:#aaa; padding:1px 6px; border-radius:6px; font-weight:800; margin-left:6px;">어제</span>`
+                : '';
 
-    const labelText = isCurrent
-        ? '현재 예상 수위'
-        : item.type === 'low' ? '간조 시각' : '만조 시각';
+        const labelText = isCurrent
+            ? '현재 예상 수위'
+            : item.type === 'low' ? '간조 시각' : '만조 시각';
 
-    const dimColor = (isNextDay || isYesterday) ? '#aaa' : '#1a1a1a';
-    const timeColor = (isNextDay || isYesterday) ? '#aaa' : '#444';
+        const dimColor  = (isNextDay || isYesterday) ? '#aaa' : '#1a1a1a';
+        const timeColor = (isNextDay || isYesterday) ? '#aaa' : '#444';
 
-    listHTML += `
-        <div style="display:flex; align-items:center; justify-content:space-between; padding:15px 18px; border-radius:20px; margin-bottom:8px; ${currentStyle}">
-            <div style="display:flex; align-items:center; gap:12px;">
-                <div style="color:${isCurrent ? 'var(--primary)' : color}; font-size:1.1rem; font-weight:900;">
-                    ${isCurrent ? '📍' : (item.type === 'low' ? '▼' : '▲')}
-                </div>
-                <div>
-                    <div style="font-size:1.1rem; font-weight:800; color:${dimColor}; letter-spacing:-0.5px;">
-                        ${item.level}cm ${dayBadge}
+        listHTML += `
+            <div style="display:flex; align-items:center; justify-content:space-between; padding:15px 18px; border-radius:20px; margin-bottom:8px; ${currentStyle}">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div style="color:${isCurrent ? 'var(--primary)' : color}; font-size:1.1rem; font-weight:900;">
+                        ${isCurrent ? '📍' : (item.type === 'low' ? '▼' : '▲')}
                     </div>
-                    <div style="font-size:0.7rem; color:#999; font-weight:600;">${labelText}</div>
+                    <div>
+                        <div style="font-size:1.1rem; font-weight:800; color:${dimColor}; letter-spacing:-0.5px;">
+                            ${item.level}cm ${dayBadge}
+                        </div>
+                        <div style="font-size:0.7rem; color:#999; font-weight:600;">${labelText}</div>
+                    </div>
                 </div>
-            </div>
-            <div style="font-size:1rem; font-weight:700; color:${timeColor};">${item.time}</div>
-        </div>`;
-});
+                <div style="font-size:1rem; font-weight:700; color:${timeColor};">${item.time}</div>
+            </div>`;
+    });
     listHTML += '</div>';
 
     content.innerHTML = topElementsHTML + headerHTML + mainCardHTML + listHTML;
@@ -4803,8 +4828,45 @@ function closeTidePopup() {
     if (popup) popup.style.display = 'none';
 }
 
+function weatherCodeToEmoji(code) {
+    if (code === 0)               return "☀️";
+    if (code <= 2)                return "🌤";
+    if (code === 3)               return "☁️";
+    if (code <= 48)               return "🌫";
+    if (code <= 55)               return "🌦";
+    if (code <= 65)               return "🌧";
+    if (code <= 75)               return "❄️";
+    if (code <= 82)               return "🌧";
+    return "⛈";
+}
 
+async function syncGimnyeongWeather() {
+    try {
+        const response = await fetch(TIDE_SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify({ type: 'getWeather' })
+        }).then(r => r.json());
 
+        if (response.error) return;
+
+        // ─── 위젯 우측상단 뱃지 ───────────────────────────────
+        const badge    = document.getElementById('widget-weather-badge');
+        const iconEl   = document.getElementById('widget-weather-icon');
+        const windText = document.getElementById('widget-wind-text');
+
+        if (badge && iconEl && windText) {
+            iconEl.textContent   = weatherCodeToEmoji(response.weatherCode);
+            windText.textContent = `${response.windDir} ${response.windSpeed}m/s`;
+            badge.style.opacity  = '1';
+        }
+
+        // ─── 팝업 카드용으로 캐싱 ────────────────────────────
+        window.cachedWeatherData = response;
+
+    } catch(e) {
+        console.error("날씨 오류", e);
+    }
+}
 let currentStep = 0;
 const guideSteps = [
     { target: '#welcome-message', icon: '🌲', title: '탄소 저감량', desc: '실천으로 구한 지구의 무게입니다.<br>소나무 몇 그루를 심었는지 확인해 보세요.' },
